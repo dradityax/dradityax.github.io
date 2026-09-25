@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aditya X</title>
+<meta name="description" content="Aditya X">
+<link rel="canonical" href="https://dradityax.pages.dev/">
+<meta property="og:title" content="Aditya X">
+<meta property="og:description" content="Aditya X">
+<meta property="og:url" content="https://dradityax.pages.dev/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Aditya X">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Aditya X","url":"https://dradityax.pages.dev/"}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    min-height:100svh;
+    display:flex; align-items:center; justify-content:center;
+    background:#faf8f3;
+    background-image:radial-gradient(circle at 50% 40%, #fffdf8 0%, #faf8f3 60%, #f3eee3 100%);
+    font-family:Georgia, serif;
+    overflow:hidden;
+  }
+  main { text-align:center; padding:2rem; }
+  .sig {
+    font-family:'Great Vibes', cursive;
+    font-size:clamp(4.5rem, 17vw, 9rem);
+    line-height:1.1;
+    color:#191713;
+    opacity:0;
+    filter:blur(10px);
+    animation:reveal 5s ease-out 0.4s forwards, floaty 14s ease-in-out 6s infinite;
+  }
+  .sig .sheen {
+    background:linear-gradient(100deg, #191713 40%, #6b6257 50%, #191713 60%);
+    background-size:220% 100%;
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent;
+    animation:sheen 11s ease-in-out 7s infinite;
+  }
+  @keyframes reveal {
+    to { opacity:1; filter:blur(0); }
+  }
+  @keyframes floaty {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(-7px); }
+  }
+  @keyframes sheen {
+    0%,100% { background-position:120% 0; }
+    50% { background-position:-20% 0; }
+  }
+  .flourish { width:min(420px, 72vw); height:44px; margin:-0.4rem auto 0; overflow:visible; }
+  .flourish path {
+    fill:none; stroke:#8a3b2e; stroke-width:2.4; stroke-linecap:round;
+    stroke-dasharray:640; stroke-dashoffset:640;
+    animation:draw 6s ease-in-out 3.2s forwards;
+    opacity:0.9;
+  }
+  @keyframes draw { to { stroke-dashoffset:0; } }
+  .tag {
+    margin-top:1.6rem;
+    font-size:0.82rem; letter-spacing:0.42em; text-transform:uppercase;
+    color:#8b8378;
+    opacity:0;
+    animation:reveal 4s ease-out 5.5s forwards;
+  }
+  .ghost {
+    position:fixed; left:0; right:0; bottom:0;
+    opacity:0; pointer-events:none;
+    font-size:1px; line-height:1;
+  }
+  .ghost a { color:inherit; text-decoration:none; }
+  @media (prefers-reduced-motion: reduce) {
+    .sig, .sig .sheen, .flourish path, .tag { animation:none; opacity:1; filter:none; }
+    .flourish path { stroke-dashoffset:0; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="sig" aria-label="Aditya X"><span class="sheen">Aditya X</span></div>
+  <svg class="flourish" viewBox="0 0 420 44" aria-hidden="true">
+    <path d="M12 30 C 90 8, 150 40, 215 24 S 340 10, 408 28" />
+  </svg>
+  <p class="tag">he is your friend</p>
+</main>
+<nav class="ghost" aria-label="hidden">
+  <a href="https://instagram.com/dradityax" rel="me">Instagram</a>
+  <a href="https://x.com/DrAdityaX" rel="me">X</a>
+  <a href="https://youtube.com/@dradityax" rel="me">YouTube</a>
+  <a href="https://github.com/dradityax" rel="me">GitHub</a>
+  <a href="mailto:dradityax@gmail.com" rel="me">Email</a>
+</nav>
+</body>
+</html>
