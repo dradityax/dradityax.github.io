@@ -4,27 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AX Playground — Aditya X</title>
-<meta name="description" content="A tiny original game by Aditya X — move the mascot, leave footprints.">
+<meta name="description" content="A tiny original game by Aditya X — move the mascot, swipe to look around.">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { height:100%; overflow:hidden; }
   body { background:#f4f1ea; font-family:Inter, system-ui, -apple-system, sans-serif; -webkit-user-select:none; user-select:none; touch-action:none; }
-  canvas.webgl { position:fixed; top:0; left:0; display:block; }
+  canvas.webgl { position:fixed; top:0; left:0; display:block; touch-action:none; }
   .brand { position:fixed; top:1.1rem; left:1.25rem; display:flex; align-items:center; gap:.5rem; text-decoration:none; z-index:10; }
   .monogram { width:2rem; height:2rem; border-radius:.6rem; background:linear-gradient(135deg,#ff6a3d,#c22e12); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.8rem; color:#fff; }
   .brand-name { color:#1a1a1a; font-weight:700; letter-spacing:-.02em; font-size:.95rem; }
   .tag { position:fixed; top:1.35rem; right:1.25rem; font-size:.7rem; color:rgba(0,0,0,.45); letter-spacing:.18em; text-transform:uppercase; z-index:10; }
-  .hint { position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%); color:rgba(0,0,0,.5); font-size:.8rem; letter-spacing:.04em; z-index:10; pointer-events:none; text-align:center; padding:0 1rem; transition:opacity 1s; }
+  .hint { position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%); color:rgba(0,0,0,.5); font-size:.8rem; letter-spacing:.04em; z-index:10; pointer-events:none; text-align:center; padding:0 1rem; transition:opacity 1s; white-space:nowrap; }
   .title-card { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; z-index:10; pointer-events:none; transition:opacity 1.2s; }
   .title-card h1 { color:#1a1a1a; font-size:clamp(1.6rem,6vw,2.6rem); font-weight:800; letter-spacing:-.03em; }
   .title-card h1 span { color:#f13343; }
   .title-card p { color:rgba(0,0,0,.55); margin-top:.5rem; font-size:.9rem; }
-  .joy { position:fixed; left:1.4rem; bottom:1.4rem; width:124px; height:124px; border-radius:50%; z-index:11; display:none;
+  .joy { position:fixed; right:1.4rem; bottom:1.4rem; width:124px; height:124px; border-radius:50%; z-index:11; display:none;
     background:rgba(255,255,255,.5); border:1px solid rgba(0,0,0,.12);
     backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); touch-action:none;
     box-shadow:0 6px 24px rgba(0,0,0,.08); }
   .joy .knob { position:absolute; left:50%; top:50%; width:54px; height:54px; margin:-27px 0 0 -27px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #ffffff, #e8e8e8);
+    background:radial-gradient(circle at 35% 30%, #ffffff, #e2e2e2);
     border:1px solid rgba(0,0,0,.1); box-shadow:0 4px 14px rgba(0,0,0,.18); }
   body.touch .joy { display:block; }
   body.touch .hint.desktop { display:none; }
@@ -38,10 +38,10 @@
 </head>
 <body>
   <a class="brand" href="/"><span class="monogram">AX</span><span class="brand-name">Aditya X</span></a>
-  <span class="tag">Playground v2</span>
-  <div class="title-card" id="titleCard"><h1>Meet the <span>Intern</span></h1><p>Move him around — he leaves footprints.</p></div>
-  <div class="hint desktop" id="hintD">WASD / Arrow keys to walk</div>
-  <div class="hint mobile" id="hintM">Drag the joystick to walk</div>
+  <span class="tag">Playground v3</span>
+  <div class="title-card" id="titleCard"><h1>Meet the <span>Intern</span></h1><p>Joystick to walk · swipe anywhere to look around.</p></div>
+  <div class="hint desktop" id="hintD">WASD to walk · drag mouse to rotate camera</div>
+  <div class="hint mobile" id="hintM">Right joystick to walk · swipe screen to look around</div>
   <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
   <div class="err" id="err">WebGL isn&rsquo;t available on this device, so the game can&rsquo;t start.</div>
 
@@ -51,7 +51,6 @@ import * as THREE from 'three';
 if (!window.WebGLRenderingContext) { document.getElementById('err').style.display = 'flex'; throw new Error('no webgl'); }
 if ('ontouchstart' in window) document.body.classList.add('touch');
 
-/* ---------- renderer / scene / camera ---------- */
 const renderer = new THREE.WebGLRenderer({ antialias:true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -66,7 +65,6 @@ scene.background = new THREE.Color(PAPER);
 scene.fog = new THREE.Fog(PAPER, 26, 62);
 const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 120);
 
-/* ---------- lights ---------- */
 scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c2, 0.75));
 const sun = new THREE.DirectionalLight(0xfff6e8, 1.5);
 sun.position.set(9, 15, 7);
@@ -81,7 +79,7 @@ const rim = new THREE.DirectionalLight(0xf13343, 0.3);
 rim.position.set(-9, 6, -9);
 scene.add(rim);
 
-/* ---------- room (light) ---------- */
+/* ---------- room ---------- */
 const RW = 30, RD = 20, WH = 6;
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(RW, RD),
@@ -104,7 +102,6 @@ wall(RW, WH, 0, WH/2, -RD/2, 0);
 wall(RD, WH, -RW/2, WH/2, 0, Math.PI/2);
 wall(RD, WH,  RW/2, WH/2, 0, Math.PI/2);
 
-// red accent strip on back wall
 const strip = new THREE.Mesh(
   new THREE.BoxGeometry(RW, 0.12, 0.06),
   new THREE.MeshStandardMaterial({ color:0xf13343, emissive:0xf13343, emissiveIntensity:0.55 })
@@ -135,27 +132,35 @@ function boardTexture(label){
   scene.add(grp);
 });
 
-/* ---------- the mascot: black silhouette Intern ---------- */
+/* ---------- mascot: black silhouette character with limbs ---------- */
 const intern = new THREE.Group();
-const black = new THREE.MeshStandardMaterial({ color:0x141414, roughness:0.65 });
+const black = new THREE.MeshStandardMaterial({ color:0x161616, roughness:0.6 });
 const whiteM = new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.4 });
 
-const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.42, 0.55, 8, 20), black);
-body.position.y = 1.0; intern.add(body);
-const coat = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.62, 0.8, 20), black);
-coat.position.y = 0.55; intern.add(coat);
-const eyeGeo = new THREE.SphereGeometry(0.075, 12, 12);
-const eyeL = new THREE.Mesh(eyeGeo, whiteM); eyeL.position.set(-0.16, 1.5, 0.36);
-const eyeR = new THREE.Mesh(eyeGeo, whiteM); eyeR.position.set(0.16, 1.5, 0.36);
+const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 0.42, 8, 18), black);
+torso.position.y = 1.08; intern.add(torso);
+const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 24, 18), black);
+head.position.y = 1.66; intern.add(head);
+const eyeGeo = new THREE.SphereGeometry(0.06, 12, 12);
+const eyeL = new THREE.Mesh(eyeGeo, whiteM); eyeL.position.set(-0.11, 1.7, 0.26);
+const eyeR = new THREE.Mesh(eyeGeo, whiteM); eyeR.position.set(0.11, 1.7, 0.26);
 intern.add(eyeL, eyeR);
-const steth = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.045, 10, 24, Math.PI), black);
-steth.position.set(0, 1.08, 0.22); steth.rotation.x = -0.5; steth.rotation.z = Math.PI;
-intern.add(steth);
+
+function limb(r, len, x, y){
+  const pivot = new THREE.Group(); pivot.position.set(x, y, 0);
+  const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 6, 12), black);
+  m.position.y = -(len/2 + r*0.5); pivot.add(m); intern.add(pivot); return pivot;
+}
+const armL = limb(0.085, 0.34, -0.4, 1.32);
+const armR = limb(0.085, 0.34,  0.4, 1.32);
+const legL = limb(0.105, 0.4, -0.16, 0.78);
+const legR = limb(0.105, 0.4,  0.16, 0.78);
+
 intern.traverse(o => { if (o.isMesh) o.castShadow = true; });
 intern.position.set(0, 0, 4);
 scene.add(intern);
 
-/* ---------- footprints (fade after a while) ---------- */
+/* ---------- footprints ---------- */
 const prints = [];
 const printGeo = new THREE.CircleGeometry(0.11, 12);
 for (let i = 0; i < 48; i++){
@@ -172,7 +177,7 @@ function spawnPrint(x, z, facing){
   p.life = 2.4; p.m.visible = true; printSide *= -1;
 }
 
-/* ---------- input: keys + joystick ---------- */
+/* ---------- input: keys + joystick (right) ---------- */
 const keys = {};
 addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
 addEventListener('keyup',   e => { keys[e.key.toLowerCase()] = false; });
@@ -189,21 +194,33 @@ function joyMove(e){
   knob.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
   joy.dx = dx/max; joy.dy = dy/max;
 }
-joyEl.addEventListener('pointerdown', e => { joyId = e.pointerId; joyEl.setPointerCapture(joyId); joyMove(e); });
+joyEl.addEventListener('pointerdown', e => { joyId = e.pointerId; joyEl.setPointerCapture(joyId); joyMove(e); e.stopPropagation(); });
 joyEl.addEventListener('pointermove', e => { if (e.pointerId === joyId) joyMove(e); });
 function joyEnd(e){ if (e.pointerId === joyId){ joyId = null; joy.dx = 0; joy.dy = 0; knob.style.transform = ''; } }
 joyEl.addEventListener('pointerup', joyEnd); joyEl.addEventListener('pointercancel', joyEnd);
 
+/* ---------- BGMI-style camera: swipe blank area to orbit ---------- */
+let camAngle = 0;
+const CAM_R = 8.8, CAM_H = 6.4;
+let dragId = null, lastX = 0;
+const cvs = renderer.domElement;
+cvs.addEventListener('pointerdown', e => { dragId = e.pointerId; lastX = e.clientX; cvs.setPointerCapture(dragId); });
+cvs.addEventListener('pointermove', e => {
+  if (e.pointerId !== dragId) return;
+  camAngle -= (e.clientX - lastX) * 0.0055;
+  lastX = e.clientX;
+});
+function dragEnd(e){ if (e.pointerId === dragId) dragId = null; }
+cvs.addEventListener('pointerup', dragEnd); cvs.addEventListener('pointercancel', dragEnd);
+
 /* ---------- game loop ---------- */
 const vel = new THREE.Vector3();
-const camOffset = new THREE.Vector3(0, 6.4, 8.8);   // lower angle
-const camTarget = new THREE.Vector3();
 const clock = new THREE.Clock();
 let faceAngle = 0, distAcc = 0, elapsed = 0, started = false;
 
 setTimeout(() => {
   document.getElementById('titleCard').style.opacity = '0';
-  ['hintD','hintM'].forEach(id => { const el = document.getElementById(id); if (el) setTimeout(() => el.style.opacity = '0', 5000); });
+  ['hintD','hintM'].forEach(id => { const el = document.getElementById(id); if (el) setTimeout(() => el.style.opacity = '0', 6000); });
 }, 2600);
 
 function angleLerp(a, b, t){
@@ -217,29 +234,39 @@ function tick(){
   const dt = Math.min(clock.getDelta(), 0.05);
   elapsed += dt;
 
+  // camera-relative movement (joystick up = away from camera)
   let ix = ((keys['d']||keys['arrowright'])?1:0) - ((keys['a']||keys['arrowleft'])?1:0) + joy.dx;
   let iz = ((keys['s']||keys['arrowdown'])?1:0) - ((keys['w']||keys['arrowup'])?1:0) + joy.dy;
   const il = Math.hypot(ix, iz);
   if (il > 1){ ix/=il; iz/=il; }
+  const fx = -Math.sin(camAngle), fz = -Math.cos(camAngle);   // forward
+  const rx = Math.cos(camAngle),  rz = -Math.sin(camAngle);   // right
+  const mx = fx*(-iz) + rx*ix, mz = fz*(-iz) + rz*ix;
+
   const SPEED = 4.2;
   const k = 1 - Math.exp(-10*dt);
-  vel.x += (ix*SPEED - vel.x) * k;
-  vel.z += (iz*SPEED - vel.z) * k;
+  vel.x += (mx*SPEED - vel.x) * k;
+  vel.z += (mz*SPEED - vel.z) * k;
 
   intern.position.x = THREE.MathUtils.clamp(intern.position.x + vel.x*dt, -RW/2+1.2, RW/2-1.2);
   intern.position.z = THREE.MathUtils.clamp(intern.position.z + vel.z*dt, -RD/2+1.2, RD/2-1.2);
 
   const spd = Math.hypot(vel.x, vel.z);
+  const walkAmt = Math.min(1, spd/3);
   if (spd > 0.4){
     faceAngle = angleLerp(faceAngle, Math.atan2(vel.x, vel.z), 1 - Math.exp(-12*dt));
     intern.rotation.y = faceAngle;
-    intern.position.y = Math.abs(Math.sin(elapsed*11)) * 0.07;
-    intern.rotation.z = Math.sin(elapsed*11) * 0.03;
+    const sw = Math.sin(elapsed*11) * 0.75 * walkAmt;
+    armL.rotation.x = sw; armR.rotation.x = -sw;
+    legL.rotation.x = -sw; legR.rotation.x = sw;
+    intern.position.y = Math.abs(Math.cos(elapsed*11)) * 0.06 * walkAmt;
     distAcc += spd * dt;
     if (distAcc > 0.38){ spawnPrint(intern.position.x, intern.position.z, faceAngle); distAcc = 0; }
     if (!started){ started = true; document.getElementById('titleCard').style.opacity = '0'; }
   } else {
-    intern.position.y *= 0.9; intern.rotation.z *= 0.9;
+    armL.rotation.x *= 0.9; armR.rotation.x *= 0.9;
+    legL.rotation.x *= 0.9; legR.rotation.x *= 0.9;
+    intern.position.y *= 0.9;
   }
 
   for (const p of prints){
@@ -250,13 +277,17 @@ function tick(){
     }
   }
 
-  camTarget.set(intern.position.x + camOffset.x, camOffset.y, intern.position.z + camOffset.z);
-  camera.position.lerp(camTarget, 1 - Math.exp(-4*dt));
+  // follow camera at orbit angle
+  const cx = intern.position.x + Math.sin(camAngle)*CAM_R;
+  const cz = intern.position.z + Math.cos(camAngle)*CAM_R;
+  camera.position.x += (cx - camera.position.x) * (1 - Math.exp(-4*dt));
+  camera.position.y += (CAM_H - camera.position.y) * (1 - Math.exp(-4*dt));
+  camera.position.z += (cz - camera.position.z) * (1 - Math.exp(-4*dt));
   camera.lookAt(intern.position.x, 0.9, intern.position.z);
 
   renderer.render(scene, camera);
 }
-camera.position.set(0, 6.4, 12.8);
+camera.position.set(0, CAM_H, 4 + CAM_R);
 tick();
 
 addEventListener('resize', () => {
