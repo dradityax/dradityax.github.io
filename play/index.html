@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AX Playground — Aditya X</title>
+<meta name="description" content="A tiny original game by Aditya X — move the mascot, leave footprints.">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; overflow:hidden; }
+  body { background:#0b0b0d; font-family:Inter, system-ui, -apple-system, sans-serif; -webkit-user-select:none; user-select:none; touch-action:none; }
+  canvas.webgl { position:fixed; top:0; left:0; display:block; }
+  .brand { position:fixed; top:1.1rem; left:1.25rem; display:flex; align-items:center; gap:.5rem; text-decoration:none; z-index:10; }
+  .monogram { width:2rem; height:2rem; border-radius:.6rem; background:linear-gradient(135deg,#ff6a3d,#c22e12); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.8rem; color:#fff; }
+  .brand-name { color:#fff; font-weight:700; letter-spacing:-.02em; font-size:.95rem; }
+  .tag { position:fixed; top:1.35rem; right:1.25rem; font-size:.7rem; color:rgba(255,255,255,.45); letter-spacing:.18em; text-transform:uppercase; z-index:10; }
+  .hint { position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%); color:rgba(255,255,255,.5); font-size:.8rem; letter-spacing:.04em; z-index:10; pointer-events:none; text-align:center; padding:0 1rem; transition:opacity 1s; }
+  .title-card { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; z-index:10; pointer-events:none; transition:opacity 1.2s; }
+  .title-card h1 { color:#fff; font-size:clamp(1.6rem,6vw,2.6rem); font-weight:800; letter-spacing:-.03em; }
+  .title-card h1 span { background:linear-gradient(135deg,#ff6a3d,#c22e12); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .title-card p { color:rgba(255,255,255,.55); margin-top:.5rem; font-size:.9rem; }
+  /* joystick */
+  .joy { position:fixed; left:1.4rem; bottom:1.4rem; width:124px; height:124px; border-radius:50%; z-index:11; display:none;
+    background:radial-gradient(circle, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); touch-action:none; }
+  .joy .knob { position:absolute; left:50%; top:50%; width:54px; height:54px; margin:-27px 0 0 -27px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ff8a5c, #c22e12); box-shadow:0 4px 18px rgba(230,59,31,.5); }
+  body.touch .joy { display:block; }
+  body.touch .hint.desktop { display:none; }
+  .hint.mobile { display:none; }
+  body.touch .hint.mobile { display:block; }
+  .err { position:fixed; inset:0; display:none; align-items:center; justify-content:center; color:rgba(255,255,255,.7); z-index:20; text-align:center; padding:2rem; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+</head>
+<body>
+  <a class="brand" href="/"><span class="monogram">AX</span><span class="brand-name">Aditya X</span></a>
+  <span class="tag">Playground v1</span>
+  <div class="title-card" id="titleCard"><h1>Meet the <span>Intern</span></h1><p>Move him around — he leaves footprints.</p></div>
+  <div class="hint desktop" id="hintD">WASD / Arrow keys to walk</div>
+  <div class="hint mobile" id="hintM">Drag the joystick to walk</div>
+  <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
+  <div class="err" id="err">WebGL isn&rsquo;t available on this device, so the game can&rsquo;t start.</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+if (!window.WebGLRenderingContext) { document.getElementById('err').style.display = 'flex'; throw new Error('no webgl'); }
+if ('ontouchstart' in window) document.body.classList.add('touch');
+
+/* ---------- renderer / scene / camera ---------- */
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.domElement.className = 'webgl';
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0b0d);
+scene.fog = new THREE.Fog(0x0b0b0d, 26, 62);
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 120);
+
+/* ---------- lights ---------- */
+scene.add(new THREE.HemisphereLight(0x9aa0b5, 0x0b0b0d, 0.55));
+const sun = new THREE.DirectionalLight(0xfff1e0, 1.7);
+sun.position.set(9, 15, 7);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -17; sun.shadow.camera.right = 17;
+sun.shadow.camera.top = 17; sun.shadow.camera.bottom = -17;
+sun.shadow.camera.near = 2; sun.shadow.camera.far = 45;
+sun.shadow.bias = -0.0004;
+scene.add(sun);
+const rim = new THREE.DirectionalLight(0xe63b1f, 0.55);
+rim.position.set(-9, 6, -9);
+scene.add(rim);
+
+/* ---------- room ---------- */
+const RW = 30, RD = 20, WH = 6;
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(RW, RD),
+  new THREE.MeshStandardMaterial({ color:0x16161a, roughness:0.95 })
+);
+floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+
+// subtle rug circle at center
+const rug = new THREE.Mesh(
+  new THREE.CircleGeometry(4.2, 48),
+  new THREE.MeshStandardMaterial({ color:0x1d1d23, roughness:1 })
+);
+rug.rotation.x = -Math.PI/2; rug.position.y = 0.005; rug.receiveShadow = true; scene.add(rug);
+
+const wallMat = new THREE.MeshStandardMaterial({ color:0x1c1c22, roughness:0.9 });
+function wall(w, h, x, y, z, ry){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.4), wallMat);
+  m.position.set(x, y, z); m.rotation.y = ry; m.receiveShadow = true; scene.add(m); return m;
+}
+wall(RW, WH, 0, WH/2, -RD/2, 0);            // back
+wall(RD, WH, -RW/2, WH/2, 0, Math.PI/2);    // left
+wall(RD, WH,  RW/2, WH/2, 0, Math.PI/2);    // right
+
+// vermilion baseboard strip on back wall
+const strip = new THREE.Mesh(
+  new THREE.BoxGeometry(RW, 0.12, 0.06),
+  new THREE.MeshStandardMaterial({ color:0xe63b1f, emissive:0xe63b1f, emissiveIntensity:0.7 })
+);
+strip.position.set(0, 0.35, -RD/2 + 0.24); scene.add(strip);
+
+// framed boards on the back wall (canvas textures, original)
+function boardTexture(label){
+  const c = document.createElement('canvas'); c.width = 256; c.height = 340;
+  const g = c.getContext('2d');
+  g.fillStyle = '#101014'; g.fillRect(0,0,256,340);
+  g.strokeStyle = 'rgba(255,255,255,.14)'; g.lineWidth = 6; g.strokeRect(14,14,228,312);
+  g.fillStyle = '#e63b1f'; g.font = '900 92px Inter, sans-serif';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(label, 128, 158);
+  g.fillStyle = 'rgba(255,255,255,.35)'; g.font = '500 22px Inter, sans-serif';
+  g.fillText('chapter', 128, 248);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+['01','02','03','04'].forEach((label, i) => {
+  const grp = new THREE.Group();
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(2.1, 2.8, 0.12),
+    new THREE.MeshStandardMaterial({ color:0x2a2a31, roughness:0.6 }));
+  const art = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.4),
+    new THREE.MeshStandardMaterial({ map:boardTexture(label), roughness:0.85 }));
+  art.position.z = 0.07; grp.add(frame, art);
+  grp.position.set(-9 + i*6, 3.1, -RD/2 + 0.35);
+  scene.add(grp);
+});
+
+/* ---------- the mascot: the Intern ---------- */
+const intern = new THREE.Group();
+const cream = new THREE.MeshStandardMaterial({ color:0xf3e7d3, roughness:0.6 });
+const coatW = new THREE.MeshStandardMaterial({ color:0xf4f4f6, roughness:0.7 });
+const darkM = new THREE.MeshStandardMaterial({ color:0x232830, roughness:0.5 });
+
+const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.42, 0.55, 8, 20), cream);
+body.position.y = 1.0; intern.add(body);
+const coat = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.62, 0.8, 20), coatW);
+coat.position.y = 0.55; intern.add(coat);
+const eyeGeo = new THREE.SphereGeometry(0.075, 12, 12);
+const eyeL = new THREE.Mesh(eyeGeo, darkM); eyeL.position.set(-0.16, 1.5, 0.36);
+const eyeR = new THREE.Mesh(eyeGeo, darkM); eyeR.position.set(0.16, 1.5, 0.36);
+intern.add(eyeL, eyeR);
+// stethoscope drape
+const steth = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.045, 10, 24, Math.PI), darkM);
+steth.position.set(0, 1.08, 0.22); steth.rotation.x = -0.5; steth.rotation.z = Math.PI;
+intern.add(steth);
+intern.traverse(o => { if (o.isMesh) o.castShadow = true; });
+intern.position.set(0, 0, 4);
+scene.add(intern);
+
+/* ---------- footprints (fade after a while) ---------- */
+const prints = [];
+const printGeo = new THREE.CircleGeometry(0.11, 12);
+for (let i = 0; i < 48; i++){
+  const m = new THREE.Mesh(printGeo, new THREE.MeshBasicMaterial({ color:0x55555e, transparent:true, opacity:0 }));
+  m.rotation.x = -Math.PI/2; m.position.y = 0.015; m.visible = false;
+  scene.add(m); prints.push({ m, life:0 });
+}
+let printIdx = 0, printSide = 1;
+function spawnPrint(x, z, facing){
+  const p = prints[printIdx]; printIdx = (printIdx + 1) % prints.length;
+  const px = -Math.sin(facing), pz = -Math.cos(facing); // perpendicular
+  p.m.position.set(x + px * 0.16 * printSide, 0.015, z + pz * 0.16 * printSide);
+  p.m.rotation.z = -facing;
+  p.life = 2.4; p.m.visible = true; printSide *= -1;
+}
+
+/* ---------- input: keys + joystick ---------- */
+const keys = {};
+addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+addEventListener('keyup',   e => { keys[e.key.toLowerCase()] = false; });
+
+const joy = { dx:0, dy:0 };
+const joyEl = document.getElementById('joy'), knob = document.getElementById('knob');
+let joyId = null;
+function joyMove(e){
+  const r = joyEl.getBoundingClientRect();
+  const cx = r.left + r.width/2, cy = r.top + r.height/2;
+  let dx = e.clientX - cx, dy = e.clientY - cy;
+  const max = 42, d = Math.hypot(dx, dy);
+  if (d > max){ dx = dx/d*max; dy = dy/d*max; }
+  knob.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+  joy.dx = dx/max; joy.dy = dy/max;
+}
+joyEl.addEventListener('pointerdown', e => { joyId = e.pointerId; joyEl.setPointerCapture(joyId); joyMove(e); });
+joyEl.addEventListener('pointermove', e => { if (e.pointerId === joyId) joyMove(e); });
+function joyEnd(e){ if (e.pointerId === joyId){ joyId = null; joy.dx = 0; joy.dy = 0; knob.style.transform = ''; } }
+joyEl.addEventListener('pointerup', joyEnd); joyEl.addEventListener('pointercancel', joyEnd);
+
+/* ---------- game loop ---------- */
+const vel = new THREE.Vector3();
+const camOffset = new THREE.Vector3(0, 8.4, 9.4);
+const camTarget = new THREE.Vector3();
+const clock = new THREE.Clock();
+let faceAngle = 0, distAcc = 0, elapsed = 0, started = false;
+
+setTimeout(() => {
+  document.getElementById('titleCard').style.opacity = '0';
+  ['hintD','hintM'].forEach(id => { const el = document.getElementById(id); if (el) setTimeout(() => el.style.opacity = '0', 5000); });
+}, 2600);
+
+function angleLerp(a, b, t){
+  let d = (b - a) % (Math.PI*2);
+  if (d > Math.PI) d -= Math.PI*2; if (d < -Math.PI) d += Math.PI*2;
+  return a + d * t;
+}
+
+function tick(){
+  requestAnimationFrame(tick);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  elapsed += dt;
+
+  // input → world-space intent (screen up = -z)
+  let ix = ((keys['d']||keys['arrowright'])?1:0) - ((keys['a']||keys['arrowleft'])?1:0) + joy.dx;
+  let iz = ((keys['s']||keys['arrowdown'])?1:0) - ((keys['w']||keys['arrowup'])?1:0) + joy.dy;
+  const il = Math.hypot(ix, iz);
+  if (il > 1){ ix/=il; iz/=il; }
+  const SPEED = 4.2;
+  const k = 1 - Math.exp(-10*dt);
+  vel.x += (ix*SPEED - vel.x) * k;
+  vel.z += (iz*SPEED - vel.z) * k;
+
+  intern.position.x = THREE.MathUtils.clamp(intern.position.x + vel.x*dt, -RW/2+1.2, RW/2-1.2);
+  intern.position.z = THREE.MathUtils.clamp(intern.position.z + vel.z*dt, -RD/2+1.2, RD/2-1.2);
+
+  const spd = Math.hypot(vel.x, vel.z);
+  if (spd > 0.4){
+    faceAngle = angleLerp(faceAngle, Math.atan2(vel.x, vel.z), 1 - Math.exp(-12*dt));
+    intern.rotation.y = faceAngle;
+    intern.position.y = Math.abs(Math.sin(elapsed*11)) * 0.07;   // walk bob
+    intern.rotation.z = Math.sin(elapsed*11) * 0.03;             // waddle
+    distAcc += spd * dt;
+    if (distAcc > 0.38){ spawnPrint(intern.position.x, intern.position.z, faceAngle); distAcc = 0; }
+    if (!started){ started = true; document.getElementById('titleCard').style.opacity = '0'; }
+  } else {
+    intern.position.y *= 0.9; intern.rotation.z *= 0.9;
+  }
+
+  // footprints fade
+  for (const p of prints){
+    if (p.life > 0){
+      p.life -= dt;
+      p.m.material.opacity = Math.max(0, p.life/2.4) * 0.55;
+      if (p.life <= 0) p.m.visible = false;
+    }
+  }
+
+  // follow camera (the angle)
+  camTarget.set(intern.position.x + camOffset.x, camOffset.y, intern.position.z + camOffset.z);
+  camera.position.lerp(camTarget, 1 - Math.exp(-4*dt));
+  camera.lookAt(intern.position.x, 1.1, intern.position.z);
+
+  renderer.render(scene, camera);
+}
+camera.position.set(0, 8.4, 13.4);
+tick();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
