@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 — Aditya X</title>
+    <meta name="description" content="This page drifted off the map. — Aditya X" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: linear-gradient(to bottom, #100c0e, #251511);
+        color: #fff;
+        overflow: hidden;
+      }
+      .stage {
+        position: relative; width: 100%; height: 100vh; height: 100dvh;
+        overflow: hidden; display: flex; flex-direction: column;
+        user-select: none; -webkit-user-select: none;
+      }
+      /* ---------- giant 404 backdrop ---------- */
+      .backdrop {
+        position: absolute; inset: 0; pointer-events: none;
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0.9;
+        -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 95%);
+        mask-image: linear-gradient(to bottom, black 40%, transparent 95%);
+      }
+      .backdrop-inner { position: relative; display: flex; align-items: center; justify-content: center; }
+      .big404 {
+        color: #fff; font-weight: 900; line-height: 1; letter-spacing: -0.05em;
+        white-space: nowrap; font-size: clamp(200px, 48vw, 800px);
+        transform-origin: center; opacity: 0.16;
+      }
+      .sun {
+        position: absolute; border-radius: 9999px;
+        background: radial-gradient(circle at 35% 30%, #ff6a3d, #e63b1f 60%, #b8280f);
+        height: 22vh; width: clamp(120px, 20vw, 400px);
+        transform-origin: center;
+        box-shadow: 0 0 120px 30px rgba(230, 59, 31, 0.35);
+      }
+      @media (min-width: 640px) { .sun { height: 26vh; } }
+      @media (min-width: 768px) { .sun { height: 50vh; } }
+      /* ---------- cute lost mascot ---------- */
+      .mascot-wrap {
+        position: absolute; inset: 0; z-index: 10;
+        display: flex; align-items: center; justify-content: center;
+        pointer-events: none;
+      }
+      .mascot {
+        width: min(58vw, 300px); height: auto;
+        mix-blend-mode: screen;
+        margin-top: calc(-6vh - 40px);
+        filter: drop-shadow(0 10px 40px rgba(230, 59, 31, 0.35));
+        animation: floaty 4.5s ease-in-out infinite;
+      }
+      @media (min-width: 768px) { .mascot { width: min(30vw, 380px); } }
+      @keyframes floaty {
+        0%, 100% { transform: translateY(0) rotate(-2deg); }
+        50% { transform: translateY(-18px) rotate(2deg); }
+      }
+      /* ---------- header ---------- */
+      header {
+        position: relative; z-index: 20;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1rem 1rem;
+      }
+      @media (min-width: 640px) { header { padding: 1.25rem 1.5rem; } }
+      @media (min-width: 768px) { header { padding: 1.25rem 3rem; } }
+      .brand { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+      .monogram {
+        width: 2rem; height: 2rem; border-radius: 0.6rem;
+        background: linear-gradient(135deg, #ff6a3d, #c22e12);
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 900; font-size: 0.8rem; color: #fff; letter-spacing: -0.02em;
+        transition: transform 0.2s;
+      }
+      .brand:hover .monogram { transform: scale(1.08); }
+      .brand-name { color: #fff; font-weight: 700; font-size: 1.125rem; letter-spacing: -0.02em; margin-left: 0.25rem; }
+      @media (min-width: 640px) { .brand-name { font-size: 1.25rem; } }
+      .menu-btn {
+        display: flex; align-items: center; gap: 0.5rem;
+        padding: 0.5rem 1rem; border: none; border-radius: 9999px;
+        background: #e63b1f; color: #fff; cursor: pointer;
+        font-size: 0.875rem; font-weight: 500;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+        transition: opacity 0.2s, transform 0.1s;
+      }
+      @media (min-width: 640px) { .menu-btn { padding: 0.625rem 1.25rem; } }
+      .menu-btn:hover { opacity: 0.92; }
+      .menu-btn:active { transform: scale(0.95); }
+      .menu-btn .label { display: none; }
+      @media (min-width: 640px) { .menu-btn .label { display: inline; } }
+      /* ---------- bottom content ---------- */
+      main {
+        position: relative; z-index: 30; margin-top: auto;
+        padding: 0 1rem 2rem; display: flex; flex-direction: column;
+        align-items: center; text-align: center;
+      }
+      @media (min-width: 640px) { main { padding-bottom: 4rem; } }
+      main h1 {
+        color: #fff; font-weight: 500; font-size: 1.125rem;
+        margin-bottom: 0.75rem; text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+      }
+      @media (min-width: 640px) { main h1 { font-size: 1.25rem; margin-bottom: 1rem; } }
+      @media (min-width: 768px) { main h1 { font-size: 1.5rem; } }
+      main p.sub { color: rgba(255,255,255,0.55); font-size: 0.85rem; margin-bottom: 1.25rem; max-width: 26rem; }
+      .home-btn {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.75rem 1.5rem; border-radius: 9999px;
+        background: #e63b1f; color: #fff; text-decoration: none;
+        font-weight: 600; font-size: 0.875rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      @media (min-width: 640px) { .home-btn { padding: 1rem 2rem; font-size: 1rem; } }
+      .home-btn:hover { transform: scale(1.05); box-shadow: 0 6px 24px rgba(230,59,31,0.45); }
+      .home-btn:active { transform: scale(0.95); }
+      /* ---------- mobile menu overlay ---------- */
+      .overlay {
+        position: fixed; inset: 0; z-index: 50;
+        visibility: hidden; pointer-events: none;
+        transition: visibility 0.5s;
+      }
+      .overlay.open { visibility: visible; pointer-events: auto; }
+      .overlay .scrim {
+        position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        opacity: 0; transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1);
+      }
+      .overlay.open .scrim { opacity: 1; }
+      .panel {
+        position: absolute; top: 0; right: 0; height: 100%; width: 100%;
+        background: linear-gradient(135deg, #2a1410 0%, #120c0d 100%);
+        padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;
+        box-shadow: -8px 0 40px rgba(0,0,0,0.5);
+        transform: translateX(100%);
+        transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+      }
+      @media (min-width: 640px) { .panel { width: 380px; padding: 2rem; } }
+      .overlay.open .panel { transform: translateX(0); }
+      .panel-head {
+        display: flex; align-items: center; justify-content: space-between;
+        padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.12);
+      }
+      .close-btn {
+        width: 2.5rem; height: 2.5rem; border: none; border-radius: 9999px;
+        background: rgba(255,255,255,0.12); color: #fff; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: background 0.2s, transform 0.1s;
+      }
+      .close-btn:hover { background: rgba(255,255,255,0.22); }
+      .close-btn:active { transform: scale(0.95); }
+      .panel nav { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
+      .panel nav a {
+        padding: 1rem 1.5rem; font-size: 1.125rem; font-weight: 600; color: #fff;
+        text-decoration: none; border-radius: 1rem; background: rgba(255,255,255,0.07);
+        opacity: 0; transform: translateY(1rem);
+        transition: opacity 0.3s, transform 0.3s, background 0.2s;
+      }
+      .panel nav a:hover { background: rgba(255,255,255,0.14); }
+      .overlay.open .panel nav a { opacity: 1; transform: translateY(0); }
+      .overlay.open .panel nav a:nth-child(1) { transition-delay: 150ms; }
+      .overlay.open .panel nav a:nth-child(2) { transition-delay: 210ms; }
+      .panel-cta { padding: 1.5rem 0 0; opacity: 0; transform: translateY(1rem); transition: opacity 0.5s, transform 0.5s; }
+      .overlay.open .panel-cta { opacity: 1; transform: translateY(0); transition-delay: 450ms; }
+      .panel-cta a {
+        width: 100%; padding: 1rem; border-radius: 9999px; background: #fff;
+        color: #c22e12; font-weight: 600; font-size: 1rem; text-decoration: none;
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        transition: transform 0.2s;
+      }
+      .panel-cta a:hover { transform: scale(1.02); }
+      .panel-cta a:active { transform: scale(0.98); }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <!-- giant 404 + vermilion sun -->
+      <div class="backdrop">
+        <div class="backdrop-inner">
+          <div class="big404" id="big404">404</div>
+          <div class="sun" id="sun"></div>
+        </div>
+      </div>
+
+      <!-- cute lost mascot -->
+      <div class="mascot-wrap">
+        <img class="mascot" src="assets/lost-mascot.png" alt="A cute little lost creature" />
+      </div>
+
+      <!-- header -->
+      <header>
+        <a href="/" class="brand" aria-label="Aditya X — home">
+          <span class="monogram">AX</span>
+          <span class="brand-name">Aditya X</span>
+        </a>
+        <button type="button" class="menu-btn" id="openMenu" aria-label="Open menu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          <span class="label">Menu</span>
+        </button>
+      </header>
+
+      <!-- bottom content -->
+      <main>
+        <h1>Oops, this page wandered off.</h1>
+        <p class="sub">The trail ends here — but the story continues back home.</p>
+        <a href="/" class="home-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back to Home
+        </a>
+      </main>
+
+      <!-- menu overlay -->
+      <div class="overlay" id="overlay" aria-hidden="true">
+        <div class="scrim" id="scrim"></div>
+        <div class="panel">
+          <div>
+            <div class="panel-head">
+              <a href="/" class="brand" aria-label="Aditya X — home">
+                <span class="monogram">AX</span>
+                <span class="brand-name">Aditya X</span>
+              </a>
+              <button type="button" class="close-btn" id="closeMenu" aria-label="Close menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <nav>
+              <a href="/">Home</a>
+              <a href="/#about">About</a>
+            </nav>
+          </div>
+          <div class="panel-cta">
+            <a href="/">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              Back to Home
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var big = document.getElementById('big404');
+        var sun = document.getElementById('sun');
+        function updateScale() {
+          var h = big.offsetHeight;
+          if (h > 0) {
+            var s = window.innerHeight / h;
+            big.style.transform = 'scale(1.15, ' + (s * 1.4) + ')';
+            sun.style.transform = 'scale(1, ' + s + ')';
+          }
+        }
+        updateScale();
+        window.addEventListener('resize', updateScale);
+
+        var overlay = document.getElementById('overlay');
+        function setMenu(open) {
+          overlay.classList.toggle('open', open);
+          overlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+          document.body.style.overflow = open ? 'hidden' : '';
+        }
+        document.getElementById('openMenu').addEventListener('click', function () { setMenu(true); });
+        document.getElementById('closeMenu').addEventListener('click', function () { setMenu(false); });
+        document.getElementById('scrim').addEventListener('click', function () { setMenu(false); });
+        overlay.querySelectorAll('nav a, .panel-cta a').forEach(function (a) {
+          a.addEventListener('click', function () { setMenu(false); });
+        });
+      })();
+    </script>
+  </body>
+</html>
