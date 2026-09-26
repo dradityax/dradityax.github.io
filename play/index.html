@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AX Playground — Aditya X</title>
-<meta name="description" content="A tiny original game by Aditya X — move the mascot, swipe to look around.">
+<meta name="description" content="A tiny original game by Aditya X — a living ink scribble in a cozy house.">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { height:100%; overflow:hidden; }
@@ -38,10 +38,10 @@
 </head>
 <body>
   <a class="brand" href="/"><span class="monogram">AX</span><span class="brand-name">Aditya X</span></a>
-  <span class="tag">Playground v3</span>
-  <div class="title-card" id="titleCard"><h1>Meet the <span>Intern</span></h1><p>Joystick to walk · swipe anywhere to look around.</p></div>
-  <div class="hint desktop" id="hintD">WASD to walk · drag mouse to rotate camera</div>
-  <div class="hint mobile" id="hintM">Right joystick to walk · swipe screen to look around</div>
+  <span class="tag">Playground v4</span>
+  <div class="title-card" id="titleCard"><h1>Meet the <span>Scribble</span></h1><p>A living ink doodle. Joystick to walk · swipe to look around.</p></div>
+  <div class="hint desktop" id="hintD">WASD to walk · drag to look around</div>
+  <div class="hint mobile" id="hintM">Right joystick to walk · swipe to look around</div>
   <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
   <div class="err" id="err">WebGL isn&rsquo;t available on this device, so the game can&rsquo;t start.</div>
 
@@ -62,103 +62,191 @@ document.body.appendChild(renderer.domElement);
 const PAPER = 0xf4f1ea;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(PAPER);
-scene.fog = new THREE.Fog(PAPER, 26, 62);
+scene.fog = new THREE.Fog(PAPER, 28, 64);
 const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 120);
 
-scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c2, 0.75));
+scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c2, 0.8));
 const sun = new THREE.DirectionalLight(0xfff6e8, 1.5);
 sun.position.set(9, 15, 7);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
-sun.shadow.camera.left = -17; sun.shadow.camera.right = 17;
-sun.shadow.camera.top = 17; sun.shadow.camera.bottom = -17;
-sun.shadow.camera.near = 2; sun.shadow.camera.far = 45;
+sun.shadow.camera.left = -18; sun.shadow.camera.right = 18;
+sun.shadow.camera.top = 18; sun.shadow.camera.bottom = -18;
+sun.shadow.camera.near = 2; sun.shadow.camera.far = 48;
 sun.shadow.bias = -0.0004;
 scene.add(sun);
-const rim = new THREE.DirectionalLight(0xf13343, 0.3);
+const rim = new THREE.DirectionalLight(0xf13343, 0.28);
 rim.position.set(-9, 6, -9);
 scene.add(rim);
 
+/* ---------- helpers ---------- */
+function bx(w,h,d,color,x,y,z,ry=0,parent=scene){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d),
+    new THREE.MeshStandardMaterial({ color, roughness:0.85 }));
+  m.position.set(x,y,z); m.rotation.y = ry;
+  m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+function cyl(rt,rb,h,color,x,y,z,seg=20,parent=scene){
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),
+    new THREE.MeshStandardMaterial({ color, roughness:0.8 }));
+  m.position.set(x,y,z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+}
+
 /* ---------- room ---------- */
 const RW = 30, RD = 20, WH = 6;
-const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(RW, RD),
-  new THREE.MeshStandardMaterial({ color:0xe9e4d6, roughness:0.95 })
-);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(RW, RD),
+  new THREE.MeshStandardMaterial({ color:0xe9e4d6, roughness:0.95 }));
 floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
 
-const rug = new THREE.Mesh(
-  new THREE.CircleGeometry(4.2, 48),
-  new THREE.MeshStandardMaterial({ color:0xded6c2, roughness:1 })
-);
-rug.rotation.x = -Math.PI/2; rug.position.y = 0.005; rug.receiveShadow = true; scene.add(rug);
+const rug = new THREE.Mesh(new THREE.CircleGeometry(4.4, 48),
+  new THREE.MeshStandardMaterial({ color:0xded6c2, roughness:1 }));
+rug.rotation.x = -Math.PI/2; rug.position.set(0, 0.005, 2); rug.receiveShadow = true; scene.add(rug);
 
 const wallMat = new THREE.MeshStandardMaterial({ color:0xefece2, roughness:0.9 });
-function wall(w, h, x, y, z, ry){
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.4), wallMat);
-  m.position.set(x, y, z); m.rotation.y = ry; m.receiveShadow = true; scene.add(m); return m;
+function wall(w,h,x,y,z,ry){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,0.4), wallMat);
+  m.position.set(x,y,z); m.rotation.y = ry; m.receiveShadow = true; scene.add(m);
 }
 wall(RW, WH, 0, WH/2, -RD/2, 0);
 wall(RD, WH, -RW/2, WH/2, 0, Math.PI/2);
 wall(RD, WH,  RW/2, WH/2, 0, Math.PI/2);
 
-const strip = new THREE.Mesh(
-  new THREE.BoxGeometry(RW, 0.12, 0.06),
-  new THREE.MeshStandardMaterial({ color:0xf13343, emissive:0xf13343, emissiveIntensity:0.55 })
-);
+const strip = new THREE.Mesh(new THREE.BoxGeometry(RW, 0.12, 0.06),
+  new THREE.MeshStandardMaterial({ color:0xf13343, emissive:0xf13343, emissiveIntensity:0.55 }));
 strip.position.set(0, 0.35, -RD/2 + 0.24); scene.add(strip);
 
+/* ---------- cozy interior ---------- */
+// sofa (left)
+const sofa = new THREE.Group();
+{
+  const c = 0xd8cdb6, cd = 0xc9bc9f;
+  const seat = bx(2.6,0.55,1.1,c,0,0.45,0,0,sofa);
+  bx(2.6,0.95,0.32,c,0,1.05,-0.42,0,sofa);
+  bx(0.32,0.8,1.1,c,-1.16,0.8,0,0,sofa); bx(0.32,0.8,1.1,c,1.16,0.8,0,0,sofa);
+  bx(1.1,0.2,0.95,cd,-0.6,0.82,0.02,0,sofa); bx(1.1,0.2,0.95,cd,0.6,0.82,0.02,0,sofa);
+  bx(0.5,0.5,0.16,0xf13343,-0.6,1.15,-0.28,0.2,sofa); // red cushion!
+  sofa.position.set(-11, 0, -3.5); sofa.rotation.y = Math.PI/2; scene.add(sofa);
+}
+// coffee table
+cyl(0.05,0.05,0.45,0x8a6f52,-8.6,0.22,-3.9); cyl(0.05,0.05,0.45,0x8a6f52,-7.4,0.22,-3.9);
+cyl(0.05,0.05,0.45,0x8a6f52,-8.6,0.22,-3.1); cyl(0.05,0.05,0.45,0x8a6f52,-7.4,0.22,-3.1);
+bx(1.7,0.09,1.0,0xa5825e,-8,0.5,-3.5);
+// floor lamp (right corner) + warm light
+cyl(0.28,0.32,0.08,0x3a3a3a,11.5,0.04,-6.5);
+cyl(0.05,0.05,2.3,0x3a3a3a,11.5,1.2,-6.5);
+{
+  const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.52,0.55,20,1,true),
+    new THREE.MeshStandardMaterial({ color:0xf5ead0, roughness:0.7, side:THREE.DoubleSide }));
+  shade.position.set(11.5,2.5,-6.5); shade.castShadow = true; scene.add(shade);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.09,12,12),
+    new THREE.MeshStandardMaterial({ color:0xffe2ae, emissive:0xffc46b, emissiveIntensity:2.2 }));
+  bulb.position.set(11.5,2.38,-6.5); scene.add(bulb);
+  const pl = new THREE.PointLight(0xffd9a0, 18, 16, 2);
+  pl.position.set(11.5,2.3,-6.5); scene.add(pl);
+}
+// bookshelf (back wall right)
+{
+  const g = new THREE.Group(); const wood = 0x9a7b58;
+  bx(0.12,3.0,0.55,wood,-1.05,1.5,0,0,g); bx(0.12,3.0,0.55,wood,1.05,1.5,0,0,g);
+  bx(2.22,0.12,0.55,wood,0,2.94,0,0,g); bx(2.22,0.12,0.55,wood,0,0.12,0,0,g);
+  const bookCols = [0xf13343,0x3a6ea5,0x4a9e6b,0xe8b93c,0x7a5fa0,0xd97b3f];
+  [0.75, 1.55, 2.35].forEach(sy => {
+    bx(1.98,0.08,0.5,wood,0,sy,0,0,g);
+    let bx0 = -0.88;
+    while (bx0 < 0.8){
+      const bw = 0.1 + Math.random()*0.09, bh = 0.42 + Math.random()*0.24;
+      bx(bw,bh,0.34,bookCols[(Math.random()*bookCols.length)|0],bx0+bw/2,sy+0.04+bh/2,0,0,g);
+      bx0 += bw + 0.025;
+    }
+  });
+  g.position.set(9.5, 0, -9.3); scene.add(g);
+}
+// plant (back-left corner)
+cyl(0.34,0.26,0.5,0xb5654a,-12.5,0.25,-7.5);
+{
+  const leaf = new THREE.MeshStandardMaterial({ color:0x5f9159, roughness:0.9 });
+  [[0,0.95,0,0.42],[0.25,1.2,0.1,0.32],[-0.22,1.15,-0.08,0.3]].forEach(([x,y,z,r]) => {
+    const s = new THREE.Mesh(new THREE.SphereGeometry(r,14,14), leaf);
+    s.position.set(-12.5+x,y,-7.5+z); s.castShadow = true; scene.add(s);
+  });
+}
+// windows on side walls
+function window_(x, z, ry){
+  const g = new THREE.Group();
+  bx(0.16,2.5,3.4,0xffffff,0,0,0,0,g);
+  bx(0.1,0.08,3.0,0xffffff,0.02,0,0,0,g); bx(0.1,2.1,0.08,0xffffff,0.02,0,0,0,g);
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(3.0,2.1),
+    new THREE.MeshStandardMaterial({ color:0xd8e9f7, emissive:0xc4ddf2, emissiveIntensity:0.5 }));
+  glass.position.set(0.02,0,0); glass.rotation.y = Math.PI/2; g.add(glass);
+  g.position.set(x,3.3,z); g.rotation.y = ry; scene.add(g);
+}
+window_(-14.7,-4,Math.PI/2); window_(-14.7,4,Math.PI/2);
+window_(14.7,-4,-Math.PI/2); window_(14.7,4,-Math.PI/2);
+// picture frames (chapters) on back wall
 function boardTexture(label){
   const c = document.createElement('canvas'); c.width = 256; c.height = 340;
   const g = c.getContext('2d');
   g.fillStyle = '#ffffff'; g.fillRect(0,0,256,340);
   g.strokeStyle = 'rgba(0,0,0,.16)'; g.lineWidth = 6; g.strokeRect(14,14,228,312);
   g.fillStyle = '#f13343'; g.font = '900 92px Inter, sans-serif';
-  g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillText(label, 128, 158);
-  g.fillStyle = 'rgba(0,0,0,.4)'; g.font = '500 22px Inter, sans-serif';
-  g.fillText('chapter', 128, 248);
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(label,128,158);
+  g.fillStyle = 'rgba(0,0,0,.4)'; g.font = '500 22px Inter, sans-serif'; g.fillText('chapter',128,248);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
-['01','02','03','04'].forEach((label, i) => {
+[-10.5,-5.5,-0.5,4.5].forEach(label => {
   const grp = new THREE.Group();
-  const frame = new THREE.Mesh(new THREE.BoxGeometry(2.1, 2.8, 0.12),
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(2.1,2.8,0.12),
     new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.6 }));
   frame.castShadow = true;
-  const art = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 2.4),
-    new THREE.MeshStandardMaterial({ map:boardTexture(label), roughness:0.85 }));
+  const art = new THREE.Mesh(new THREE.PlaneGeometry(1.8,2.4),
+    new THREE.MeshStandardMaterial({ map:boardTexture(String(label).replace('-','')), roughness:0.85 }));
   art.position.z = 0.07; grp.add(frame, art);
-  grp.position.set(-9 + i*6, 3.1, -RD/2 + 0.35);
-  scene.add(grp);
+  grp.position.set(label, 3.1, -9.45); scene.add(grp);
 });
 
-/* ---------- mascot: black silhouette character with limbs ---------- */
-const intern = new THREE.Group();
-const black = new THREE.MeshStandardMaterial({ color:0x161616, roughness:0.6 });
-const whiteM = new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.4 });
+/* ---------- furniture colliders ---------- */
+const colliders = [
+  { x:-11, z:-3.5, r:2.0 }, { x:-8, z:-3.5, r:1.15 },
+  { x:11.5, z:-6.5, r:0.6 }, { x:9.5, z:-9.0, r:1.7 },
+  { x:-12.5, z:-7.5, r:0.85 },
+];
 
-const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 0.42, 8, 18), black);
-torso.position.y = 1.08; intern.add(torso);
-const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 24, 18), black);
-head.position.y = 1.66; intern.add(head);
-const eyeGeo = new THREE.SphereGeometry(0.06, 12, 12);
-const eyeL = new THREE.Mesh(eyeGeo, whiteM); eyeL.position.set(-0.11, 1.7, 0.26);
-const eyeR = new THREE.Mesh(eyeGeo, whiteM); eyeR.position.set(0.11, 1.7, 0.26);
-intern.add(eyeL, eyeR);
-
-function limb(r, len, x, y){
-  const pivot = new THREE.Group(); pivot.position.set(x, y, 0);
-  const m = new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 6, 12), black);
-  m.position.y = -(len/2 + r*0.5); pivot.add(m); intern.add(pivot); return pivot;
+/* ---------- the mascot: living ink scribble ---------- */
+const scribbleMat = new THREE.LineBasicMaterial({ color:0x111111 });
+function scribbleMesh(rx, ry, rz, count, step){
+  const pts = [];
+  const p = new THREE.Vector3((Math.random()-.5)*.1,(Math.random()-.5)*.1,(Math.random()-.5)*.1);
+  for (let i=0;i<count;i++){
+    p.x += (Math.random()-.5)*step; p.y += (Math.random()-.5)*step; p.z += (Math.random()-.5)*step;
+    const l = Math.sqrt((p.x/rx)**2 + (p.y/ry)**2 + (p.z/rz)**2);
+    if (l > 1){ p.multiplyScalar(0.9/l); }
+    pts.push(p.x, p.y, p.z);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  const line = new THREE.Line(g, scribbleMat);
+  line.frustumCulled = false;
+  return line;
 }
-const armL = limb(0.085, 0.34, -0.4, 1.32);
-const armR = limb(0.085, 0.34,  0.4, 1.32);
-const legL = limb(0.105, 0.4, -0.16, 0.78);
-const legR = limb(0.105, 0.4,  0.16, 0.78);
-
-intern.traverse(o => { if (o.isMesh) o.castShadow = true; });
-intern.position.set(0, 0, 4);
-scene.add(intern);
+const scrib = new THREE.Group();
+const headS = scribbleMesh(0.34,0.34,0.34, 1500, 0.13); headS.position.y = 1.62; scrib.add(headS);
+const torsoS = scribbleMesh(0.26,0.34,0.22, 950, 0.11); torsoS.position.y = 1.02; scrib.add(torsoS);
+function scribLimb(x, y, r, len){
+  const pivot = new THREE.Group(); pivot.position.set(x, y, 0);
+  const s = scribbleMesh(r, len/2, r, 260, 0.07); s.position.y = -len/2;
+  pivot.add(s); scrib.add(pivot); return pivot;
+}
+const armL = scribLimb(-0.36, 1.28, 0.085, 0.42);
+const armR = scribLimb( 0.36, 1.28, 0.085, 0.42);
+const legL = scribLimb(-0.15, 0.74, 0.1, 0.5);
+const legR = scribLimb( 0.15, 0.74, 0.1, 0.5);
+// hidden solid core so the scribble casts a nice shadow
+const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.34, 1),
+  new THREE.MeshBasicMaterial({ color:0x111111 }));
+core.scale.set(0.85, 1.5, 0.75); core.position.y = 1.05; core.castShadow = true;
+scrib.add(core);
+scrib.position.set(0, 0, 5);
+scene.add(scrib);
 
 /* ---------- footprints ---------- */
 const prints = [];
@@ -172,12 +260,12 @@ let printIdx = 0, printSide = 1;
 function spawnPrint(x, z, facing){
   const p = prints[printIdx]; printIdx = (printIdx + 1) % prints.length;
   const px = -Math.sin(facing), pz = -Math.cos(facing);
-  p.m.position.set(x + px * 0.16 * printSide, 0.015, z + pz * 0.16 * printSide);
+  p.m.position.set(x + px*0.16*printSide, 0.015, z + pz*0.16*printSide);
   p.m.rotation.z = -facing;
   p.life = 2.4; p.m.visible = true; printSide *= -1;
 }
 
-/* ---------- input: keys + joystick (right) ---------- */
+/* ---------- input ---------- */
 const keys = {};
 addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
 addEventListener('keyup',   e => { keys[e.key.toLowerCase()] = false; });
@@ -199,7 +287,7 @@ joyEl.addEventListener('pointermove', e => { if (e.pointerId === joyId) joyMove(
 function joyEnd(e){ if (e.pointerId === joyId){ joyId = null; joy.dx = 0; joy.dy = 0; knob.style.transform = ''; } }
 joyEl.addEventListener('pointerup', joyEnd); joyEl.addEventListener('pointercancel', joyEnd);
 
-/* ---------- BGMI-style camera: swipe blank area to orbit ---------- */
+/* ---------- camera orbit (clamped inside the room) ---------- */
 let camAngle = 0;
 const CAM_R = 8.8, CAM_H = 6.4;
 let dragId = null, lastX = 0;
@@ -213,7 +301,7 @@ cvs.addEventListener('pointermove', e => {
 function dragEnd(e){ if (e.pointerId === dragId) dragId = null; }
 cvs.addEventListener('pointerup', dragEnd); cvs.addEventListener('pointercancel', dragEnd);
 
-/* ---------- game loop ---------- */
+/* ---------- loop ---------- */
 const vel = new THREE.Vector3();
 const clock = new THREE.Clock();
 let faceAngle = 0, distAcc = 0, elapsed = 0, started = false;
@@ -234,13 +322,12 @@ function tick(){
   const dt = Math.min(clock.getDelta(), 0.05);
   elapsed += dt;
 
-  // camera-relative movement (joystick up = away from camera)
   let ix = ((keys['d']||keys['arrowright'])?1:0) - ((keys['a']||keys['arrowleft'])?1:0) + joy.dx;
   let iz = ((keys['s']||keys['arrowdown'])?1:0) - ((keys['w']||keys['arrowup'])?1:0) + joy.dy;
   const il = Math.hypot(ix, iz);
   if (il > 1){ ix/=il; iz/=il; }
-  const fx = -Math.sin(camAngle), fz = -Math.cos(camAngle);   // forward
-  const rx = Math.cos(camAngle),  rz = -Math.sin(camAngle);   // right
+  const fx = -Math.sin(camAngle), fz = -Math.cos(camAngle);
+  const rx = Math.cos(camAngle),  rz = -Math.sin(camAngle);
   const mx = fx*(-iz) + rx*ix, mz = fz*(-iz) + rz*ix;
 
   const SPEED = 4.2;
@@ -248,25 +335,31 @@ function tick(){
   vel.x += (mx*SPEED - vel.x) * k;
   vel.z += (mz*SPEED - vel.z) * k;
 
-  intern.position.x = THREE.MathUtils.clamp(intern.position.x + vel.x*dt, -RW/2+1.2, RW/2-1.2);
-  intern.position.z = THREE.MathUtils.clamp(intern.position.z + vel.z*dt, -RD/2+1.2, RD/2-1.2);
+  scrib.position.x = THREE.MathUtils.clamp(scrib.position.x + vel.x*dt, -RW/2+1.2, RW/2-1.2);
+  scrib.position.z = THREE.MathUtils.clamp(scrib.position.z + vel.z*dt, -RD/2+1.2, RD/2-1.2);
+  for (const c of colliders){
+    const dx = scrib.position.x - c.x, dz = scrib.position.z - c.z;
+    const d = Math.hypot(dx, dz);
+    if (d < c.r && d > 0.001){ scrib.position.x = c.x + dx/d*c.r; scrib.position.z = c.z + dz/d*c.r; }
+  }
 
   const spd = Math.hypot(vel.x, vel.z);
   const walkAmt = Math.min(1, spd/3);
   if (spd > 0.4){
     faceAngle = angleLerp(faceAngle, Math.atan2(vel.x, vel.z), 1 - Math.exp(-12*dt));
-    intern.rotation.y = faceAngle;
-    const sw = Math.sin(elapsed*11) * 0.75 * walkAmt;
+    scrib.rotation.y = faceAngle;
+    const sw = Math.sin(elapsed*11) * 0.7 * walkAmt;
     armL.rotation.x = sw; armR.rotation.x = -sw;
     legL.rotation.x = -sw; legR.rotation.x = sw;
-    intern.position.y = Math.abs(Math.cos(elapsed*11)) * 0.06 * walkAmt;
+    scrib.position.y = Math.abs(Math.cos(elapsed*11)) * 0.06 * walkAmt;
     distAcc += spd * dt;
-    if (distAcc > 0.38){ spawnPrint(intern.position.x, intern.position.z, faceAngle); distAcc = 0; }
+    if (distAcc > 0.38){ spawnPrint(scrib.position.x, scrib.position.z, faceAngle); distAcc = 0; }
     if (!started){ started = true; document.getElementById('titleCard').style.opacity = '0'; }
   } else {
     armL.rotation.x *= 0.9; armR.rotation.x *= 0.9;
     legL.rotation.x *= 0.9; legR.rotation.x *= 0.9;
-    intern.position.y *= 0.9;
+    scrib.position.y *= 0.9;
+    scrib.rotation.z = Math.sin(elapsed*1.6) * 0.02; // idle sway
   }
 
   for (const p of prints){
@@ -277,17 +370,17 @@ function tick(){
     }
   }
 
-  // follow camera at orbit angle
-  const cx = intern.position.x + Math.sin(camAngle)*CAM_R;
-  const cz = intern.position.z + Math.cos(camAngle)*CAM_R;
+  // camera follows but NEVER leaves the room
+  const cx = THREE.MathUtils.clamp(scrib.position.x + Math.sin(camAngle)*CAM_R, -RW/2+1.5, RW/2-1.5);
+  const cz = THREE.MathUtils.clamp(scrib.position.z + Math.cos(camAngle)*CAM_R, -RD/2+1.5, RD/2-1.5);
   camera.position.x += (cx - camera.position.x) * (1 - Math.exp(-4*dt));
   camera.position.y += (CAM_H - camera.position.y) * (1 - Math.exp(-4*dt));
   camera.position.z += (cz - camera.position.z) * (1 - Math.exp(-4*dt));
-  camera.lookAt(intern.position.x, 0.9, intern.position.z);
+  camera.lookAt(scrib.position.x, 0.9, scrib.position.z);
 
   renderer.render(scene, camera);
 }
-camera.position.set(0, CAM_H, 4 + CAM_R);
+camera.position.set(0, CAM_H, 5 + CAM_R);
 tick();
 
 addEventListener('resize', () => {
