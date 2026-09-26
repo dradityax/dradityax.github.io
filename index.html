@@ -34,6 +34,14 @@
   .hint.mobile { display:none; }
   body.touch .hint.mobile { display:block; }
   body.ready .brand, body.ready .tag, body.ready .joy { opacity:1; }
+  .actions { position:fixed; left:1rem; bottom:1rem; display:flex; gap:.55rem; z-index:12;
+    opacity:0; transition:opacity 1s; pointer-events:none; }
+  body.ready .actions { opacity:1; pointer-events:auto; }
+  .actions button { width:3rem; height:3rem; border-radius:50%; border:1px solid rgba(0,0,0,.1);
+    background:rgba(255,255,255,.75); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    font-size:1.35rem; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.12); transition:transform .15s; }
+  .actions button:active { transform:scale(.88); }
+  .actions button.on { outline:2px solid #f13343; background:#fff; }
   body.ready .title-card, body.ready .hint { opacity:1; }
   .skip { position:fixed; bottom:1.4rem; right:1.4rem; z-index:12; background:rgba(255,255,255,.75); border:1px solid rgba(0,0,0,.12);
     color:#1a1a1a; font-size:.8rem; padding:.55rem 1rem; border-radius:2rem; cursor:pointer;
@@ -52,6 +60,12 @@
   <div class="hint desktop" id="hintD">WASD to walk · drag to orbit · drag ↕ for top view · walk out the door 🚪</div>
   <div class="hint mobile" id="hintM">Joystick to walk · swipe to orbit · ↕ for top view · walk out the door 🚪</div>
   <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
+  <div class="actions" id="actions">
+    <button data-a="sit" title="Betho">🪑</button>
+    <button data-a="dance" title="Naacho">💃</button>
+    <button data-a="eat" title="Khao">🍎</button>
+    <button data-a="play" title="Khelo">⚽</button>
+  </div>
   <button class="skip" id="skip">Skip intro →</button>
   <div class="err" id="err">WebGL isn&rsquo;t available on this device, so the house can&rsquo;t open.</div>
 
@@ -439,7 +453,7 @@ const solids = [
   { x0:-1.5,  z0:9.3,  x1:-1.05, z1:10.7 },
 ];
 
-/* ---------- Kalam: living ink scribble ---------- */
+/* ---------- living ink scribble character ---------- */
 const scribbleMat = new THREE.LineBasicMaterial({ color:0x111111 });
 function scribbleMesh(rx,ry,rz,count,step){
   const pts = []; const p = new THREE.Vector3((Math.random()-.5)*.1,(Math.random()-.5)*.1,(Math.random()-.5)*.1);
@@ -467,6 +481,23 @@ const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.34,1), new THREE.Mes
 core.scale.set(0.85,1.5,0.75); core.position.y = 1.05; core.castShadow = true; scrib.add(core);
 scrib.position.set(0,0,-1); scrib.visible = false;
 scene.add(scrib);
+// action props: apple + football
+const apple = new THREE.Group();
+{
+  const a = new THREE.Mesh(new THREE.SphereGeometry(0.16,14,14),
+    new THREE.MeshStandardMaterial({ color:0xe0393e, roughness:0.5 }));
+  a.castShadow = true; apple.add(a);
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,0.1,8),
+    new THREE.MeshStandardMaterial({ color:0x6b4a2f, roughness:0.9 }));
+  stem.position.y = 0.18; apple.add(stem);
+  const leafA = new THREE.Mesh(new THREE.SphereGeometry(0.05,8,8),
+    new THREE.MeshStandardMaterial({ color:0x5f9159, roughness:0.9 }));
+  leafA.position.set(0.06,0.2,0); leafA.scale.set(1.4,0.6,0.8); apple.add(leafA);
+}
+apple.visible = false; scene.add(apple);
+const ball = new THREE.Mesh(new THREE.SphereGeometry(0.22,16,16),
+  new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.55 }));
+ball.castShadow = true; ball.visible = false; scene.add(ball);
 
 /* ---------- footprints ---------- */
 const prints = []; const printGeo = new THREE.CircleGeometry(0.13,12);
@@ -511,6 +542,26 @@ cvs.addEventListener('pointermove', e=>{ if(e.pointerId!==dragId) return;
   lastX = e.clientX; lastY = e.clientY; });
 function dragEnd(e){ if(e.pointerId===dragId) dragId = null; }
 cvs.addEventListener('pointerup', dragEnd); cvs.addEventListener('pointercancel', dragEnd);
+
+/* ---------- visitor actions: sit · dance · eat · play ---------- */
+let action = null, actionT = 0;
+function setAction(a){
+  if (!introDone) return;
+  action = (action===a) ? null : a; actionT = 0;
+  document.querySelectorAll('#actions button').forEach(b=>b.classList.toggle('on', b.dataset.a===action));
+  apple.visible = (action==='eat'); ball.visible = (action==='play');
+  if (action==='eat') apple.scale.setScalar(1);
+  if (!action){
+    armL.rotation.z = 0; armR.rotation.z = 0; headS.position.y = 1.66;
+    scrib.rotation.y = faceAngle;
+  }
+}
+document.querySelectorAll('#actions button').forEach(b=>
+  b.addEventListener('click', ()=>setAction(b.dataset.a)));
+addEventListener('keydown', e=>{
+  const k = e.key.toLowerCase();
+  if (k>='1' && k<='4') setAction(['sit','dance','eat','play'][+k-1]);
+});
 
 /* ---------- intro cinematic ---------- */
 const INTRO = [
@@ -572,6 +623,7 @@ function tick(){
   let ix = ((keys['d']||keys['arrowright'])?1:0) - ((keys['a']||keys['arrowleft'])?1:0) + joy.dx;
   let iz = ((keys['s']||keys['arrowdown'])?1:0) - ((keys['w']||keys['arrowup'])?1:0) + joy.dy;
   const il = Math.hypot(ix,iz); if (il > 1){ ix/=il; iz/=il; }
+  if (il > 0.15 && action) setAction(null); // moving cancels any action
   const fx = -Math.sin(camAngle), fz = -Math.cos(camAngle);
   const rx = Math.cos(camAngle),  rz = -Math.sin(camAngle);
   const mx = fx*(-iz)+rx*ix, mz = fz*(-iz)+rz*ix;
@@ -606,6 +658,45 @@ function tick(){
   } else {
     armL.rotation.x *= 0.9; armR.rotation.x *= 0.9; legL.rotation.x *= 0.9; legR.rotation.x *= 0.9;
     scrib.position.y *= 0.9; scrib.rotation.z = Math.sin(elapsed*1.6)*0.02;
+  }
+  // Fracture's visitor demands: sit · dance · eat · play
+  if (action){ actionT += dt; }
+  if (action==='sit'){
+    legL.rotation.x = -1.35; legR.rotation.x = -1.35;
+    armL.rotation.x = -0.25; armR.rotation.x = -0.25;
+    scrib.position.y = -0.40; scrib.rotation.y = faceAngle;
+  } else if (action==='dance'){
+    const b = elapsed*7;
+    scrib.position.y = Math.abs(Math.sin(b))*0.32;
+    scrib.rotation.y = faceAngle + Math.sin(elapsed*2.1)*0.85;
+    armL.rotation.x = 0; armR.rotation.x = 0;
+    armL.rotation.z = 2.3+Math.sin(b)*0.45; armR.rotation.z = -2.3-Math.sin(b)*0.45;
+    legL.rotation.x = Math.sin(b)*0.55; legR.rotation.x = -Math.sin(b)*0.55;
+    headS.position.y = 1.66+Math.abs(Math.sin(b))*0.09;
+  } else if (action==='eat'){
+    const cyc = (actionT%1.15)/1.15, bite = Math.floor(actionT/1.15);
+    if (bite >= 3){ setAction(null); }
+    else {
+      const m = Math.sin(cyc*Math.PI);
+      apple.position.set(
+        scrib.position.x+Math.sin(faceAngle)*0.34, 1.02+m*0.58,
+        scrib.position.z+Math.cos(faceAngle)*0.34);
+      apple.rotation.y += dt*2;
+      armR.rotation.x = -0.35-m*1.15; armL.rotation.x = -0.15;
+      apple.scale.setScalar(Math.max(0.05, 1-bite*0.34));
+      headS.position.y = 1.66-m*0.06;
+    }
+  } else if (action==='play'){
+    const b = actionT*7;
+    ball.position.set(
+      scrib.position.x+Math.sin(faceAngle)*0.62, 0.30+Math.abs(Math.sin(b))*0.85,
+      scrib.position.z+Math.cos(faceAngle)*0.62);
+    ball.rotation.x += dt*7;
+    const kw = Math.sin(b);
+    legL.rotation.x = kw>0 ? -kw*1.25 : kw*0.15;
+    legR.rotation.x = kw<0 ? kw*1.25 : kw*0.15;
+    armL.rotation.z = 0.75; armR.rotation.z = -0.75;
+    scrib.position.y = Math.abs(Math.sin(b))*0.07;
   }
   for (const p of prints) if (p.life > 0){
     p.life -= dt; p.m.material.opacity = Math.max(0,p.life/2.4)*0.7;
