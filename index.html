@@ -15,10 +15,13 @@
   .brand-name { color:#1a1a1a; font-weight:700; letter-spacing:-.02em; font-size:.95rem; }
   .tag { position:fixed; top:1.35rem; right:1.25rem; font-size:.7rem; color:rgba(0,0,0,.45); letter-spacing:.18em; text-transform:uppercase; z-index:10; opacity:0; transition:opacity 1s; }
   .hint { position:fixed; bottom:1.4rem; left:50%; transform:translateX(-50%); color:rgba(0,0,0,.5); font-size:.8rem; letter-spacing:.04em; z-index:10; pointer-events:none; text-align:center; padding:0 1rem; transition:opacity 1s; white-space:nowrap; opacity:0; }
-  .title-card { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; z-index:10; pointer-events:none; transition:opacity 1.2s; opacity:0; }
-  .title-card h1 { color:#1a1a1a; font-size:clamp(1.6rem,6vw,2.6rem); font-weight:800; letter-spacing:-.03em; }
+  .title-card { position:fixed; top:4.4rem; left:50%; transform:translateX(-50%); text-align:center; z-index:10; pointer-events:none; transition:opacity 1.2s; opacity:0;
+    background:rgba(255,255,255,.72); border:1px solid rgba(0,0,0,.08); border-radius:1.4rem;
+    padding:.7rem 1.5rem; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    box-shadow:0 8px 28px rgba(0,0,0,.08); max-width:min(92vw,30rem); }
+  .title-card h1 { color:#1a1a1a; font-size:1.15rem; font-weight:700; letter-spacing:-.01em; }
   .title-card h1 span { color:#f13343; }
-  .title-card p { color:rgba(0,0,0,.55); margin-top:.5rem; font-size:.9rem; }
+  .title-card p { color:rgba(0,0,0,.55); margin-top:.25rem; font-size:.78rem; }
   .joy { position:fixed; right:1.4rem; bottom:1.4rem; width:124px; height:124px; border-radius:50%; z-index:11; display:none;
     background:rgba(255,255,255,.5); border:1px solid rgba(0,0,0,.12);
     backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); touch-action:none;
@@ -45,7 +48,7 @@
 <body>
   <a class="brand" href="/"><span class="monogram">AX</span><span class="brand-name">Aditya X</span></a>
   <span class="tag">Home · v1</span>
-  <div class="title-card" id="titleCard"><h1>Welcome <span>home</span> 🏠</h1><p>A living ink doodle lives here. Joystick to walk · swipe to look around.</p></div>
+  <div class="title-card" id="titleCard"><h1>Welcome <span>home</span> 🏠</h1><p>A little house on the internet — come in, look around.</p></div>
   <div class="hint desktop" id="hintD">WASD to walk · drag to orbit · drag ↕ for top view</div>
   <div class="hint mobile" id="hintM">Joystick to walk · swipe to orbit · ↕ for top view</div>
   <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
@@ -114,17 +117,26 @@ lawn.rotation.x = -Math.PI/2; lawn.position.y = -0.02; lawn.receiveShadow = true
 const RW = 30, RD = 20, WH = 6;
 // wooden floor
 const woodTex = canvasTex(512,512,(g)=>{
-  g.fillStyle = '#dcc49c'; g.fillRect(0,0,512,512);
-  for (let y=0;y<512;y+=64){ g.fillStyle = 'rgba(120,85,50,.28)'; g.fillRect(0,y,512,3);
-    for (let x=0;x<512;x+=128){ const off = ((y/64)%2)*64; g.fillRect((x+off)%512, y, 3, 64); } }
-  g.fillStyle = 'rgba(255,255,255,.06)';
-  for (let i=0;i<200;i++) g.fillRect(Math.random()*512, Math.random()*512, 2, 2);
+  g.fillStyle = '#d9c096'; g.fillRect(0,0,512,512);
+  for (let y=0;y<512;y+=86){
+    g.fillStyle = 'rgba(120,85,50,.25)'; g.fillRect(0,y,512,3);
+    g.fillStyle = 'rgba(120,85,50,.08)';
+    for (let i=0;i<6;i++) g.fillRect(0, y+8+Math.random()*70, 512, 1);
+    g.fillStyle = 'rgba(120,85,50,.2)'; g.fillRect(Math.random()*512, y, 3, 86);
+  }
 });
-woodTex.wrapS = woodTex.wrapT = THREE.RepeatWrapping; woodTex.repeat.set(6,4);
+woodTex.wrapS = woodTex.wrapT = THREE.RepeatWrapping; woodTex.repeat.set(4,2.5);
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(RW,RD), new THREE.MeshStandardMaterial({ map:woodTex, roughness:0.8 }));
 floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
 
-const rug = new THREE.Mesh(new THREE.CircleGeometry(4.4,48), new THREE.MeshStandardMaterial({ color:0xded6c2, roughness:1 }));
+const rugTex = canvasTex(512,512,(g)=>{
+  g.fillStyle = '#ded6c2'; g.fillRect(0,0,512,512);
+  g.strokeStyle = '#c9bda1'; g.lineWidth = 26;
+  g.beginPath(); g.arc(256,256,218,0,Math.PI*2); g.stroke();
+  g.strokeStyle = '#f13343'; g.lineWidth = 6;
+  g.beginPath(); g.arc(256,256,190,0,Math.PI*2); g.stroke();
+});
+const rug = new THREE.Mesh(new THREE.CircleGeometry(3.3,48), new THREE.MeshStandardMaterial({ map:rugTex, roughness:1 }));
 rug.rotation.x = -Math.PI/2; rug.position.set(0,0.005,2); rug.receiveShadow = true; scene.add(rug);
 
 const wallMat = new THREE.MeshStandardMaterial({ color:0xefece2, roughness:0.9 });
@@ -146,8 +158,8 @@ const bbMat = new THREE.MeshStandardMaterial({ color:0xf8f5ee, roughness:0.8 });
   b.position.set(x,0.14,z); scene.add(b);
 });
 // red accent strip
-const strip = new THREE.Mesh(new THREE.BoxGeometry(RW,0.12,0.06),
-  new THREE.MeshStandardMaterial({ color:0xf13343, emissive:0xf13343, emissiveIntensity:0.55 }));
+const strip = new THREE.Mesh(new THREE.BoxGeometry(RW,0.16,0.06),
+  new THREE.MeshStandardMaterial({ color:0xf13343, emissive:0xf13343, emissiveIntensity:0.3 }));
 strip.position.set(0,0.42,-RD/2+0.24); scene.add(strip);
 
 // door (pivot at hinge)
@@ -164,7 +176,7 @@ const doorPivot = new THREE.Group(); doorPivot.position.set(-1.1,0,RD/2); scene.
 [[-5],[5]].forEach(([x])=>{
   bx(0.24,2.5,3.2, 0xf8f5ee, x,3.4,RD/2);
   const glass = new THREE.Mesh(new THREE.PlaneGeometry(2.7,2.0),
-    new THREE.MeshStandardMaterial({ color:0xffe3b0, emissive:0xffc98a, emissiveIntensity:0.9 }));
+    new THREE.MeshStandardMaterial({ color:0xffe3b0, emissive:0xffc98a, emissiveIntensity:0.5 }));
   glass.position.set(x,3.4,RD/2+0.14); scene.add(glass);
 });
 // welcome plaque outside, by the door
@@ -246,6 +258,21 @@ cyl(0.34,0.26,0.5,0xb5654a,-12.5,0.25,-7.5);
     s.position.set(-12.5+x,y,-7.5+z); s.castShadow = true; scene.add(s);
   });
 }
+// floor cushions on the rug + a second plant for the empty corner
+[[1.8,3.4,0xf13343],[-1.7,3.1,0xe8b93c]].forEach(([x,z,c])=>{
+  const cu = new THREE.Mesh(new THREE.SphereGeometry(0.45,16,12),
+    new THREE.MeshStandardMaterial({ color:c, roughness:0.95 }));
+  cu.scale.set(1,0.45,1); cu.position.set(x,0.2,z);
+  cu.castShadow = true; cu.receiveShadow = true; scene.add(cu);
+});
+cyl(0.3,0.24,0.45,0xb5654a,12.8,0.22,5.5);
+{
+  const leaf2 = new THREE.MeshStandardMaterial({ color:0x5f9159, roughness:0.9 });
+  [[0,0.85,0,0.36],[0.2,1.05,0.08,0.26]].forEach(([x,y,z,r])=>{
+    const s = new THREE.Mesh(new THREE.SphereGeometry(r,14,14), leaf2);
+    s.position.set(12.8+x,y,5.5+z); s.castShadow = true; scene.add(s);
+  });
+}
 
 /* ---------- content as interior ---------- */
 // hero plaque (right wall)
@@ -283,9 +310,9 @@ chapters.forEach((line,i)=>{
     g.strokeStyle='rgba(0,0,0,.15)'; g.lineWidth=6; g.strokeRect(12,12,232,316);
     g.textAlign='center'; g.fillStyle='#f13343'; g.font='900 64px Inter,sans-serif';
     g.fillText('0'+(i+1),128,110);
-    g.fillStyle='rgba(0,0,0,.72)'; g.font='italic 500 25px Georgia,serif';
+    g.fillStyle='rgba(0,0,0,.8)'; g.font='italic 500 30px Georgia,serif';
     const words = line.split(' '); let ln='', y=180;
-    words.forEach(w=>{ if ((ln+' '+w).length>20){ g.fillText(ln,128,y); y+=34; ln=w; } else ln+=' '+w; });
+    words.forEach(w=>{ if ((ln+' '+w).length>18){ g.fillText(ln,128,y); y+=40; ln=w; } else ln+=' '+w; });
     g.fillText(ln,128,y);
     g.fillStyle='rgba(0,0,0,.35)'; g.font='500 20px Inter,sans-serif'; g.fillText('chapter',128,300);
   });
@@ -323,10 +350,10 @@ frame(1.7,2.3, canvasTex(256,340,(g)=>{
 {
   const tex = canvasTex(512,300,(g)=>{
     g.fillStyle='#fdfbf5'; g.fillRect(0,0,512,300);
-    g.fillStyle='#1a1a1a'; g.textAlign='left'; g.font='italic 500 27px Georgia,serif';
+    g.fillStyle='#1a1a1a'; g.textAlign='left'; g.font='italic 500 33px Georgia,serif';
     const t='Some people collect stamps. I collect systems — the ones inside the human body. The coat does not fit yet, and that is fine — the learning fits.';
-    const words=t.split(' '); let ln='',y=60;
-    words.forEach(w=>{ if ((ln+' '+w).length>38){ g.fillText(ln,36,y); y+=42; ln=w; } else ln+=' '+w; });
+    const words=t.split(' '); let ln='',y=64;
+    words.forEach(w=>{ if ((ln+' '+w).length>32){ g.fillText(ln,36,y); y+=48; ln=w; } else ln+=' '+w; });
     g.fillText(ln,36,y);
   });
   const pg = new THREE.MeshStandardMaterial({ map:tex, roughness:0.95 });
@@ -340,6 +367,7 @@ const colliders = [
   { x:-11, z:-3.5, r:2.0 }, { x:-8, z:-3.5, r:1.15 },
   { x:11.5, z:-6.5, r:0.6 }, { x:9.5, z:-9.0, r:1.7 },
   { x:-12.5, z:-7.5, r:0.85 },
+  { x:1.8, z:3.4, r:0.65 }, { x:-1.7, z:3.1, r:0.65 }, { x:12.8, z:5.5, r:0.7 },
 ];
 
 /* ---------- Kalam: living ink scribble ---------- */
@@ -357,7 +385,7 @@ function scribbleMesh(rx,ry,rz,count,step){
   const line = new THREE.Line(g, scribbleMat); line.frustumCulled = false; return line;
 }
 const scrib = new THREE.Group();
-const headS = scribbleMesh(0.34,0.34,0.34,1500,0.13); headS.position.y = 1.62; scrib.add(headS);
+const headS = scribbleMesh(0.38,0.38,0.38,1800,0.14); headS.position.y = 1.66; scrib.add(headS);
 const torsoS = scribbleMesh(0.26,0.34,0.22,950,0.11); torsoS.position.y = 1.02; scrib.add(torsoS);
 function scribLimb(x,y,r,len){
   const pivot = new THREE.Group(); pivot.position.set(x,y,0);
@@ -372,7 +400,7 @@ scrib.position.set(0,0,-1); scrib.visible = false;
 scene.add(scrib);
 
 /* ---------- footprints ---------- */
-const prints = []; const printGeo = new THREE.CircleGeometry(0.11,12);
+const prints = []; const printGeo = new THREE.CircleGeometry(0.13,12);
 for (let i=0;i<48;i++){
   const m = new THREE.Mesh(printGeo, new THREE.MeshBasicMaterial({ color:0xb3ab99, transparent:true, opacity:0 }));
   m.rotation.x = -Math.PI/2; m.position.y = 0.015; m.visible = false; scene.add(m); prints.push({ m, life:0 });
@@ -500,7 +528,7 @@ function tick(){
     scrib.position.y *= 0.9; scrib.rotation.z = Math.sin(elapsed*1.6)*0.02;
   }
   for (const p of prints) if (p.life > 0){
-    p.life -= dt; p.m.material.opacity = Math.max(0,p.life/2.4)*0.55;
+    p.life -= dt; p.m.material.opacity = Math.max(0,p.life/2.4)*0.7;
     if (p.life <= 0) p.m.visible = false;
   }
   const cx = THREE.MathUtils.clamp(scrib.position.x+Math.sin(camAngle)*CAM_R, -RW/2+1.5, RW/2-1.5);
