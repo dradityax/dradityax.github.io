@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mascot v1 — Aditya X</title>
+<meta name="description" content="Mascot v1 — an original experiment by Aditya X">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; }
+  body {
+    background:#0b0b0d; color:#fff;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100vh; min-height:100dvh; overflow:hidden;
+    -webkit-user-select:none; user-select:none;
+  }
+  .brand { position:fixed; top:1.25rem; left:1.5rem; display:flex; align-items:center; gap:.5rem; text-decoration:none; z-index:10; }
+  .monogram { width:2rem; height:2rem; border-radius:.6rem; background:linear-gradient(135deg,#ff6a3d,#c22e12); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:.8rem; color:#fff; }
+  .brand-name { color:#fff; font-weight:700; letter-spacing:-.02em; }
+  .tag { position:fixed; top:1.6rem; right:1.5rem; font-size:.72rem; color:rgba(255,255,255,.45); letter-spacing:.18em; text-transform:uppercase; z-index:10; }
+  .stage { display:flex; flex-direction:column; align-items:center; gap:2.2rem; padding:2rem; }
+  .tv { position:relative; width:min(78vw, 340px); animation: hover 5s ease-in-out infinite; }
+  @keyframes hover { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
+  .antenna { position:absolute; top:-62px; left:50%; width:2px; height:68px; background:#3a3a40; transform-origin:bottom; z-index:0; }
+  .antenna.left { transform:translateX(-50%) rotate(-24deg); }
+  .antenna.right { transform:translateX(-50%) rotate(24deg); }
+  .antenna::after { content:""; position:absolute; top:-6px; left:50%; width:10px; height:10px; border-radius:50%; background:#e63b1f; transform:translateX(-50%); box-shadow:0 0 12px rgba(230,59,31,.8); }
+  .tv-body {
+    background:linear-gradient(160deg, #2b2b31, #17171b 60%, #101014);
+    border-radius:28px; padding:26px 26px 20px; position:relative; z-index:1;
+    box-shadow:0 30px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .screen {
+    background:radial-gradient(ellipse at 50% 40%, #1e2f24, #0d120e 70%);
+    border-radius:18px; aspect-ratio:4/3; position:relative; overflow:hidden;
+    box-shadow:inset 0 0 40px rgba(0,0,0,.7);
+    display:flex; align-items:center; justify-content:center; gap:34px;
+  }
+  .screen::after {
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:2;
+    background:repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0,0,0,.25) 3px 4px);
+  }
+  .screen::before {
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:3;
+    background:linear-gradient(115deg, rgba(255,255,255,.09), transparent 40%);
+  }
+  .eye { width:44px; height:56px; background:#e8f5e9; border-radius:9px; position:relative; box-shadow:0 0 18px rgba(180,255,190,.35); transition:transform .12s ease; z-index:1; }
+  .pupil { position:absolute; width:18px; height:22px; background:#0a0f0a; border-radius:4px; left:50%; top:50%; transform:translate(-50%,-50%); }
+  .tv-controls { display:flex; align-items:center; justify-content:space-between; margin-top:16px; padding:0 4px; }
+  .led { width:10px; height:10px; border-radius:50%; background:#e63b1f; box-shadow:0 0 10px rgba(230,59,31,.9); animation:ledPulse 2.4s ease-in-out infinite; }
+  @keyframes ledPulse { 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+  .tv-label { font-size:.7rem; letter-spacing:.28em; color:rgba(255,255,255,.35); }
+  .knob { width:26px; height:26px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #4a4a52, #232328); box-shadow:inset 0 1px 2px rgba(255,255,255,.15); }
+  .caption { color:rgba(255,255,255,.5); font-size:.85rem; text-align:center; max-width:22rem; line-height:1.65; }
+  .caption b { color:#fff; font-weight:600; }
+  @media (prefers-reduced-motion: reduce){
+    .tv, .led { animation:none; }
+  }
+</style>
+</head>
+<body>
+  <a class="brand" href="/"><span class="monogram">AX</span><span class="brand-name">Aditya X</span></a>
+  <span class="tag">Mascot v1</span>
+
+  <div class="stage">
+    <div class="tv">
+      <div class="antenna left"></div>
+      <div class="antenna right"></div>
+      <div class="tv-body">
+        <div class="screen" id="screen">
+          <div class="eye" id="eyeL"><div class="pupil"></div></div>
+          <div class="eye" id="eyeR"><div class="pupil"></div></div>
+        </div>
+        <div class="tv-controls">
+          <div class="led"></div>
+          <div class="tv-label">AX-1</div>
+          <div class="knob"></div>
+        </div>
+      </div>
+    </div>
+    <p class="caption"><b>Say hi.</b> Move your cursor &mdash; it&rsquo;s watching. An original little experiment, v1.</p>
+  </div>
+
+<script>
+(function(){
+  var pupils = document.querySelectorAll('.pupil');
+  var eyes = [document.getElementById('eyeL'), document.getElementById('eyeR')];
+  var mx = window.innerWidth/2, my = window.innerHeight/2;
+  window.addEventListener('pointermove', function(e){ mx = e.clientX; my = e.clientY; });
+  function tick(){
+    for (var i = 0; i < pupils.length; i++){
+      var p = pupils[i];
+      var r = p.parentElement.getBoundingClientRect();
+      var cx = r.left + r.width/2, cy = r.top + r.height/2;
+      var dx = mx - cx, dy = my - cy;
+      var dist = Math.hypot(dx, dy) || 1;
+      var max = 10;
+      var step = Math.min(max, dist/12);
+      var ox = dx/dist * step, oy = dy/dist * step;
+      p.style.transform = 'translate(calc(-50% + ' + ox.toFixed(1) + 'px), calc(-50% + ' + oy.toFixed(1) + 'px))';
+    }
+    requestAnimationFrame(tick);
+  }
+  tick();
+  (function blink(){
+    setTimeout(function(){
+      eyes.forEach(function(e){ e.style.transform = 'scaleY(0.08)'; });
+      setTimeout(function(){
+        eyes.forEach(function(e){ e.style.transform = 'scaleY(1)'; });
+        blink();
+      }, 140);
+    }, 2200 + Math.random()*3200);
+  })();
+})();
+</script>
+</body>
+</html>
