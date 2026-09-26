@@ -45,9 +45,9 @@
 <body>
   <a class="brand" href="/"><span class="monogram">AX</span><span class="brand-name">Aditya X</span></a>
   <span class="tag">Home · v1</span>
-  <div class="title-card" id="titleCard"><h1>Meet <span>Kalam</span> 🖊️</h1><p>A living ink doodle. Joystick to walk · swipe to look around.</p></div>
-  <div class="hint desktop" id="hintD">WASD to walk · drag to look around</div>
-  <div class="hint mobile" id="hintM">Right joystick to walk · swipe to look around</div>
+  <div class="title-card" id="titleCard"><h1>Welcome <span>home</span> 🏠</h1><p>A living ink doodle lives here. Joystick to walk · swipe to look around.</p></div>
+  <div class="hint desktop" id="hintD">WASD to walk · drag to orbit · drag ↕ for top view</div>
+  <div class="hint mobile" id="hintM">Joystick to walk · swipe to orbit · ↕ for top view</div>
   <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
   <button class="skip" id="skip">Skip intro →</button>
   <div class="err" id="err">WebGL isn&rsquo;t available on this device, so the house can&rsquo;t open.</div>
@@ -404,11 +404,14 @@ joyEl.addEventListener('pointermove', e=>{ if(e.pointerId===joyId) joyMove(e); }
 function joyEnd(e){ if(e.pointerId===joyId){ joyId=null; joy.dx=0; joy.dy=0; knob.style.transform=''; } }
 joyEl.addEventListener('pointerup', joyEnd); joyEl.addEventListener('pointercancel', joyEnd);
 
-let camAngle = 0; const CAM_R = 8.8, CAM_H = 6.4;
-let dragId = null, lastX = 0;
+let camAngle = 0, camH = 6.4; const CAM_R = 8.8, CAM_H = 6.4;
+let dragId = null, lastX = 0, lastY = 0;
 const cvs = renderer.domElement;
-cvs.addEventListener('pointerdown', e=>{ if(!introDone) return; dragId = e.pointerId; lastX = e.clientX; cvs.setPointerCapture(dragId); });
-cvs.addEventListener('pointermove', e=>{ if(e.pointerId!==dragId) return; camAngle -= (e.clientX-lastX)*0.0055; lastX = e.clientX; });
+cvs.addEventListener('pointerdown', e=>{ if(!introDone) return; dragId = e.pointerId; lastX = e.clientX; lastY = e.clientY; cvs.setPointerCapture(dragId); });
+cvs.addEventListener('pointermove', e=>{ if(e.pointerId!==dragId) return;
+  camAngle -= (e.clientX-lastX)*0.0055;
+  camH = THREE.MathUtils.clamp(camH - (e.clientY-lastY)*0.025, 3.0, 13.5);
+  lastX = e.clientX; lastY = e.clientY; });
 function dragEnd(e){ if(e.pointerId===dragId) dragId = null; }
 cvs.addEventListener('pointerup', dragEnd); cvs.addEventListener('pointercancel', dragEnd);
 
@@ -504,7 +507,7 @@ function tick(){
   const cz = THREE.MathUtils.clamp(scrib.position.z+Math.cos(camAngle)*CAM_R, -RD/2+1.5, RD/2-1.5);
   const ck = 1-Math.exp(-4*dt);
   camera.position.x += (cx-camera.position.x)*ck;
-  camera.position.y += (CAM_H-camera.position.y)*ck;
+  camera.position.y += (camH-camera.position.y)*ck;
   camera.position.z += (cz-camera.position.z)*ck;
   camera.lookAt(scrib.position.x, 0.9, scrib.position.z);
   renderer.render(scene,camera);
