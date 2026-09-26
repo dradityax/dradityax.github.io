@@ -477,7 +477,7 @@ for (let i=0;i<48;i++){
 let printIdx = 0, printSide = 1;
 function spawnPrint(x,z,facing){
   const p = prints[printIdx]; printIdx = (printIdx+1)%prints.length;
-  p.m.position.set(x - Math.sin(facing)*0.16*printSide, 0.015, z - Math.cos(facing)*0.16*printSide);
+  p.m.position.set(x - Math.sin(facing)*0.16*printSide, 0.075, z - Math.cos(facing)*0.16*printSide);
   p.m.rotation.z = -facing; p.life = 2.4; p.m.visible = true; printSide *= -1;
 }
 
