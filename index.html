@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Aditya X</title>
-<meta name="description" content="Aditya X — student of medicine. A little house on the internet. Come in, the door is open.">
+<meta name="description" content="Aditya X — Medicinae Studiosus. First-year MBBS student. A little house on the internet — flip the coin and step inside.">
+<meta property="og:title" content="Aditya X">
+<meta property="og:description" content="Medicinae Studiosus | Mortui vivos docent — a little house on the internet.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dradityax.pages.dev/">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { height:100%; overflow:hidden; }
@@ -48,6 +52,54 @@
     backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); font-family:inherit; }
   .skip.hidden { display:none; }
   .err { position:fixed; inset:0; display:none; align-items:center; justify-content:center; color:rgba(0,0,0,.7); z-index:20; text-align:center; padding:2rem; }
+  /* ---------- cover: coin side A ---------- */
+  #cover { position:fixed; inset:0; z-index:8; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:4.5rem 1.25rem 6rem; transition:opacity .7s ease; touch-action:manipulation; }
+  #cover.gone { opacity:0; pointer-events:none; }
+  #coverFlip { display:flex; flex-direction:column; align-items:center; gap:.85rem; max-width:100%; }
+  #cover.flipping #coverFlip { animation:coinFlip .65s ease-in forwards; }
+  @keyframes coinFlip { from { transform:rotateY(0); opacity:1; } to { transform:rotateY(180deg); opacity:0; } }
+  #flipBtn { position:fixed; top:1.1rem; right:1.25rem; font-family:inherit; font-size:.82rem; letter-spacing:.05em;
+    color:#1a1a1a; background:rgba(255,255,255,.72); border:1px solid rgba(0,0,0,.14); border-radius:2rem;
+    padding:.55rem 1.15rem; cursor:pointer; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    box-shadow:0 4px 14px rgba(0,0,0,.08); transition:background .2s,color .2s; }
+  #flipBtn:hover { background:#1a1a1a; color:#f7f2e8; }
+  .tv { width:118px; }
+  .tv-ant { display:flex; justify-content:center; gap:30px; }
+  .tv-ant i { width:2px; height:15px; background:#1a1a1a; border-radius:2px; display:block; }
+  .tv-ant i:first-child { transform:rotate(-24deg) translateY(2px); }
+  .tv-ant i:last-child { transform:rotate(24deg) translateY(2px); }
+  .tv-body { background:#fbf8f1; border:1px solid rgba(0,0,0,.12); border-radius:14px; padding:9px 9px 7px;
+    box-shadow:0 10px 30px rgba(0,0,0,.10); }
+  .tv .screen { background:#232320; border-radius:8px; height:62px; display:flex; align-items:center; justify-content:center; gap:16px; }
+  .eye { width:25px; height:33px; background:#f7f2e8; border-radius:8px; position:relative; overflow:hidden; transition:transform .12s ease; }
+  .pupil { position:absolute; width:11px; height:14px; background:#1a1a1a; border-radius:4px; left:50%; top:50%; transform:translate(-50%,-50%); }
+  .tv-controls { display:flex; align-items:center; justify-content:space-between; margin-top:7px; padding:0 3px; }
+  .led { width:8px; height:8px; border-radius:50%; background:#f13343; box-shadow:0 0 8px rgba(241,51,67,.85); animation:ledPulse 2.4s ease-in-out infinite; }
+  @keyframes ledPulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+  .tv-label { font-size:.58rem; letter-spacing:.26em; color:rgba(0,0,0,.38); }
+  .tknob { width:16px; height:16px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffffff, #dcdcdc); border:1px solid rgba(0,0,0,.12); }
+  #cover h1 { color:#1a1a1a; font-size:clamp(2.1rem,9vw,3.2rem); font-weight:800; letter-spacing:-.03em; line-height:1.05; }
+  #cover h1 span { color:#f13343; }
+  .tagline { color:rgba(0,0,0,.55); font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; }
+  .capsule { display:flex; align-items:stretch; width:min(92vw,25rem); border-radius:999px; overflow:hidden; background:#fff;
+    border:1px solid rgba(0,0,0,.12); box-shadow:0 10px 30px rgba(0,0,0,.10); margin-top:.3rem; }
+  .cap-x { background:#f13343; color:#fff; display:flex; align-items:center; padding:0 .95rem; font-size:1.15rem; font-weight:700; }
+  .capsule input { flex:1; min-width:0; border:0; outline:0; padding:.85rem .3rem .85rem .9rem; font-family:inherit; font-size:.9rem;
+    color:#1a1a1a; background:transparent; user-select:text; -webkit-user-select:text; }
+  .capsule input::placeholder { color:rgba(0,0,0,.38); }
+  .cap-go { border:0; background:transparent; padding:0 1.05rem; font-size:1.25rem; cursor:pointer; color:#1a1a1a; font-family:inherit; }
+  .cap-go:hover { color:#f13343; }
+  #askAnswer { max-width:min(92vw,25rem); font-size:.87rem; color:rgba(26,26,26,.78); line-height:1.55; min-height:1.2em; transition:opacity .35s; }
+  #askAnswer:empty { display:none; }
+  #askAnswer b { color:#1a1a1a; }
+  #askAnswer a { color:#f13343; }
+  .contacts { position:fixed; bottom:1.25rem; left:0; right:0; display:flex; flex-wrap:wrap; gap:.45rem; justify-content:center; padding:0 1rem; }
+  .contacts a { font-size:.72rem; letter-spacing:.03em; color:#1a1a1a; text-decoration:none; background:rgba(255,255,255,.72);
+    border:1px solid rgba(0,0,0,.12); border-radius:999px; padding:.42rem .85rem; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    box-shadow:0 4px 12px rgba(0,0,0,.06); transition:background .2s,color .2s; }
+  .contacts a:hover { background:#1a1a1a; color:#f7f2e8; }
+  @media (max-height:640px){ .tv { width:92px; } .tv .screen { height:50px; } #cover h1 { font-size:1.9rem; } }
 </style>
 <script type="importmap">
 { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
@@ -66,8 +118,39 @@
     <button data-a="eat" title="Khao">🍎</button>
     <button data-a="play" title="Khelo">⚽</button>
   </div>
-  <button class="skip" id="skip">Skip intro →</button>
+  <button class="skip hidden" id="skip">Skip intro →</button>
   <div class="err" id="err">WebGL isn&rsquo;t available on this device, so the house can&rsquo;t open.</div>
+  <div id="cover">
+    <button id="flipBtn">flip the coin</button>
+    <div id="coverFlip">
+      <div class="tv" aria-hidden="true">
+        <div class="tv-ant"><i></i><i></i></div>
+        <div class="tv-body">
+          <div class="screen">
+            <div class="eye" id="eyeL"><div class="pupil"></div></div>
+            <div class="eye" id="eyeR"><div class="pupil"></div></div>
+          </div>
+          <div class="tv-controls"><span class="led"></span><span class="tv-label">AX-1</span><span class="tknob"></span></div>
+        </div>
+      </div>
+      <h1>Aditya <span>X</span></h1>
+      <p class="tagline">Medicinae Studiosus | Mortui vivos docent</p>
+      <form class="capsule" id="askForm" autocomplete="off">
+        <span class="cap-x">+</span>
+        <input id="askInput" type="text" placeholder="Aditya ke baare mein kuch poochho…" aria-label="Ask about Aditya" maxlength="120">
+        <button class="cap-go" type="submit" aria-label="Ask">→</button>
+      </form>
+      <div id="askAnswer" role="status"></div>
+    </div>
+    <nav class="contacts" aria-label="Contact">
+      <a href="mailto:dradityax@gmail.com">dradityax@gmail.com</a>
+      <a href="https://instagram.com/dradityax" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://x.com/DrAdityaX" target="_blank" rel="noopener">X</a>
+      <a href="https://github.com/dradityax" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://youtube.com/@dradityax" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://linkedin.com/in/dradityax" target="_blank" rel="noopener">LinkedIn</a>
+    </nav>
+  </div>
 
 <script type="module">
 import * as THREE from 'three';
@@ -479,7 +562,7 @@ const armL = scribLimb(-0.36,1.28,0.085,0.42), armR = scribLimb(0.36,1.28,0.085,
 const legL = scribLimb(-0.15,0.74,0.1,0.5),  legR = scribLimb(0.15,0.74,0.1,0.5);
 const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.34,1), new THREE.MeshBasicMaterial({ color:0x111111 }));
 core.scale.set(0.85,1.5,0.75); core.position.y = 1.05; core.castShadow = true; scrib.add(core);
-scrib.position.set(0,0,-1); scrib.visible = false;
+scrib.position.set(8,0,22); scrib.visible = true;
 scene.add(scrib);
 // action props: apple + football
 const apple = new THREE.Group();
@@ -588,6 +671,82 @@ function finishIntro(){
 }
 document.getElementById('skip').addEventListener('click', finishIntro);
 
+/* ---------- cover mode: coin side A ---------- */
+let coverMode = true, coverAngle = 0.7;
+const ap = { s:'idle', t:1.2, x:8, z:22 };
+function startIntro(){
+  if (!coverMode) return;
+  coverMode = false;
+  const cover = document.getElementById('cover');
+  cover.classList.add('flipping');
+  setTimeout(()=>cover.classList.add('gone'), 620);
+  scrib.position.set(0,0,-1); scrib.visible = false; scrib.scale.setScalar(1);
+  scrib.rotation.set(0,0,0);
+  doorPivot.rotation.y = 0; roofGroup.visible = true;
+  introT = 0;
+  document.getElementById('skip').classList.remove('hidden');
+}
+document.getElementById('flipBtn').addEventListener('click', startIntro);
+
+/* ---------- TV eyes: the little watcher (cover) ---------- */
+{
+  const pupils = document.querySelectorAll('#cover .pupil');
+  const eyeEls = [document.getElementById('eyeL'), document.getElementById('eyeR')];
+  let mx = innerWidth/2, my = innerHeight/2;
+  addEventListener('pointermove', e=>{ mx = e.clientX; my = e.clientY; });
+  (function eyeTick(){
+    for (const p of pupils){
+      const r = p.parentElement.getBoundingClientRect();
+      const cx = r.left+r.width/2, cy = r.top+r.height/2;
+      const dx = mx-cx, dy = my-cy, d = Math.hypot(dx,dy)||1;
+      const step = Math.min(7, d/14);
+      p.style.transform = 'translate(calc(-50% + '+(dx/d*step).toFixed(1)+'px), calc(-50% + '+(dy/d*step).toFixed(1)+'px))';
+    }
+    requestAnimationFrame(eyeTick);
+  })();
+  (function blink(){
+    setTimeout(()=>{
+      eyeEls.forEach(e=>e.style.transform='scaleY(0.08)');
+      setTimeout(()=>{ eyeEls.forEach(e=>e.style.transform='scaleY(1)'); blink(); }, 140);
+    }, 2200+Math.random()*3200);
+  })();
+}
+
+/* ---------- Ask Nancy: the capsule ---------- */
+const ASK = [
+  { k:['who are you','who is aditya','about you','about aditya','your name','introduce'], a:"That's <b>Aditya X</b> — first-year MBBS student at Madhubani Medical College, Bihar. This little house on the internet is his. Mysterious by design." },
+  { k:['study','college','mbbs','medical','doctor','student','padhai'], a:"He's a first-year <b>MBBS</b> student at <b>Madhubani Medical College</b>, Bihar — Batch of 2026. Future doctor, current professional overthinker." },
+  { k:['motto','latin','mortui'], a:"<i>Mortui vivos docent</i> — <b>the dead teach the living</b>. Every anatomist's motto. It hangs over his little house for a reason." },
+  { k:['contact','email','mail','reach'], a:"Write to him at <b><a href='mailto:dradityax@gmail.com'>dradityax@gmail.com</a></b> — he actually replies." },
+  { k:['instagram','insta'], a:"He's <b>@dradityax</b> on Instagram. Faceless, of course." },
+  { k:['twitter','tweet'], a:"He's <b>@DrAdityaX</b> on X." },
+  { k:['github','code','repo'], a:"<b>github.com/dradityax</b> — that's where this little house lives." },
+  { k:['youtube','video'], a:"<b>@dradityax</b> on YouTube. Aditya X — no face, all vibe." },
+  { k:['linkedin'], a:"<b>linkedin.com/in/dradityax</b> — the professional mask." },
+  { k:['journal','diary','write','writing'], a:"He keeps a private journal… not public yet. When he's ready, you'll know." },
+  { k:['house','website','site','home','page'], a:"You're looking at it — a little house on the internet. Press <b>flip the coin</b> and step inside: the little guy sits, dances, juggles a football, even eats apples." },
+  { k:['nancy'], a:"That's me! His best friend, part-time assistant, full-time tease. I run this place for him." },
+  { k:['girlfriend','boyfriend','love','single','married','relationship','crush'], a:"Mystery… some questions are above my pay grade. Ask him yourself." },
+  { k:['birthday','born','age'], a:"14th November. Scorpio season — that explains a lot." },
+  { k:['fracture'], a:"Fracture's demands made this house lively — sitting, dancing, snacking, football. Legend." },
+  { k:['game','play','dance','football','eat'], a:"Flip the coin and step inside — the little scribble guy sits, dances, juggles a football and eats apples. All on demand." },
+];
+const ASK_HI = "Hello hello! Aditya ke baare mein kuch poochho — main sab bata dungi.";
+const ASK_FALLBACK = "Hmm, yeh toh mujhe bhi nahi pata… Aditya se seedha poochh lo — <b>dradityax@gmail.com</b> pe woh jawab de dega.";
+{
+  const askForm = document.getElementById('askForm'), askInput = document.getElementById('askInput'), askAnswer = document.getElementById('askAnswer');
+  askForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const q = askInput.value.trim().toLowerCase();
+    if (!q) return;
+    let a;
+    if (/^(hi|hey|yo|hello|namaste)\b/.test(q) || q.includes('hello') || q.includes('namaste')) a = ASK_HI;
+    else { const hit = ASK.find(x=>x.k.some(k=>q.includes(k))); a = hit ? hit.a : ASK_FALLBACK; }
+    askAnswer.style.opacity = 0;
+    setTimeout(()=>{ askAnswer.innerHTML = a; askAnswer.style.opacity = 1; }, 180);
+  });
+}
+
 /* ---------- loop ---------- */
 const vel = new THREE.Vector3(); const clock = new THREE.Clock();
 let faceAngle = 0, distAcc = 0, elapsed = 0, started = false;
@@ -601,6 +760,39 @@ function tick(){
   const dt = Math.min(clock.getDelta(), 0.05); elapsed += dt;
   for (const c of clouds){ c.position.x += dt*0.5; if (c.position.x > 130) c.position.x = -130; }
 
+  if (coverMode){
+    coverAngle += dt*0.07;
+    camera.position.set(Math.sin(coverAngle)*30, 10.5, Math.cos(coverAngle)*30);
+    camera.lookAt(0, 2.2, 0);
+    ap.t -= dt;
+    if (ap.t <= 0){
+      if (ap.s === 'idle'){ ap.s = 'walk'; ap.x = (Math.random()*2-1)*24; ap.z = 13+Math.random()*24; ap.t = 16; }
+      else { ap.s = 'idle'; ap.t = 2+Math.random()*3; }
+    }
+    if (ap.s === 'walk'){
+      const dx = ap.x-scrib.position.x, dz = ap.z-scrib.position.z, d = Math.hypot(dx,dz);
+      if (d < 1.2){ ap.s = 'idle'; ap.t = 2+Math.random()*3; vel.set(0,0,0); }
+      else { const sp = 2.4, kk = Math.min(1,8*dt); vel.x += (dx/d*sp-vel.x)*kk; vel.z += (dz/d*sp-vel.z)*kk; }
+    } else vel.multiplyScalar(Math.max(0,1-5*dt));
+    scrib.position.x = THREE.MathUtils.clamp(scrib.position.x+vel.x*dt, -28, 28);
+    scrib.position.z = THREE.MathUtils.clamp(scrib.position.z+vel.z*dt, 12, 40);
+    for (const c of colliders){
+      const dx = scrib.position.x-c.x, dz = scrib.position.z-c.z, d = Math.hypot(dx,dz);
+      if (d < c.r && d > 0.001){ scrib.position.x = c.x+dx/d*c.r; scrib.position.z = c.z+dz/d*c.r; }
+    }
+    const cspd = Math.hypot(vel.x,vel.z);
+    if (cspd > 0.4){
+      faceAngle = angleLerp(faceAngle, Math.atan2(vel.x,vel.z), 1-Math.exp(-12*dt));
+      scrib.rotation.y = faceAngle;
+      const sw = Math.sin(elapsed*11)*0.7;
+      armL.rotation.x = sw; armR.rotation.x = -sw; legL.rotation.x = -sw; legR.rotation.x = sw;
+      scrib.position.y = Math.abs(Math.cos(elapsed*11))*0.06;
+    } else {
+      armL.rotation.x *= 0.9; armR.rotation.x *= 0.9; legL.rotation.x *= 0.9; legR.rotation.x *= 0.9;
+      scrib.position.y *= 0.9; scrib.rotation.z = Math.sin(elapsed*1.6)*0.02;
+    }
+    renderer.render(scene,camera); return;
+  }
   if (!introDone){
     introT += dt;
     if (introT >= INTRO_END){ finishIntro(); }
