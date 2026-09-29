@@ -824,6 +824,10 @@ const colliders = [
   { x:11.5, z:-6.5, r:0.6 }, { x:9.5, z:-9.0, r:1.7 },
   { x:-12.5, z:-7.5, r:0.85 },
   { x:1.8, z:3.4, r:0.65 }, { x:-1.7, z:3.1, r:0.65 }, { x:12.8, z:5.5, r:0.7 },
+  // MARKET pillars + planters (round — slide around them)
+  { x:-64, z:52, r:0.65 }, { x:-56, z:52, r:0.65 }, { x:-48, z:52, r:0.65 }, { x:-40, z:52, r:0.65 },
+  { x:-64, z:62, r:0.65 }, { x:-56, z:62, r:0.65 }, { x:-48, z:62, r:0.65 }, { x:-40, z:62, r:0.65 },
+  { x:-68, z:47, r:0.95 }, { x:-36, z:47, r:0.95 }, { x:-68, z:65, r:0.95 }, { x:-36, z:65, r:0.95 },
 ];
 // house wall solids (AABB) — the front-door gap x -1.1..1.1 stays walkable
 const solids = [
@@ -834,6 +838,37 @@ const solids = [
   { x0:14.3,  z0:-10.6, x1:15.7,  z1:10.6 }, // right
   { x0:1.05,  z0:9.3,  x1:1.5,   z1:10.7 },  // door posts
   { x0:-1.5,  z0:9.3,  x1:-1.05, z1:10.7 },
+  // MARKET — real walls. entries: front entrance (x -55.5..-48.5) + 2 back doorways
+  { x0:-70.3, z0:67.7, x1:-67, z1:68.3 },   // back-left
+  { x0:-65,   z0:67.7, x1:-39, z1:68.3 },   // back-mid
+  { x0:-37,   z0:67.7, x1:-33.7, z1:68.3 }, // back-right
+  { x0:-70.3, z0:44, x1:-69.7, z1:68 },     // left wall
+  { x0:-34.3, z0:44, x1:-33.7, z1:68 },     // right wall
+  { x0:-70.3, z0:43.7, x1:-65, z1:44.3 },   // front-left
+  { x0:-39,   z0:43.7, x1:-33.7, z1:44.3 }, // front-right
+  { x0:-65,   z0:43.7, x1:-56, z1:44.3 },   // front glass (solid — no walking through windows)
+  { x0:-48,   z0:43.7, x1:-39, z1:44.3 },   // front glass
+  { x0:-56.6, z0:43.7, x1:-55.4, z1:44.3 }, // entrance pillars
+  { x0:-48.6, z0:43.7, x1:-47.4, z1:44.3 },
+  { x0:-70.5, z0:71.75, x1:-33.5, z1:72.25 }, // back-corridor rear wall
+  { x0:-70.3, z0:68, x1:-69.7, z1:72.25 },    // corridor sides
+  { x0:-34.3, z0:68, x1:-33.7, z1:72.25 },
+  { x0:-65.5, z0:67.4, x1:-58.5, z1:67.7 },  // CAFE / BOOKS / BAKERY backs
+  { x0:-55.5, z0:67.4, x1:-48.5, z1:67.7 },
+  { x0:-45.5, z0:67.4, x1:-38.5, z1:67.7 },
+  { x0:-63.3, z0:66.35, x1:-60.7, z1:67.25 }, // shop counters
+  { x0:-53.3, z0:66.35, x1:-50.7, z1:67.25 },
+  { x0:-43.3, z0:66.35, x1:-40.7, z1:67.25 },
+  { x0:-69.9, z0:52.3, x1:-68.2, z1:59.7 },  // FLORIST / TOYS
+  { x0:-35.8, z0:52.3, x1:-34.1, z1:59.7 },
+  { x0:-61.3, z0:54.9, x1:-58.7, z1:57.1 },  // kiosks
+  { x0:-45.3, z0:54.9, x1:-42.7, z1:57.1 },
+  { x0:-67.2, z0:49.67, x1:-64.8, z1:50.33 }, // benches
+  { x0:-39.2, z0:49.67, x1:-36.8, z1:50.33 },
+  { x0:-53.2, z0:65.17, x1:-50.8, z1:65.83 },
+  { x0:-60.55, z0:69.95, x1:-59.45, z1:71.05 }, // corridor crates
+  { x0:-58.15, z0:69.85, x1:-57.25, z1:70.75 },
+  { x0:-43.55, z0:69.15, x1:-42.45, z1:70.25 },
 ];
 
 /* ---------- the two new souls: CAT + KID (3D, alive, with physics) ---------- */
@@ -923,6 +958,11 @@ function buildCat(){
     const w = P(headG, new THREE.CylinderGeometry(0.007,0.007,0.38,6), WHISK_MAT, s*0.52,-0.02+(i-1)*0.07,0.38);
     w.rotation.z = Math.PI/2 + s*0.12; w.rotation.y = s*(0.25+i*0.12);
   }
+  headG.traverse(o=>{ o.userData.part = 'head'; });
+  body.userData.part = 'body';
+  tail.userData.part = 'tail';
+  earL.userData.part = 'ear'; earR.userData.part = 'ear';
+  for (const lg of legs) lg.userData.part = 'paw';
   return finishRig({ kind:'cat', group, headG, headY:1.28, eyes, body, bodySY:1.22,
     limbs:legs, tail, earL, earR, mouthY:1.1, sitY:-0.30, popY:0.68,
     says:['meow~','mrrp!','purrr...','nya!','*wags tail*','prrrp!'] });
@@ -1000,9 +1040,11 @@ function rigWalk(rig, dt, amt){
   rig.phase += dt*10;
   const s = Math.sin(rig.phase);
   if (rig.kind === 'cat'){
-    const L = rig.limbs;
-    L[0].rotation.x = s*0.6*amt; L[3].rotation.x = s*0.6*amt;
-    L[1].rotation.x = -s*0.6*amt; L[2].rotation.x = -s*0.6*amt;
+    // true cat walk: lateral sequence (left-hind, left-fore, right-hind, right-fore)
+    const off = [0.25, 0.75, 0, 0.5]; // FL FR BL BR
+    for (let i=0;i<4;i++) rig.limbs[i].rotation.x = Math.sin(rig.phase + off[i]*Math.PI*2)*0.55*amt;
+    rig.body.rotation.z = Math.sin(rig.phase)*0.045*amt;   // gentle body roll
+    rig.headG.rotation.x = Math.sin(rig.phase*2)*0.035*amt; // head bob
   } else {
     rig.legL.rotation.x = s*0.6*amt; rig.legR.rotation.x = -s*0.6*amt;
     rig.armL.rotation.x = -s*0.45*amt; rig.armR.rotation.x = s*0.45*amt;
@@ -1013,6 +1055,7 @@ function rigRelax(rig, dt){
   const f = dt >= 1 ? 0 : Math.max(0, 1-8*dt);
   for (const L of rig.limbs){ L.rotation.x *= f; L.rotation.z *= f; }
   rig.headG.rotation.x *= f; rig.headG.rotation.y *= f; rig.headG.rotation.z *= f;
+  rig.body.rotation.z *= f; rig.headDuck = 0;
   rig.headG.position.y = rig.headY;
 }
 function resetRigPose(rig){
@@ -1023,7 +1066,7 @@ function resetRigPose(rig){
 function rigBreathe(rig, t){
   const b = Math.sin(t*2.2);
   rig.body.scale.y = rig.bodySY + b*0.02;
-  if (rig.idle.state !== 'sneeze') rig.headG.position.y = rig.headY + b*0.015;
+  if (rig.idle.state !== 'sneeze') rig.headG.position.y = rig.headY + (rig.headDuck||0) + b*0.015;
 }
 function rigTail(rig, t, moving){
   if (rig.kind === 'cat'){
@@ -1054,13 +1097,13 @@ function updateSpeech(rig, dt){
 function startIdleState(rig){
   const id = rig.idle;
   const opts = rig.kind==='cat'
-    ? ['sit','stretch','sneeze','speak','look','yawn']
+    ? ['sit','stretch','crouch','sneeze','speak','look','yawn']
     : ['sit','exercise','sneeze','speak','look','yawn'];
   id.state = opts[(Math.random()*opts.length)|0];
   id.t = id.state==='speak' ? 2.4 : 2.5+Math.random()*2.5;
   if (id.state === 'sneeze'){ say(rig, 'Aachhoo!'); blinkNow(rig); }
   else if (id.state === 'yawn') say(rig, rig.kind==='cat' ? 'mrrrp...' : 'haaah...');
-  else if (id.state === 'speak') say(rig, rig.says[(Math.random()*rig.says.length)|0]);
+  else if (id.state === 'speak'){ say(rig, rig.says[(Math.random()*rig.says.length)|0]); if (rig.kind==='cat' && rig===R) meowSound(Math.random()<0.5); }
 }
 function poseIdle(rig, t){
   const st = rig.idle.state;
@@ -1068,6 +1111,7 @@ function poseIdle(rig, t){
     const L = rig.limbs;
     if (st==='sit'){ L[2].rotation.x = -1.25; L[3].rotation.x = -1.25; L[0].rotation.x = -0.12; L[1].rotation.x = -0.12; return rig.sitY; }
     if (st==='stretch'){ L[0].rotation.x = -0.95; L[1].rotation.x = -0.95; L[2].rotation.x = 0.25; L[3].rotation.x = 0.25; rig.tail.rotation.x = -0.7; return 0.02; }
+    if (st==='crouch'){ for (const Lg of L) Lg.rotation.x = 0.55; rig.tail.rotation.x = -0.85; rig.headDuck = -0.26; rig.headG.rotation.x = 0.28; return -0.22; }
     if (st==='sneeze'){ rig.headG.rotation.x = -0.45*Math.max(0,Math.sin(t*22)); return 0; }
     if (st==='yawn'){ for (const e of rig.eyes) e.g.scale.y = 0.15; rig.headG.rotation.z = 0.12; return 0; }
     if (st==='look'){ rig.headG.rotation.y = Math.sin(t*1.6)*0.7; return 0; }
@@ -1227,6 +1271,40 @@ cvs.addEventListener('pointermove', e=>{ if(e.pointerId!==dragId) return;
   lastX = e.clientX; lastY = e.clientY; });
 function dragEnd(e){ if(e.pointerId===dragId) dragId = null; }
 cvs.addEventListener('pointerup', dragEnd); cvs.addEventListener('pointercancel', dragEnd);
+/* tap the cat: it reacts to WHERE you touch — paw, head, tail, ear, body */
+const _ray = new THREE.Raycaster(), _ptr = new THREE.Vector2();
+let tapX = 0, tapY = 0, tapT = 0;
+cvs.addEventListener('pointerdown', e=>{ tapX = e.clientX; tapY = e.clientY; tapT = performance.now(); }, true);
+cvs.addEventListener('pointerup', e=>{
+  if (!introDone || !charChosen || !R || R.kind !== 'cat') return;
+  if (performance.now()-tapT > 350 || Math.hypot(e.clientX-tapX, e.clientY-tapY) > 12) return; // it was a drag
+  _ptr.set((e.clientX/innerWidth)*2-1, -(e.clientY/innerHeight)*2+1);
+  _ray.setFromCamera(_ptr, camera);
+  const hits = _ray.intersectObject(R.group, true);
+  if (hits.length) catTapped(hits[0].object);
+}, true);
+function catTapped(obj){
+  let n = obj, part = 'body';
+  while (n && n !== R.group){ if (n.userData && n.userData.part){ part = n.userData.part; break; } n = n.parent; }
+  blinkNow(R);
+  R.tapReact = { part, t: 1.0 };
+  if (part === 'paw'){ meowSound(true); say(R, ['mrrp!','hey, my paw!','*paw wiggle*'][(Math.random()*3)|0]); }
+  else if (part === 'head'){ purrSound(); say(R, ['purrr...','mrrp!','hehe~'][(Math.random()*3)|0]); }
+  else if (part === 'tail'){ meowSound(false); say(R, '*tail flick*'); }
+  else if (part === 'ear'){ meowSound(true); say(R, 'mrrp?'); }
+  else { meowSound(false); say(R, ['meow~','mrrp!'][(Math.random()*2)|0]); }
+}
+/* pose overlay for the tap reaction — applied on top of whatever the cat is doing */
+function poseTapReact(rig, t){
+  const tr = rig.tapReact; if (!tr) return;
+  tr.t -= t; if (tr.t <= 0){ rig.tapReact = null; return; }
+  const w = Math.sin((1-tr.t)*Math.PI); // 0→1→0
+  if (tr.part === 'paw'){ rig.limbs[1].rotation.x = -1.2*w; rig.headG.rotation.z = 0.18*w; }
+  else if (tr.part === 'head'){ rig.headG.rotation.z = 0.22*w; rig.headG.rotation.x = -0.12*w; }
+  else if (tr.part === 'tail'){ rig.tail.rotation.y = w*0.9; }
+  else if (tr.part === 'ear'){ rig.earL.rotation.z = 0.28+w*0.5; rig.earR.rotation.z = -0.28-w*0.5; }
+  else { rig.headG.rotation.y = Math.sin((1-tr.t)*12)*0.18; }
+}
 
 /* ---------- visitor actions: sit · dance · eat · play ---------- */
 let action = null, actionT = 0;
@@ -1501,6 +1579,50 @@ function footstepSound(vol){
     src.connect(f); f.connect(g); g.connect(actx.destination); src.start(t);
   }catch(e){}
 }
+/* synthesized cat voice: meow + purr (no audio files needed) */
+function meowSound(high){
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const t = actx.currentTime, dur = high ? 0.42 : 0.58;
+    const o = actx.createOscillator(); o.type = 'sawtooth';
+    const f0 = high ? 640 : 500;
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.linearRampToValueAtTime(f0*1.5, t+dur*0.35);
+    o.frequency.linearRampToValueAtTime(f0*0.85, t+dur);
+    const vib = actx.createOscillator(); vib.frequency.value = 8.5;
+    const vg = actx.createGain(); vg.gain.value = 28;
+    vib.connect(vg); vg.connect(o.frequency); vib.start(t); vib.stop(t+dur);
+    const bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1350; bp.Q.value = 1.7;
+    const g = actx.createGain();
+    g.gain.setValueAtTime(0.001, t);
+    g.gain.exponentialRampToValueAtTime(0.4, t+0.07);
+    g.gain.exponentialRampToValueAtTime(0.001, t+dur);
+    o.connect(bp); bp.connect(g); g.connect(actx.destination);
+    o.start(t); o.stop(t+dur+0.05);
+  }catch(e){}
+}
+function purrSound(){
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const t = actx.currentTime, dur = 1.6;
+    const buf = actx.createBuffer(1, Math.floor(actx.sampleRate*dur), actx.sampleRate);
+    const ch = buf.getChannelData(0);
+    for (let i = 0; i < ch.length; i++) ch[i] = (Math.random()*2-1);
+    const src = actx.createBufferSource(); src.buffer = buf;
+    const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 130;
+    const lfo = actx.createOscillator(); lfo.frequency.value = 21;
+    const lg = actx.createGain(); lg.gain.value = 0.5;
+    const g = actx.createGain(); g.gain.value = 0.5;
+    lfo.connect(lg); lg.connect(g.gain);
+    g.gain.setValueAtTime(0.001, t);
+    g.gain.exponentialRampToValueAtTime(0.35, t+0.25);
+    g.gain.exponentialRampToValueAtTime(0.001, t+dur);
+    src.connect(f); f.connect(g); g.connect(actx.destination);
+    src.start(t); lfo.start(t); lfo.stop(t+dur);
+  }catch(e){}
+}
 let lastNetSend = 0;
 function netTick(dt){
   const now = performance.now();
@@ -1772,6 +1894,8 @@ function tick(){
   // always alive: breathing, tail, eyes, speech
   rigBreathe(R, elapsed);
   rigTail(R, elapsed, moving);
+  if (R.kind === 'cat' && R.tapReact && !moving && !action) poseTapReact(R, dt);
+  else if (R.tapReact && (moving || action)) R.tapReact = null;
   updateEyes(R, dt); updateBlink(R, dt); updateSpeech(R, dt);
   // squash on landing, stretch in the air
   let sq = 1;
