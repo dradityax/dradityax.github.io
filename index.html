@@ -52,6 +52,23 @@
     backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); font-family:inherit; }
   .skip.hidden { display:none; }
   .err { position:fixed; inset:0; display:none; align-items:center; justify-content:center; color:rgba(0,0,0,.7); z-index:20; text-align:center; padding:2rem; }
+  /* ---------- character select ---------- */
+  .charpick { position:fixed; inset:0; z-index:30; display:flex; align-items:center; justify-content:center;
+    background:rgba(247,242,232,.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    opacity:0; pointer-events:none; transition:opacity .5s; padding:1rem; }
+  .charpick.show { opacity:1; pointer-events:auto; }
+  .charpick-card { background:#fbf8f1; border:1px solid rgba(0,0,0,.12); border-radius:20px;
+    box-shadow:0 24px 70px rgba(0,0,0,.18); padding:1.6rem 1.6rem 1.4rem; text-align:center; max-width:26rem; width:100%; }
+  .charpick-card h2 { color:#1a1a1a; font-size:1.25rem; font-weight:800; letter-spacing:-.02em; }
+  .charpick-sub { color:rgba(0,0,0,.55); font-size:.8rem; margin:.3rem 0 1.1rem; }
+  .charpick-row { display:flex; gap:.9rem; justify-content:center; }
+  .charpick-opt { flex:1; background:#fff; border:1px solid rgba(0,0,0,.1); border-radius:14px; padding:.8rem .5rem .9rem;
+    cursor:pointer; font-family:inherit; transition:transform .18s, box-shadow .18s, border-color .18s; }
+  .charpick-opt:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgba(0,0,0,.14); border-color:#f13343; }
+  .charpick-opt canvas { width:100%; height:auto; display:block; }
+  .charpick-name { display:block; color:#1a1a1a; font-weight:700; font-size:.92rem; margin-top:.45rem; }
+  .charpick-opt:last-child .charpick-name { color:#d9382c; }
+  .charpick-desc { display:block; color:rgba(0,0,0,.5); font-size:.72rem; margin-top:.15rem; line-height:1.4; }
   /* ---------- cover: coin side A ---------- */
   #cover { position:fixed; inset:0; z-index:8; display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:4.5rem 1.25rem 6rem; transition:opacity .7s ease; touch-action:manipulation; }
@@ -120,6 +137,24 @@
   </div>
   <button class="skip hidden" id="skip">Skip intro →</button>
   <div class="err" id="err">WebGL isn&rsquo;t available on this device, so the house can&rsquo;t open.</div>
+  <div class="charpick" id="charPick">
+    <div class="charpick-card">
+      <h2>Choose your wanderer</h2>
+      <p class="charpick-sub">Two ink souls live here. Pick yours.</p>
+      <div class="charpick-row">
+        <button class="charpick-opt" id="pick1">
+          <canvas id="pv1" width="150" height="220"></canvas>
+          <span class="charpick-name">The Wanderer</span>
+          <span class="charpick-desc">Hooded, long-coated, all mystery.</span>
+        </button>
+        <button class="charpick-opt" id="pick2">
+          <canvas id="pv2" width="150" height="220"></canvas>
+          <span class="charpick-name">The Vermilion</span>
+          <span class="charpick-desc">Ink soul with a red scarf.</span>
+        </button>
+      </div>
+    </div>
+  </div>
   <div id="cover">
     <button id="flipBtn">flip the coin</button>
     <div id="coverFlip">
@@ -536,9 +571,10 @@ const solids = [
   { x0:-1.5,  z0:9.3,  x1:-1.05, z1:10.7 },
 ];
 
-/* ---------- living ink scribble character ---------- */
+/* ---------- living ink characters: two souls to choose from ---------- */
 const scribbleMat = new THREE.LineBasicMaterial({ color:0x111111 });
-function scribbleMesh(rx,ry,rz,count,step){
+const vermilionMat = new THREE.LineBasicMaterial({ color:0xd9382c });
+function scribbleMesh(rx,ry,rz,count,step,mat){
   const pts = []; const p = new THREE.Vector3((Math.random()-.5)*.1,(Math.random()-.5)*.1,(Math.random()-.5)*.1);
   for (let i=0;i<count;i++){
     p.x += (Math.random()-.5)*step; p.y += (Math.random()-.5)*step; p.z += (Math.random()-.5)*step;
@@ -548,20 +584,38 @@ function scribbleMesh(rx,ry,rz,count,step){
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pts,3));
-  const line = new THREE.Line(g, scribbleMat); line.frustumCulled = false; return line;
+  const line = new THREE.Line(g, mat || scribbleMat); line.frustumCulled = false; return line;
 }
 const scrib = new THREE.Group();
-const headS = scribbleMesh(0.38,0.38,0.38,1800,0.14); headS.position.y = 1.66; scrib.add(headS);
-const torsoS = scribbleMesh(0.26,0.34,0.22,950,0.11); torsoS.position.y = 1.02; scrib.add(torsoS);
-function scribLimb(x,y,r,len){
+let headS, armL, armR, legL, legR, charKind = 1;
+function scribLimb(x,y,r,len,mat){
   const pivot = new THREE.Group(); pivot.position.set(x,y,0);
-  const s = scribbleMesh(r,len/2,r,260,0.07); s.position.y = -len/2;
+  const s = scribbleMesh(r,len/2,r,380,0.07,mat); s.position.y = -len/2;
   pivot.add(s); scrib.add(pivot); return pivot;
 }
-const armL = scribLimb(-0.36,1.28,0.085,0.42), armR = scribLimb(0.36,1.28,0.085,0.42);
-const legL = scribLimb(-0.15,0.74,0.1,0.5),  legR = scribLimb(0.15,0.74,0.1,0.5);
-const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.34,1), new THREE.MeshBasicMaterial({ color:0x111111 }));
-core.scale.set(0.85,1.5,0.75); core.position.y = 1.05; core.castShadow = true; scrib.add(core);
+function setCharacter(kind){
+  charKind = kind;
+  while (scrib.children.length) scrib.remove(scrib.children[0]);
+  headS = scribbleMesh(0.38,0.38,0.38,2600,0.12); headS.position.y = 1.66; scrib.add(headS);
+  const torsoS = scribbleMesh(0.26,0.34,0.22,1400,0.10); torsoS.position.y = 1.02; scrib.add(torsoS);
+  armL = scribLimb(-0.36,1.28,0.085,0.42); armR = scribLimb(0.36,1.28,0.085,0.42);
+  legL = scribLimb(-0.15,0.74,0.1,0.5);   legR = scribLimb(0.15,0.74,0.1,0.5);
+  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.34,1), new THREE.MeshBasicMaterial({ color:0x111111 }));
+  core.scale.set(0.85,1.5,0.75); core.position.y = 1.05; core.castShadow = true; scrib.add(core);
+  if (kind === 1){
+    // The Wanderer: hood cowl + long ink coat
+    const hood = scribbleMesh(0.47,0.50,0.47,1500,0.13); hood.position.set(0,1.70,-0.10); scrib.add(hood);
+    const coatTop = scribbleMesh(0.33,0.34,0.29,1300,0.11); coatTop.position.y = 1.02; scrib.add(coatTop);
+    const coatLow = scribbleMesh(0.40,0.42,0.34,1500,0.12); coatLow.position.y = 0.48; scrib.add(coatLow);
+  } else {
+    // The Vermilion: ink body + red scarf wrap and tail
+    const wrap = scribbleMesh(0.31,0.13,0.27,900,0.08,vermilionMat); wrap.position.y = 1.44; scrib.add(wrap);
+    const tail = scribbleMesh(0.10,0.30,0.08,550,0.07,vermilionMat); tail.position.set(0.24,1.00,0.14); scrib.add(tail);
+  }
+  armL.rotation.set(0,0,0); armR.rotation.set(0,0,0); legL.rotation.set(0,0,0); legR.rotation.set(0,0,0);
+  headS.position.y = 1.66;
+}
+setCharacter(1);
 scrib.position.set(8,0,22); scrib.visible = true;
 scene.add(scrib);
 // action props: apple + football
@@ -596,7 +650,7 @@ function spawnPrint(x,z,facing){
 }
 
 /* ---------- input (gated by intro) ---------- */
-let introDone = false;
+let introDone = false, charChosen = false;
 const keys = {};
 addEventListener('keydown', e=>{ keys[e.key.toLowerCase()] = true; });
 addEventListener('keyup',   e=>{ keys[e.key.toLowerCase()] = false; });
@@ -629,7 +683,7 @@ cvs.addEventListener('pointerup', dragEnd); cvs.addEventListener('pointercancel'
 /* ---------- visitor actions: sit · dance · eat · play ---------- */
 let action = null, actionT = 0;
 function setAction(a){
-  if (!introDone) return;
+  if (!introDone || !charChosen) return;
   action = (action===a) ? null : a; actionT = 0;
   document.querySelectorAll('#actions button').forEach(b=>b.classList.toggle('on', b.dataset.a===action));
   apple.visible = (action==='eat'); ball.visible = (action==='play');
@@ -665,11 +719,50 @@ function finishIntro(){
   camera.position.set(0,6.4,7.8); camera.lookAt(0,0.9,-1);
   document.body.classList.add('ready');
   document.getElementById('skip').classList.add('hidden');
+  showCharPick();
   setTimeout(()=>{ document.getElementById('titleCard').style.opacity='0';
     ['hintD','hintM'].forEach(id=>{ const el=document.getElementById(id); if(el) setTimeout(()=>el.style.opacity='0',6000); });
   }, 2600);
 }
 document.getElementById('skip').addEventListener('click', finishIntro);
+
+/* ---------- character select: two ink souls ---------- */
+function drawCharPreview(cv, kind){
+  const ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+  const ink = 'rgba(26,26,26,0.85)', red = 'rgba(217,56,44,0.9)';
+  function scribble(cx,cy,rx,ry,n,color){
+    ctx.strokeStyle = color || ink; ctx.lineWidth = 1.1;
+    for (let s=0;s<n;s++){
+      ctx.beginPath();
+      let x = cx+(Math.random()-.5)*rx, y = cy+(Math.random()-.5)*ry;
+      ctx.moveTo(x,y);
+      for (let i=0;i<7;i++){ x += (Math.random()-.5)*rx*0.9; y += (Math.random()-.5)*ry*0.9; ctx.lineTo(x,y); }
+      ctx.stroke();
+    }
+  }
+  const cx = W/2;
+  scribble(cx, H*0.24, 34, 34, 46);                    // head
+  if (kind === 1) scribble(cx, H*0.22, 52, 54, 40);    // hood
+  else scribble(cx, H*0.36, 40, 12, 26, red);         // scarf wrap
+  scribble(cx, H*0.52, 30, 44, 50);                   // torso
+  if (kind === 1) scribble(cx, H*0.68, 44, 52, 55);    // long coat
+  if (kind === 2) scribble(cx+26, H*0.55, 10, 30, 22, red); // scarf tail
+  scribble(cx-34, H*0.52, 10, 34, 18); scribble(cx+34, H*0.52, 10, 34, 18); // arms
+  scribble(cx-16, H*0.82, 11, 30, 18); scribble(cx+16, H*0.82, 11, 30, 18); // legs
+}
+function showCharPick(){
+  document.getElementById('charPick').classList.add('show');
+  drawCharPreview(document.getElementById('pv1'), 1);
+  drawCharPreview(document.getElementById('pv2'), 2);
+}
+function chooseCharacter(kind){
+  setCharacter(kind);
+  charChosen = true;
+  document.getElementById('charPick').classList.remove('show');
+}
+document.getElementById('pick1').addEventListener('click', ()=>chooseCharacter(1));
+document.getElementById('pick2').addEventListener('click', ()=>chooseCharacter(2));
 
 /* ---------- cover mode: coin side A ---------- */
 let coverMode = true, coverAngle = 0.7;
@@ -815,6 +908,7 @@ function tick(){
   let ix = ((keys['d']||keys['arrowright'])?1:0) - ((keys['a']||keys['arrowleft'])?1:0) + joy.dx;
   let iz = ((keys['s']||keys['arrowdown'])?1:0) - ((keys['w']||keys['arrowup'])?1:0) + joy.dy;
   const il = Math.hypot(ix,iz); if (il > 1){ ix/=il; iz/=il; }
+  if (!charChosen){ ix = 0; iz = 0; }
   if (il > 0.15 && action) setAction(null); // moving cancels any action
   const fx = -Math.sin(camAngle), fz = -Math.cos(camAngle);
   const rx = Math.cos(camAngle),  rz = -Math.sin(camAngle);
