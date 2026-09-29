@@ -369,10 +369,12 @@ const wallHatch = canvasTex(512,512,(g)=>{
 });
 wallHatch.wrapS = wallHatch.wrapT = THREE.RepeatWrapping; wallHatch.repeat.set(3,1);
 const wallMat = new THREE.MeshStandardMaterial({ map:wallHatch, roughness:0.9 });
+const occluders = [];   // wall meshes that can block the camera's view of the player (camera pulls in — option a)
+const _cray = new THREE.Raycaster(), _corigin = new THREE.Vector3(), _cdir = new THREE.Vector3();
 function wall(w,h,x,y,z,ry){
   const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,0.4), wallMat);
   m.position.set(x,y,z); m.rotation.y = ry; m.receiveShadow = true; m.castShadow = true;
-  m.add(inkOutline(m.geometry)); scene.add(m);
+  m.add(inkOutline(m.geometry)); scene.add(m); occluders.push(m);
 }
 wall(RW,WH, 0,WH/2,-RD/2, 0);                    // back
 wall(RD,WH, -RW/2,WH/2,0, Math.PI/2);            // left
@@ -493,7 +495,7 @@ const MW = 36, MD = 24, MH = 7;
 function mwall(w,h,d,x,y,z){
   const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), wallMat);
   m.position.set(x,y,z); m.castShadow = true; m.receiveShadow = true;
-  m.add(inkOutline(m.geometry)); mall.add(m); return m;
+  m.add(inkOutline(m.geometry)); mall.add(m); occluders.push(m); return m;
 }
 const mbx = (w,h,d,c,x,y,z,ry=0)=>bx(w,h,d,c,x,y,z,ry,mall);
 const mcyl = (rt,rb,h,c,x,y,z,seg=16)=>cyl(rt,rb,h,c,x,y,z,seg,mall);
@@ -915,13 +917,15 @@ joyEl.addEventListener('pointermove', e=>{ if(e.pointerId===joyId) joyMove(e); }
 function joyEnd(e){ if(e.pointerId===joyId){ joyId=null; joy.dx=0; joy.dy=0; knob.style.transform=''; } }
 joyEl.addEventListener('pointerup', joyEnd); joyEl.addEventListener('pointercancel', joyEnd);
 
-let camAngle = 0, camH = 6.4; const CAM_R = 8.8, CAM_H = 6.4;
+let camAngle = 0, camH = 6.4, tCamAngle = 0, tCamH = 6.4; const CAM_R = 8.8, CAM_H = 6.4;
 let dragId = null, lastX = 0, lastY = 0;
 const cvs = renderer.domElement;
-cvs.addEventListener('pointerdown', e=>{ if(!introDone) return; dragId = e.pointerId; lastX = e.clientX; lastY = e.clientY; cvs.setPointerCapture(dragId); });
+// drag-to-orbit: only the FIRST finger steers the camera (a second finger can no longer hijack it mid-drag);
+// the drag writes target angles, the camera eases toward them in tick() for a smooth feel
+cvs.addEventListener('pointerdown', e=>{ if(!introDone || dragId!==null) return; dragId = e.pointerId; lastX = e.clientX; lastY = e.clientY; try{ cvs.setPointerCapture(dragId); }catch(_){} });
 cvs.addEventListener('pointermove', e=>{ if(e.pointerId!==dragId) return;
-  camAngle -= (e.clientX-lastX)*0.0055;
-  camH = THREE.MathUtils.clamp(camH - (e.clientY-lastY)*0.025, 3.0, 13.5);
+  tCamAngle -= (e.clientX-lastX)*0.0055;
+  tCamH = THREE.MathUtils.clamp(tCamH - (e.clientY-lastY)*0.025, 3.0, 13.5);
   lastX = e.clientX; lastY = e.clientY; });
 function dragEnd(e){ if(e.pointerId===dragId) dragId = null; }
 cvs.addEventListener('pointerup', dragEnd); cvs.addEventListener('pointercancel', dragEnd);
@@ -1496,6 +1500,9 @@ function tick(){
   const px = scrib.position.x, pz = scrib.position.z;
   const inside = Math.abs(px) < 14.6 && Math.abs(pz) < 9.6;
   mallRoofG.visible = !(px > -71 && px < -33 && pz > 43 && pz < 73); // lift the mall roof while the player is inside
+  // finger-drag smoothing: ease the real orbit angles toward the drag targets
+  const ak = 1-Math.exp(-14*dt);
+  camAngle += (tCamAngle-camAngle)*ak; camH += (tCamH-camH)*ak;
   let cx = px+Math.sin(camAngle)*CAM_R, cz = pz+Math.cos(camAngle)*CAM_R, cy = camH;
   if (inside){
     cx = THREE.MathUtils.clamp(cx, -RW/2+1.5, RW/2-1.5);
@@ -1506,7 +1513,19 @@ function tick(){
     if (Math.abs(cx) < 15.8 && Math.abs(cz) < 10.8) cy = Math.max(cy, 13.5); // pop above the roofless house
     cy = THREE.MathUtils.clamp(cy, 1.2, 16);
   }
-  const ck = 1-Math.exp(-4*dt);
+  // (a) wall between camera and player? pull the camera in front of the wall — never show just a wall
+  _cdir.set(cx-px, cy-1.7, cz-pz);
+  const wantD = _cdir.length();
+  if (wantD > 0.01){
+    _cdir.multiplyScalar(1/wantD);
+    _cray.set(_corigin.set(px,1.7,pz), _cdir); _cray.far = wantD;
+    const hit = _cray.intersectObjects(occluders, false)[0];
+    if (hit && hit.distance > 1.4){
+      const dd = Math.max(hit.distance-0.7, 1.2);
+      cx = px+_cdir.x*dd; cy = 1.7+_cdir.y*dd; cz = pz+_cdir.z*dd;
+    }
+  }
+  const ck = 1-Math.exp(-8*dt);
   camera.position.x += (cx-camera.position.x)*ck;
   camera.position.y += (cy-camera.position.y)*ck;
   camera.position.z += (cz-camera.position.z)*ck;
