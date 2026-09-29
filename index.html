@@ -222,11 +222,13 @@ rim.position.set(-9, 6, -9); scene.add(rim);
 /* ---------- helpers ---------- */
 function bx(w,h,d,color,x,y,z,ry=0,parent=scene){
   const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshStandardMaterial({ color, roughness:0.85 }));
-  m.position.set(x,y,z); m.rotation.y = ry; m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+  m.position.set(x,y,z); m.rotation.y = ry; m.castShadow = true; m.receiveShadow = true;
+  m.add(inkOutline(m.geometry)); parent.add(m); return m;
 }
 function cyl(rt,rb,h,color,x,y,z,seg=20,parent=scene){
   const m = new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg), new THREE.MeshStandardMaterial({ color, roughness:0.8 }));
-  m.position.set(x,y,z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m;
+  m.position.set(x,y,z); m.castShadow = true; m.receiveShadow = true;
+  m.add(inkOutline(m.geometry)); parent.add(m); return m;
 }
 function canvasTex(w,h,draw){
   const c = document.createElement('canvas'); c.width = w; c.height = h;
@@ -236,13 +238,30 @@ function canvasTex(w,h,draw){
 function frame(w,h,tex,x,y,z,ry=0){
   const g = new THREE.Group();
   const f = new THREE.Mesh(new THREE.BoxGeometry(w,h,0.1), new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.6 }));
-  f.castShadow = true;
+  f.castShadow = true; f.add(inkOutline(f.geometry));
   const a = new THREE.Mesh(new THREE.PlaneGeometry(w-0.3,h-0.3), new THREE.MeshStandardMaterial({ map:tex, roughness:0.9 }));
   a.position.z = 0.06; g.add(f,a); g.position.set(x,y,z); g.rotation.y = ry; scene.add(g); return g;
 }
 
+/* ---------- ink-sketch restyle toolkit ---------- */
+const inkLineMat = new THREE.LineBasicMaterial({ color:0x1a1a1a });
+const leafInkMat = new THREE.LineBasicMaterial({ color:0x2e4a2e });
+function inkOutline(geo){
+  const l = new THREE.LineSegments(new THREE.EdgesGeometry(geo), inkLineMat);
+  l.frustumCulled = false; return l;
+}
+
 /* ---------- exterior ground ---------- */
-const lawn = new THREE.Mesh(new THREE.PlaneGeometry(230,230), new THREE.MeshStandardMaterial({ color:0xdde3d0, roughness:1 }));
+const lawnHatch = canvasTex(256,256,(g)=>{
+  g.fillStyle = '#dde3d0'; g.fillRect(0,0,256,256);
+  g.strokeStyle = 'rgba(46,74,46,.07)'; g.lineWidth = 1;
+  for (let i=0;i<46;i++){
+    const x = Math.random()*256, y = Math.random()*256;
+    g.beginPath(); g.moveTo(x,y); g.lineTo(x+(Math.random()-0.5)*26, y-6-Math.random()*12); g.stroke();
+  }
+});
+lawnHatch.wrapS = lawnHatch.wrapT = THREE.RepeatWrapping; lawnHatch.repeat.set(30,30);
+const lawn = new THREE.Mesh(new THREE.PlaneGeometry(230,230), new THREE.MeshStandardMaterial({ map:lawnHatch, roughness:1 }));
 lawn.rotation.x = -Math.PI/2; lawn.position.y = -0.02; lawn.receiveShadow = true; scene.add(lawn);
 scene.fog = new THREE.Fog(0xf4f1ea, 130, 320);
 
@@ -257,10 +276,15 @@ const woodTex = canvasTex(512,512,(g)=>{
     for (let i=0;i<6;i++) g.fillRect(0, y+8+Math.random()*70, 512, 1);
     g.fillStyle = 'rgba(120,85,50,.2)'; g.fillRect(Math.random()*512, y, 3, 86);
   }
+  g.strokeStyle = 'rgba(60,40,25,.10)'; g.lineWidth = 1;   // hand-drawn pen hatching
+  for (let i=-512;i<1024;i+=9){
+    g.beginPath(); const j = i+(Math.random()-0.5)*8;
+    g.moveTo(j,0); g.lineTo(j+512,512); g.stroke();
+  }
 });
 woodTex.wrapS = woodTex.wrapT = THREE.RepeatWrapping; woodTex.repeat.set(4,2.5);
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(RW,RD), new THREE.MeshStandardMaterial({ map:woodTex, roughness:0.8 }));
-floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; floor.add(inkOutline(floor.geometry)); scene.add(floor);
 
 const rugTex = canvasTex(512,512,(g)=>{
   g.fillStyle = '#ded6c2'; g.fillRect(0,0,512,512);
@@ -270,12 +294,27 @@ const rugTex = canvasTex(512,512,(g)=>{
   g.beginPath(); g.arc(256,256,190,0,Math.PI*2); g.stroke();
 });
 const rug = new THREE.Mesh(new THREE.CircleGeometry(3.3,48), new THREE.MeshStandardMaterial({ map:rugTex, roughness:1 }));
-rug.rotation.x = -Math.PI/2; rug.position.set(0,0.005,2); rug.receiveShadow = true; scene.add(rug);
+rug.rotation.x = -Math.PI/2; rug.position.set(0,0.005,2); rug.receiveShadow = true; rug.add(inkOutline(rug.geometry)); scene.add(rug);
 
-const wallMat = new THREE.MeshStandardMaterial({ color:0xefece2, roughness:0.9 });
+const wallHatch = canvasTex(512,512,(g)=>{
+  g.fillStyle = '#efece2'; g.fillRect(0,0,512,512);
+  g.strokeStyle = 'rgba(26,26,26,.045)'; g.lineWidth = 1;
+  for (let i=-512;i<1024;i+=7){
+    g.beginPath(); const j = i+(Math.random()-0.5)*6;
+    g.moveTo(j,0); g.lineTo(j+512,512); g.stroke();
+  }
+  g.strokeStyle = 'rgba(26,26,26,.07)';
+  for (let k=0;k<14;k++){
+    const x = Math.random()*512, y = Math.random()*512, len = 60+Math.random()*140;
+    g.beginPath(); g.moveTo(x,y); g.lineTo(x+len*0.7, y+len*0.7); g.stroke();
+  }
+});
+wallHatch.wrapS = wallHatch.wrapT = THREE.RepeatWrapping; wallHatch.repeat.set(3,1);
+const wallMat = new THREE.MeshStandardMaterial({ map:wallHatch, roughness:0.9 });
 function wall(w,h,x,y,z,ry){
   const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,0.4), wallMat);
-  m.position.set(x,y,z); m.rotation.y = ry; m.receiveShadow = true; m.castShadow = true; scene.add(m);
+  m.position.set(x,y,z); m.rotation.y = ry; m.receiveShadow = true; m.castShadow = true;
+  m.add(inkOutline(m.geometry)); scene.add(m);
 }
 wall(RW,WH, 0,WH/2,-RD/2, 0);                    // back
 wall(RD,WH, -RW/2,WH/2,0, Math.PI/2);            // left
@@ -288,12 +327,12 @@ wall(2.2,WH-3.2, 0,3.2+(WH-3.2)/2, RD/2, 0);
 const bbMat = new THREE.MeshStandardMaterial({ color:0xf8f5ee, roughness:0.8 });
 [[0,-9.78,0],[-14.78,0,Math.PI/2],[14.78,0,Math.PI/2],[0,9.78,0]].forEach(([x,z,ry])=>{
   const b = new THREE.Mesh(new THREE.BoxGeometry(ry?0.12:RW, 0.28, ry?RD:0.12), bbMat);
-  b.position.set(x,0.14,z); scene.add(b);
+  b.position.set(x,0.14,z); b.add(inkOutline(b.geometry)); scene.add(b);
 });
 // red accent strip
 const strip = new THREE.Mesh(new THREE.BoxGeometry(RW,0.16,0.06),
   new THREE.MeshStandardMaterial({ color:0xf13343, emissive:0xf13343, emissiveIntensity:0.3 }));
-strip.position.set(0,0.42,-RD/2+0.24); scene.add(strip);
+strip.position.set(0,0.42,-RD/2+0.24); strip.add(inkOutline(strip.geometry)); scene.add(strip);
 
 // door (pivot at hinge)
 const doorPivot = new THREE.Group(); doorPivot.position.set(-1.1,0,RD/2); scene.add(doorPivot);
@@ -343,8 +382,8 @@ const doorPivot = new THREE.Group(); doorPivot.position.set(-1.1,0,RD/2); scene.
 // path + bushes
 for (let i=0;i<6;i++) bx(1.7,0.07,1.15, 0xcfc8b8, 0,0.035,RD/2+1.8+i*1.5);
 [[-2.7],[2.7]].forEach(([x])=>{
-  const b = new THREE.Mesh(new THREE.SphereGeometry(0.6,14,14), new THREE.MeshStandardMaterial({ color:0x7aa36b, roughness:0.95 }));
-  b.position.set(x,0.5,RD/2+1.2); b.castShadow = true; scene.add(b);
+  const b = scribbleMesh(0.6,0.6,0.6,700,0.1,leafInkMat);
+  b.position.set(x,0.5,RD/2+1.2); scene.add(b);
 });
 /* ---------- open world: road, sidewalk, trees, lamps, clouds ---------- */
 const ROAD_Z = 26;
@@ -355,11 +394,10 @@ function tree(x,z,s=1){
   const g = new THREE.Group();
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.22*s,0.3*s,1.6*s,10),
     new THREE.MeshStandardMaterial({ color:0x8a6a4d, roughness:0.95 }));
-  trunk.position.y = 0.8*s; trunk.castShadow = true; g.add(trunk);
-  const leaf = new THREE.MeshStandardMaterial({ color:0x7aa36b, roughness:0.95 });
+  trunk.position.y = 0.8*s; trunk.castShadow = true; trunk.add(inkOutline(trunk.geometry)); g.add(trunk);
   [[0,2.2,0,1.15],[0.55,1.7,0.25,0.8],[-0.5,1.75,-0.2,0.75]].forEach(([lx,ly,lz,r])=>{
-    const f = new THREE.Mesh(new THREE.SphereGeometry(r*s,14,14), leaf);
-    f.position.set(lx*s,ly*s,lz*s); f.castShadow = true; g.add(f);
+    const f = scribbleMesh(r*s,r*s,r*s,700,0.1,leafInkMat);   // loose ink-scribble foliage
+    f.position.set(lx*s,ly*s,lz*s); g.add(f);
   });
   g.position.set(x,0,z); scene.add(g); return g;
 }
@@ -395,14 +433,16 @@ const roofGroup = new THREE.Group(); scene.add(roofGroup);
 {
   const roofMat = new THREE.MeshStandardMaterial({ color:0xbf5f4c, roughness:0.85 });
   const mk = (z,rx)=>{ const p = new THREE.Mesh(new THREE.BoxGeometry(RW+2.4,0.22,11.5), roofMat);
-    p.position.set(0,7.3,z); p.rotation.x = rx; p.castShadow = true; roofGroup.add(p); };
+    p.position.set(0,7.3,z); p.rotation.x = rx; p.castShadow = true; p.add(inkOutline(p.geometry)); roofGroup.add(p); };
   mk(-5.5,-0.232); mk(5.5,0.232);
   const tri = new THREE.Shape(); tri.moveTo(-10,0); tri.lineTo(10,0); tri.lineTo(0,2.6); tri.closePath();
   const gg = new THREE.ExtrudeGeometry(tri,{ depth:0.4, bevelEnabled:false });
-  const g1 = new THREE.Mesh(gg, wallMat); g1.rotation.y = Math.PI/2; g1.position.set(-15.2,6,0); roofGroup.add(g1);
-  const g2 = new THREE.Mesh(gg, wallMat); g2.rotation.y = -Math.PI/2; g2.position.set(15.2,6,0); roofGroup.add(g2);
+  const g1 = new THREE.Mesh(gg, wallMat); g1.rotation.y = Math.PI/2; g1.position.set(-15.2,6,0);
+  g1.add(inkOutline(g1.geometry)); roofGroup.add(g1);
+  const g2 = new THREE.Mesh(gg, wallMat); g2.rotation.y = -Math.PI/2; g2.position.set(15.2,6,0);
+  g2.add(inkOutline(g2.geometry)); roofGroup.add(g2);
   const ch = new THREE.Mesh(new THREE.BoxGeometry(1.1,2.4,1.1), new THREE.MeshStandardMaterial({ color:0x9a8a7a, roughness:0.9 }));
-  ch.position.set(8,9.3,-4); ch.castShadow = true; roofGroup.add(ch);
+  ch.position.set(8,9.3,-4); ch.castShadow = true; ch.add(inkOutline(ch.geometry)); roofGroup.add(ch);
 }
 
 /* ---------- interior furniture ---------- */
@@ -443,10 +483,9 @@ cyl(0.28,0.32,0.08,0x3a3a3a,11.5,0.04,-6.5); cyl(0.05,0.05,2.3,0x3a3a3a,11.5,1.2
 }
 cyl(0.34,0.26,0.5,0xb5654a,-12.5,0.25,-7.5);
 {
-  const leaf = new THREE.MeshStandardMaterial({ color:0x5f9159, roughness:0.9 });
   [[0,0.95,0,0.42],[0.25,1.2,0.1,0.32],[-0.22,1.15,-0.08,0.3]].forEach(([x,y,z,r])=>{
-    const s = new THREE.Mesh(new THREE.SphereGeometry(r,14,14), leaf);
-    s.position.set(-12.5+x,y,-7.5+z); s.castShadow = true; scene.add(s);
+    const s = scribbleMesh(r,r,r,450,0.08,leafInkMat);
+    s.position.set(-12.5+x,y,-7.5+z); scene.add(s);
   });
 }
 // floor cushions on the rug + a second plant for the empty corner
@@ -458,10 +497,9 @@ cyl(0.34,0.26,0.5,0xb5654a,-12.5,0.25,-7.5);
 });
 cyl(0.3,0.24,0.45,0xb5654a,12.8,0.22,5.5);
 {
-  const leaf2 = new THREE.MeshStandardMaterial({ color:0x5f9159, roughness:0.9 });
   [[0,0.85,0,0.36],[0.2,1.05,0.08,0.26]].forEach(([x,y,z,r])=>{
-    const s = new THREE.Mesh(new THREE.SphereGeometry(r,14,14), leaf2);
-    s.position.set(12.8+x,y,5.5+z); s.castShadow = true; scene.add(s);
+    const s = scribbleMesh(r,r,r,450,0.08,leafInkMat);
+    s.position.set(12.8+x,y,5.5+z); scene.add(s);
   });
 }
 
@@ -549,9 +587,9 @@ frame(1.7,2.3, canvasTex(256,340,(g)=>{
   });
   const pg = new THREE.MeshStandardMaterial({ map:tex, roughness:0.95 });
   const L = new THREE.Mesh(new THREE.BoxGeometry(0.75,0.03,0.55), pg);
-  L.position.set(-8.38,0.62,-3.5); L.rotation.z = 0.06; L.castShadow = true; scene.add(L);
+  L.position.set(-8.38,0.62,-3.5); L.rotation.z = 0.06; L.castShadow = true; L.add(inkOutline(L.geometry)); scene.add(L);
   const R = new THREE.Mesh(new THREE.BoxGeometry(0.75,0.03,0.55), pg);
-  R.position.set(-7.62,0.62,-3.5); R.rotation.z = -0.06; R.castShadow = true; scene.add(R);
+  R.position.set(-7.62,0.62,-3.5); R.rotation.z = -0.06; R.castShadow = true; R.add(inkOutline(R.geometry)); scene.add(R);
 }
 
 const colliders = [
