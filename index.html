@@ -172,7 +172,7 @@
       <p class="tagline">Medicinae Studiosus | Mortui vivos docent</p>
       <form class="capsule" id="askForm" autocomplete="off">
         <span class="cap-x">+</span>
-        <input id="askInput" type="text" placeholder="Aditya ke baare mein kuch poochho…" aria-label="Ask about Aditya" maxlength="120">
+        <input id="askInput" type="text" placeholder="Curious about Aditya? Ask me anything…" aria-label="Ask about Aditya" maxlength="120">
         <button class="cap-go" type="submit" aria-label="Ask">→</button>
       </form>
       <div id="askAnswer" role="status"></div>
@@ -824,8 +824,8 @@ const ASK = [
   { k:['fracture'], a:"Fracture's demands made this house lively — sitting, dancing, snacking, football. Legend." },
   { k:['game','play','dance','football','eat'], a:"Flip the coin and step inside — the little scribble guy sits, dances, juggles a football and eats apples. All on demand." },
 ];
-const ASK_HI = "Hello hello! Aditya ke baare mein kuch poochho — main sab bata dungi.";
-const ASK_FALLBACK = "Hmm, yeh toh mujhe bhi nahi pata… Aditya se seedha poochh lo — <b>dradityax@gmail.com</b> pe woh jawab de dega.";
+const ASK_HI = "Hello hello! Curious about Aditya? Ask me anything — I'll tell you everything I know.";
+const ASK_FALLBACK = "Hmm, even I don't know that one… ask Aditya directly at <b>dradityax@gmail.com</b> — he actually replies.";
 {
   const askForm = document.getElementById('askForm'), askInput = document.getElementById('askInput'), askAnswer = document.getElementById('askAnswer');
   askForm.addEventListener('submit', e=>{
