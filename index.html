@@ -11,10 +11,8 @@
   canvas.webgl { position:fixed; top:0; left:0; display:block; touch-action:none; }
   .ftc { position:fixed; top:1.35rem; right:1.5rem; z-index:10;
          font-size:.8rem; font-weight:600; letter-spacing:.35em; text-transform:uppercase;
-         color:rgba(26,26,26,.55); cursor:pointer; touch-action:manipulation;
-         padding:.4rem .2rem .4rem .6rem; }
+         color:rgba(26,26,26,.55); text-decoration:none; cursor:pointer; }
   .ftc:hover { color:rgba(26,26,26,.9); }
-  .ftc:active { transform:scale(.94); }
 </style>
 <script>
 /* Old invite links (?room=CODE) pointed at the homepage — forward them into the world. */
@@ -25,11 +23,11 @@
 </script>
 </head>
 <body>
-<div class="ftc" id="ftc" title="Flip the coin">FTC</div>
+<a class="ftc" href="/world/">FTC</a>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js"></script>
 <script>
 (function(){
-  // ================= renderer / scene =================
+  // ---------- renderer / scene ----------
   var renderer = new THREE.WebGLRenderer({ antialias:true });
   renderer.setSize(innerWidth, innerHeight);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -41,411 +39,193 @@
   var scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf4f1ea);
 
-  // cat sits a little farther from the screen now
-  var camera = new THREE.PerspectiveCamera(35, innerWidth/innerHeight, 0.1, 60);
-  camera.position.set(0, 2.05, 7.6);
-  camera.lookAt(0, 1.02, 0);
+  var camera = new THREE.PerspectiveCamera(35, innerWidth/innerHeight, 0.1, 50);
+  camera.position.set(0, 1.7, 4.6);
+  camera.lookAt(0, 0.95, 0);
 
   scene.add(new THREE.HemisphereLight(0xfffaf0, 0xd8cfc0, 0.95));
   var sun = new THREE.DirectionalLight(0xffffff, 1.6);
-  sun.position.set(2.5, 5.5, 3.5);
+  sun.position.set(2.5, 5, 3);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024,1024);
-  sun.shadow.camera.left=-4; sun.shadow.camera.right=4;
-  sun.shadow.camera.top=5;  sun.shadow.camera.bottom=-1;
+  sun.shadow.camera.left=-3; sun.shadow.camera.right=3;
+  sun.shadow.camera.top=4;  sun.shadow.camera.bottom=-1;
   scene.add(sun);
   var fill = new THREE.DirectionalLight(0xffe9d6, 0.35);
   fill.position.set(-3, 2, -2);
   scene.add(fill);
 
+  // soft ground shadow only — page stays plain
   var ground = new THREE.Mesh(
-    new THREE.CircleGeometry(2.6, 48),
+    new THREE.CircleGeometry(2.4, 48),
     new THREE.ShadowMaterial({ opacity:0.16 })
   );
   ground.rotation.x = -Math.PI/2;
   ground.receiveShadow = true;
   scene.add(ground);
 
-  // ================= materials (sketchy ink look) =================
-  var FUR   = new THREE.MeshStandardMaterial({ color:0x2b2b31, roughness:0.9, flatShading:true });
-  var FUR_D = new THREE.MeshStandardMaterial({ color:0x1e1e24, roughness:0.9, flatShading:true });
-  var CREAM = new THREE.MeshStandardMaterial({ color:0xf3ecdd, roughness:0.9, flatShading:true });
+  // ---------- materials ----------
+  var FUR   = new THREE.MeshStandardMaterial({ color:0x26262b, roughness:0.85 });
+  var CREAM = new THREE.MeshStandardMaterial({ color:0xf7f2e7, roughness:0.9 });
   var WHITE = new THREE.MeshStandardMaterial({ color:0xffffff, roughness:0.35 });
-  var INK   = new THREE.MeshStandardMaterial({ color:0x101014, roughness:0.3 });
-  var PINK  = new THREE.MeshStandardMaterial({ color:0xd98a8a, roughness:0.8, flatShading:true });
+  var INK   = new THREE.MeshStandardMaterial({ color:0x141416, roughness:0.3 });
+  var PINK  = new THREE.MeshStandardMaterial({ color:0xd98a8a, roughness:0.8 });
   var VERM  = new THREE.MeshStandardMaterial({ color:0xe0492f, roughness:0.6 });
-  var INK_LINE = new THREE.LineBasicMaterial({ color:0x14141a, transparent:true, opacity:0.5 });
 
   function ball(r, mat, x, y, z, sx, sy, sz){
-    var m = new THREE.Mesh(new THREE.SphereGeometry(r, 28, 22), mat);
+    var m = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 32), mat);
     m.position.set(x||0, y||0, z||0);
     m.scale.set(sx||1, sy||1, sz||1);
     m.castShadow = true;
     return m;
   }
-  // ink outline -> hand-drawn sketch feel (child inherits the mesh transform)
-  function ink(mesh, thresh){
-    var e = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry, thresh || 30), INK_LINE);
-    mesh.add(e);
-    return mesh;
-  }
 
   var cat = new THREE.Group();
   scene.add(cat);
 
-  // ================= body (sitting, real cat proportions) =================
-  var bodyBase = { x:1, y:1.32, z:0.92 };
-  var body = ink(ball(0.55, FUR, 0, 0.98, 0, bodyBase.x, bodyBase.y, bodyBase.z));
+  // ---------- body (sitting) ----------
+  var body = ball(0.55, FUR, 0, 0.66, 0, 1, 1.12, 0.92);
   cat.add(body);
-  cat.add(ink(ball(0.40, CREAM, 0, 0.95, 0.38, 0.72, 1.0, 0.55)));   // chest bib
-  var haunchL = ink(ball(0.30, FUR, -0.48, 0.34, -0.02));
-  var haunchR = ink(ball(0.30, FUR,  0.48, 0.34, -0.02));
-  cat.add(haunchL); cat.add(haunchR);
-  cat.add(ball(0.13, FUR_D, -0.50, 0.08, 0.32, 1, 0.6, 1.4));        // hind paws peeking out
-  cat.add(ball(0.13, FUR_D,  0.50, 0.08, 0.32, 1, 0.6, 1.4));
+  cat.add(ball(0.40, CREAM, 0, 0.60, 0.36, 0.72, 0.95, 0.55));       // chest patch
+  cat.add(ball(0.28, FUR, -0.44, 0.30, -0.05));                       // haunches
+  cat.add(ball(0.28, FUR,  0.44, 0.30, -0.05));
 
-  // front legs as liftable groups (paw tap -> paw lifts)
-  function frontLeg(s){
-    var g = new THREE.Group();
-    g.position.set(0.21*s, 0.78, 0.40);
-    var leg = ink(new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.10, 0.62, 18), FUR));
-    leg.position.y = -0.28; leg.castShadow = true;
-    var paw = ink(ball(0.11, FUR, 0, -0.60, 0.05, 1, 0.72, 1.3));
-    g.add(leg); g.add(paw);
-    cat.add(g);
-    return g;
-  }
-  var legL = frontLeg(-1), legR = frontLeg(1);
+  [-1,1].forEach(function(s){
+    var leg = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.095, 0.5, 20), FUR);
+    leg.position.set(0.20*s, 0.30, 0.42); leg.castShadow = true; cat.add(leg);
+    cat.add(ball(0.10, FUR, 0.20*s, 0.075, 0.46, 1, 0.75, 1.25));     // paws
+  });
 
-  // ================= tail (curled around the side, resting) =================
+  // ---------- tail (wags!) ----------
   var tail = new THREE.Group();
-  tail.position.set(0.30, 0.16, -0.42);
+  tail.position.set(0, 0.42, -0.50);
   var tailSegs = [];
-  for (var i=0; i<8; i++){
-    var a = 2.6 - i*0.42;                       // curl from back around the right side
-    var r = 0.62 - i*0.028;
-    var seg = ink(ball(0.105 - i*0.006, FUR,
-      0.15 + Math.cos(a)*r, 0.02 + i*0.012, 0.42 + Math.sin(a)*r));
+  for (var i=0; i<6; i++){
+    var r = 0.115 - i*0.008;
+    var seg = ball(r, FUR, 0.30*(1-Math.cos(i*0.55)), i*0.17, -0.06*i);
     tail.add(seg); tailSegs.push(seg);
   }
-  tail.add(ball(0.07, CREAM, 0.15 + Math.cos(2.6-7*0.42)*(0.62-7*0.028), 0.11, 0.42 + Math.sin(2.6-7*0.42)*(0.62-7*0.028))); // tip
+  tail.add(ball(0.075, CREAM, 0.30*(1-Math.cos(5*0.55)), 5*0.17+0.05, -0.06*5)); // tip
   cat.add(tail);
 
-  // ================= head =================
+  // ---------- head ----------
   var head = new THREE.Group();
-  head.position.set(0, 2.02, 0.10);
+  head.position.set(0, 1.50, 0.08);
   cat.add(head);
-  head.add(ink(ball(0.44, FUR, 0, 0, 0)));                                  // skull
-  head.add(ball(0.20, FUR, -0.20, -0.15, 0.24));                            // cheeks
-  head.add(ball(0.20, FUR,  0.20, -0.15, 0.24));
-  head.add(ball(0.17, CREAM, 0, -0.17, 0.36, 1.4, 0.85, 0.9));              // muzzle
-  head.add(ball(0.05, VERM, 0, -0.10, 0.50, 1.4, 0.9, 0.8));                // nose
-  var mouth = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.011, 8, 18, Math.PI), INK);
-  mouth.position.set(0, -0.185, 0.49); mouth.rotation.z = Math.PI; mouth.rotation.x = -0.15;
-  head.add(mouth);
+  head.add(ball(0.40, FUR, 0, 0, 0));
 
   // ears
-  function ear(s){
-    var g = new THREE.Group();
-    var outer = ink(new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.36, 20), FUR));
-    outer.scale.set(1, 1, 0.62); outer.castShadow = true;
-    var inner = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.18, 16), PINK);
-    inner.position.set(0, -0.04, 0.055); inner.scale.set(1, 1, 0.6);
+  var earL = new THREE.Group(), earR = new THREE.Group();
+  [[-1,earL],[1,earR]].forEach(function(pair){
+    var s = pair[0], g = pair[1];
+    var outer = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.32, 24), FUR);
+    outer.castShadow = true;
+    var inner = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.16, 20), PINK);
+    inner.position.set(0, -0.02, 0.075);
     g.add(outer); g.add(inner);
-    g.position.set(0.27*s, 0.40, -0.03);
-    g.rotation.z = -0.24*s; g.rotation.x = -0.08;
+    g.position.set(0.24*s, 0.36, -0.02);
+    g.rotation.z = -0.28*s;
     head.add(g);
-    return g;
-  }
-  var earL = ear(-1), earR = ear(1);
+  });
+
+  // muzzle + nose
+  head.add(ball(0.16, CREAM, 0, -0.10, 0.34, 1.35, 0.8, 0.8));
+  var nose = ball(0.045, VERM, 0, -0.055, 0.465, 1.25, 0.8, 0.8);
+  head.add(nose);
 
   // whiskers
-  var whiskMat = new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0.7 });
+  var whiskMat = new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0.75 });
   [-1,1].forEach(function(s){
-    for (var w=0; w<4; w++){
-      var wh = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.44, 6), whiskMat);
-      wh.position.set(0.30*s, -0.06 - w*0.05, 0.40);
-      wh.rotation.z = Math.PI/2 + s*(0.22 - w*0.14);
-      wh.rotation.y = s*0.3;
+    for (var w=0; w<3; w++){
+      var wh = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.36, 6), whiskMat);
+      wh.position.set(0.32*s, -0.03 - w*0.055, 0.38);
+      wh.rotation.z = Math.PI/2 + s*(0.18 - w*0.16);
+      wh.rotation.y = s*0.25;
       head.add(wh);
     }
   });
 
-  // eyes (follow the cursor / the coin)
-  var pupils = [], eyeWhites = [];
+  // ---------- eyes (follow the cursor, like the TV mascot) ----------
+  var pupils = [], eyeWhites = [], highlights = [];
   [-1,1].forEach(function(s){
     var eye = new THREE.Group();
-    eye.position.set(0.175*s, 0.10, 0.345);
-    var sclera = ball(0.115, WHITE, 0, 0, 0, 1, 0.82, 0.55);
-    var pupil  = ball(0.055, INK, 0, 0, 0.055, 0.62, 1, 0.5);   // vertical slit
-    var hl     = ball(0.018, WHITE, 0.022, 0.026, 0.038);
+    eye.position.set(0.155*s, 0.07, 0.325);
+    var sclera = ball(0.105, WHITE, 0, 0, 0);
+    var pupil  = ball(0.052, INK, 0, 0, 0.068);
+    var hl     = ball(0.016, WHITE, 0.02, 0.02, 0.048);
     pupil.add(hl);
     eye.add(sclera); eye.add(pupil);
     head.add(eye);
-    pupils.push(pupil); eyeWhites.push(eye);
+    pupils.push(pupil); eyeWhites.push(sclera); highlights.push(hl);
   });
 
-  // ---- tag tappable parts ----
-  function tagAll(obj, part){ obj.traverse(function(o){ if (!o.userData.part) o.userData.part = part; }); }
-  tagAll(earL, 'earL'); tagAll(earR, 'earR');
-  tagAll(legL, 'pawL'); tagAll(legR, 'pawR');
-  tagAll(tail, 'tail');
-  tagAll(head, 'head');
-  tagAll(cat, 'body');
-
-  // ================= sound (synthesized, no files) =================
-  var actx = null;
-  function meowSound(high){
-    try{
-      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-      if (actx.state === 'suspended') actx.resume();
-      var t = actx.currentTime, dur = high ? 0.42 : 0.58;
-      var o = actx.createOscillator(); o.type = 'sawtooth';
-      var f0 = high ? 640 : 500;
-      o.frequency.setValueAtTime(f0, t);
-      o.frequency.linearRampToValueAtTime(f0*1.5, t+dur*0.35);
-      o.frequency.linearRampToValueAtTime(f0*0.85, t+dur);
-      var vib = actx.createOscillator(); vib.frequency.value = 8.5;
-      var vg = actx.createGain(); vg.gain.value = 28;
-      vib.connect(vg); vg.connect(o.frequency); vib.start(t); vib.stop(t+dur);
-      var bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1350; bp.Q.value = 1.7;
-      var g = actx.createGain();
-      g.gain.setValueAtTime(0.001, t);
-      g.gain.exponentialRampToValueAtTime(0.4, t+0.07);
-      g.gain.exponentialRampToValueAtTime(0.001, t+dur);
-      o.connect(bp); bp.connect(g); g.connect(actx.destination);
-      o.start(t); o.stop(t+dur+0.05);
-    }catch(e){}
-  }
-  function purrSound(){
-    try{
-      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-      if (actx.state === 'suspended') actx.resume();
-      var t = actx.currentTime, dur = 1.6;
-      var buf = actx.createBuffer(1, Math.floor(actx.sampleRate*dur), actx.sampleRate);
-      var ch = buf.getChannelData(0);
-      for (var i = 0; i < ch.length; i++) ch[i] = (Math.random()*2-1);
-      var src = actx.createBufferSource(); src.buffer = buf;
-      var f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 130;
-      var lfo = actx.createOscillator(); lfo.frequency.value = 21;
-      var lg = actx.createGain(); lg.gain.value = 0.5;
-      var g = actx.createGain(); g.gain.value = 0.5;
-      lfo.connect(lg); lg.connect(g.gain);
-      g.gain.setValueAtTime(0.001, t);
-      g.gain.exponentialRampToValueAtTime(0.35, t+0.25);
-      g.gain.exponentialRampToValueAtTime(0.001, t+dur);
-      src.connect(f); f.connect(g); g.connect(actx.destination);
-      src.start(t); lfo.start(t); lfo.stop(t+dur);
-    }catch(e){}
-  }
-  function tingSound(){
-    try{
-      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-      if (actx.state === 'suspended') actx.resume();
-      var t = actx.currentTime;
-      [2830, 3610].forEach(function(fr, i){
-        var o = actx.createOscillator(); o.type = 'triangle'; o.frequency.value = fr;
-        var g = actx.createGain();
-        g.gain.setValueAtTime(i ? 0.10 : 0.16, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t+0.55);
-        o.connect(g); g.connect(actx.destination);
-        o.start(t); o.stop(t+0.6);
-      });
-    }catch(e){}
-  }
-
-  // ================= the coin (FTC = flip the coin) =================
-  function faceTexture(draw){
-    var c = document.createElement('canvas'); c.width = c.height = 256;
-    var g = c.getContext('2d');
-    var grad = g.createRadialGradient(128,128,20,128,128,128);
-    grad.addColorStop(0, '#f2cd6f'); grad.addColorStop(1, '#c8922e');
-    g.fillStyle = grad;
-    g.beginPath(); g.arc(128,128,128,0,7); g.fill();
-    g.strokeStyle = '#a06f1f'; g.lineWidth = 7;
-    g.beginPath(); g.arc(128,128,102,0,7); g.stroke();
-    draw(g);
-    var t = new THREE.CanvasTexture(c);
-    t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
-    return t;
-  }
-  var headsTex = faceTexture(function(g){
-    g.fillStyle = '#8a5c14'; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.font = '900 104px Inter, system-ui, sans-serif';
-    g.fillText('AX', 128, 136);
-  });
-  var tailsTex = faceTexture(function(g){
-    g.fillStyle = '#8a5c14';
-    g.beginPath(); g.ellipse(128, 148, 44, 36, 0, 0, 7); g.fill();   // pad
-    [[84,96],[116,82],[150,82],[182,96]].forEach(function(p){        // toes
-      g.beginPath(); g.arc(p[0], p[1], 17, 0, 7); g.fill();
-    });
-  });
-  var coinSideMat = new THREE.MeshStandardMaterial({ color:0xb57e22, metalness:0.55, roughness:0.4 });
-  var coin = new THREE.Group();
-  var coinMesh = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.42, 0.42, 0.07, 48),
-    [ coinSideMat,
-      new THREE.MeshStandardMaterial({ map:headsTex, metalness:0.35, roughness:0.45 }),
-      new THREE.MeshStandardMaterial({ map:tailsTex, metalness:0.35, roughness:0.45 }) ]
-  );
-  coinMesh.castShadow = true;
-  coin.add(coinMesh);
-  coin.position.set(0, 2.3, 1.35);
-  coin.visible = false;
-  scene.add(coin);
-
-  var flip = null;
-  function easeOutCubic(k){ return 1 - Math.pow(1-k, 3); }
-  function easeOutBack(k){ var c1=1.70158, c3=c1+1; return 1 + c3*Math.pow(k-1,3) + c1*Math.pow(k-1,2); }
-  function flipCoin(){
-    if (flip) return;
-    tingSound();
-    var result = Math.random() < 0.5 ? 'heads' : 'tails';
-    var targetX = result === 'heads' ? Math.PI/2 : -Math.PI/2;  // winning face toward camera
-    var spins = 4 + Math.floor(Math.random()*3);
-    flip = { t:0, dur:1.6, total: spins*Math.PI*2 + targetX, holdT:0 };
-    coin.visible = true;
-    coin.scale.set(0.01, 0.01, 0.01);
-  }
-  document.getElementById('ftc').addEventListener('pointerdown', function(e){
-    e.preventDefault(); flipCoin();
-  });
-
-  // ================= tap-the-cat =================
-  var ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
-  var react = { headTilt:0, headTiltDir:1, pawL:0, pawR:0, squish:0, tailFlick:0, slowBlink:0 };
-  var excitement = 0;
-  var twitchEar = null, twitchT = 0;
-
-  function partOf(o){ while(o){ if (o.userData && o.userData.part) return o.userData.part; o = o.parent; } return null; }
-
-  function handleTap(cx, cy){
-    ptr.x = (cx / innerWidth) * 2 - 1;
-    ptr.y = -(cy / innerHeight) * 2 + 1;
-    ray.setFromCamera(ptr, camera);
-    var hits = ray.intersectObject(cat, true);
-    var part = hits.length ? partOf(hits[0].object) : null;
-    if (part === 'head'){ purrSound(); react.headTilt = 1; react.headTiltDir = Math.random()<0.5?-1:1; react.slowBlink = 1.2; }
-    else if (part === 'earL'){ twitchEar = earL; twitchT = 0.3; meowSound(true); }
-    else if (part === 'earR'){ twitchEar = earR; twitchT = 0.3; meowSound(true); }
-    else if (part === 'pawL'){ react.pawL = 1; meowSound(true); }
-    else if (part === 'pawR'){ react.pawR = 1; meowSound(true); }
-    else if (part === 'tail'){ react.tailFlick = 1; meowSound(false); }
-    else if (part === 'body'){ react.squish = 1; meowSound(false); }
-    else { excitement = 1; }   // empty tap = happy tail wag
-  }
-  var dX=0, dY=0, dT=0;
-  renderer.domElement.addEventListener('pointerdown', function(e){ dX=e.clientX; dY=e.clientY; dT=performance.now(); });
-  renderer.domElement.addEventListener('pointerup', function(e){
-    if (Math.hypot(e.clientX-dX, e.clientY-dY) < 12 && performance.now()-dT < 400) handleTap(e.clientX, e.clientY);
-  });
-
-  // pointer for eye-follow
+  // ---------- pointer ----------
   var pointer = { x:0, y:0 };
-  addEventListener('pointermove', function(e){
-    pointer.x = (e.clientX / innerWidth) * 2 - 1;
-    pointer.y = -((e.clientY / innerHeight) * 2 - 1);
-  });
+  function onMove(cx, cy){
+    pointer.x = (cx / innerWidth) * 2 - 1;
+    pointer.y = -((cy / innerHeight) * 2 - 1);
+  }
+  addEventListener('pointermove', function(e){ onMove(e.clientX, e.clientY); });
+  addEventListener('touchmove', function(e){
+    if (e.touches[0]) onMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive:true });
 
-  // ================= animation =================
+  // tap = excited tail wag
+  var excitement = 0;
+  addEventListener('pointerdown', function(){ excitement = 1; });
+
+  // ---------- animation ----------
   var clock = new THREE.Clock();
-  var t = 0, blinkTimer = 2.5, blinking = 0;
-  var lookYaw = 0, lookPitch = 0, lookYawT = 0, lookPitchT = 0, lookTimer = 4;
-  var pupilX = 0, pupilY = 0;
-  var autoTwitchTimer = 5;
+  var t = 0, blinkTimer = 2.5, blinking = 0, twitchTimer = 4, twitchEar = null, twitchT = 0;
+  var pupilPos = { x:0, y:0 }, headRot = { x:0, y:0 };
 
   function animate(){
     requestAnimationFrame(animate);
     var dt = Math.min(clock.getDelta(), 0.05);
     t += dt;
 
-    // ---- coin flight ----
-    var coinActive = false;
-    if (flip){
-      coinActive = true;
-      if (flip.holdT > 0){
-        flip.holdT -= dt;
-        coin.position.y = 2.55 + Math.sin(t*2.2)*0.05;
-        if (flip.holdT <= 0){ coin.visible = false; flip = null; coinActive = false; }
-      } else {
-        flip.t += dt;
-        var k = Math.min(1, flip.t / flip.dur);
-        var ks = Math.min(1, k*3);
-        var s = easeOutBack(ks);
-        coin.scale.set(s, s, s);
-        coin.position.y = 2.3 + Math.sin(k*Math.PI)*1.5;
-        coinMesh.rotation.x = easeOutCubic(k) * flip.total;
-        coinMesh.rotation.z = Math.sin(k*Math.PI)*0.35;
-        if (k >= 1){ flip.holdT = 1.5; excitement = 1; }
-      }
-    }
+    // tail wag (faster when excited)
+    excitement = Math.max(0, excitement - dt*0.5);
+    var wagSpeed = 2.2 + excitement*6, wagAmp = 0.45 + excitement*0.35;
+    tail.rotation.y = Math.sin(t*wagSpeed) * wagAmp;
+    tail.rotation.x = Math.sin(t*1.3) * 0.08;
 
-    // ---- head look: coin wins over idle look-around ----
-    lookTimer -= dt;
-    if (lookTimer <= 0){ lookYawT = (Math.random()*2-1)*0.35; lookPitchT = (Math.random()*2-1)*0.10; lookTimer = 5 + Math.random()*5; }
-    if (coinActive){
-      var dx = coin.position.x - head.position.x, dy = coin.position.y - head.position.y, dz = coin.position.z - head.position.z;
-      lookYawT = Math.max(-0.5, Math.min(0.5, Math.atan2(dx, dz)*0.7));
-      lookPitchT = Math.max(-0.15, Math.min(0.35, -Math.atan2(dy, Math.hypot(dx,dz))*0.6));
-    }
-    var ke = Math.min(1, dt*3);
-    lookYaw += (lookYawT - lookYaw)*ke;
-    lookPitch += (lookPitchT - lookPitch)*ke;
-    head.rotation.y = lookYaw;
-    head.rotation.x = lookPitch;
+    // breathing
+    body.scale.y = 1.12 + Math.sin(t*2)*0.012;
+    head.position.y = 1.50 + Math.sin(t*2)*0.008;
 
-    // head-tilt reaction (being petted)
-    react.headTilt = Math.max(0, react.headTilt - dt*1.1);
-    head.rotation.z = react.headTilt * 0.30 * react.headTiltDir;
+    // eyes follow cursor
+    var tx = Math.max(-1, Math.min(1, pointer.x)) * 0.045;
+    var ty = Math.max(-1, Math.min(1, pointer.y)) * 0.035;
+    pupilPos.x += (tx - pupilPos.x) * 0.18;
+    pupilPos.y += (ty - pupilPos.y) * 0.18;
+    pupils.forEach(function(p){ p.position.x = pupilPos.x; p.position.y = pupilPos.y; });
 
-    // breathing + gentle idle sway (she keeps moving a little)
-    body.scale.set(bodyBase.x + Math.sin(t*2)*0.008 + react.squish*0.06,
-                   bodyBase.y + Math.sin(t*2)*0.014 - react.squish*0.14,
-                   bodyBase.z + react.squish*0.06);
-    react.squish = Math.max(0, react.squish - dt*2.2);
-    head.position.y = 2.02 + Math.sin(t*2)*0.012;
-    cat.rotation.z = Math.sin(t*0.5)*0.015;
-    cat.rotation.y = Math.sin(t*0.23)*0.035;
+    // head turns slightly toward cursor
+    headRot.y += (pointer.x*0.18 - headRot.y) * 0.06;
+    headRot.x += (-pointer.y*0.10 - headRot.x) * 0.06;
+    head.rotation.y = headRot.y;
+    head.rotation.x = headRot.x;
 
-    // paw lifts
-    react.pawL = Math.max(0, react.pawL - dt*1.8);
-    react.pawR = Math.max(0, react.pawR - dt*1.8);
-    legL.rotation.x = -react.pawL*1.05;
-    legR.rotation.x = -react.pawR*1.05;
-
-    // tail: sway + excited wag + tap flick
-    excitement = Math.max(0, excitement - dt*0.45);
-    react.tailFlick = Math.max(0, react.tailFlick - dt*1.4);
-    tail.rotation.y = Math.sin(t*(2.2 + excitement*6)) * (0.10 + excitement*0.35)
-                    + Math.sin(t*28)*0.45*react.tailFlick;
-
-    // eyes follow cursor (and the coin)
-    var tx = Math.max(-1, Math.min(1, pointer.x + lookYaw*0.9)) * 0.045;
-    var ty = Math.max(-1, Math.min(1, pointer.y - lookPitch*0.9)) * 0.035;
-    pupilX += (tx - pupilX)*0.18; pupilY += (ty - pupilY)*0.18;
-    pupils.forEach(function(p){ p.position.x = pupilX; p.position.y = pupilY; });
-
-    // blink (slow happy blink after a head pat)
+    // blink
     blinkTimer -= dt;
-    if (blinkTimer <= 0){ blinking = react.slowBlink > 0 ? 0.35 : 0.12; blinkTimer = 2.5 + Math.random()*3; }
-    react.slowBlink = Math.max(0, react.slowBlink - dt);
+    if (blinkTimer <= 0){ blinking = 0.12; blinkTimer = 2.5 + Math.random()*3; }
     var eyeSY = 1;
     if (blinking > 0){ blinking -= dt; eyeSY = 0.12; }
     eyeWhites.forEach(function(e){ e.scale.y = eyeSY; });
     pupils.forEach(function(p){ p.scale.y = eyeSY; });
 
-    // ear twitches (idle + forced on tap)
-    autoTwitchTimer -= dt;
-    if (autoTwitchTimer <= 0 && !twitchEar){
+    // occasional ear twitch
+    twitchTimer -= dt;
+    if (twitchTimer <= 0 && !twitchEar){
       twitchEar = Math.random() < 0.5 ? earL : earR;
-      twitchT = 0.25; autoTwitchTimer = 4 + Math.random()*5;
+      twitchT = 0.25; twitchTimer = 3 + Math.random()*4;
     }
     if (twitchEar){
       twitchT -= dt;
-      var kk = Math.sin(Math.max(0, twitchT)/0.3 * Math.PI);
-      twitchEar.rotation.x = -0.08 - 0.35*kk;
-      if (twitchT <= 0){ twitchEar.rotation.x = -0.08; twitchEar = null; }
+      var k = Math.sin((0.25-twitchT)/0.25 * Math.PI);
+      twitchEar.rotation.x = -0.35 * k;
+      if (twitchT <= 0){ twitchEar.rotation.x = 0; twitchEar = null; }
     }
 
     renderer.render(scene, camera);
