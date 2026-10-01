@@ -458,6 +458,9 @@
   var hipsG = B.hipsG, torsoG = B.torsoG, headG = B.headG;
   var armL = B.armL, armR = B.armR, legL = B.legL, legR = B.legR;
 
+  fig.position.set(HOME.x, 0, HOME.z);
+  scene.add(fig);
+
   var headLag = spring(90, 0.82);
   var leaner  = spring(70, 0.86);
 
