@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Aditya X</title>
-<!-- MYSTERY-DESK v10 -->
+<!-- MYSTERY-DESK v11 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
@@ -39,11 +39,21 @@
            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); }
   #intro { position:fixed; inset:0; z-index:50; background:#f3ead9;
            transition:opacity 1.4s ease; }
+  #aboutPanel { position:fixed; right:6%; top:50%; z-index:10; pointer-events:none;
+           transform:translateY(-50%) translateX(30px); opacity:0;
+           transition:opacity .7s ease, transform .7s ease;
+           background:rgba(247,242,232,.93); border-left:4px solid #6e1423;
+           padding:1.2rem 1.3rem; border-radius:2px;
+           box-shadow:0 10px 30px rgba(61,18,32,.18); max-width:300px; }
+  #aboutPanel.show { opacity:1; transform:translateY(-50%) translateX(0); }
+  #aboutPanel h2 { font-size:2rem; color:#6e1423; font-style:italic; margin-bottom:.6rem; }
+  #aboutPanel p { font-family:Georgia, serif; font-size:1.02rem; line-height:1.5; color:#3d1220; }
 </style>
 </head>
 <body>
 <div class="wordmark" id="wordmark"><h1>Aditya X</h1><span class="badge">Medicinae Studiosus</span></div>
 <a class="ftc" href="https://dradityax.pages.dev/world/">FTC</a>
+<div id="aboutPanel"><h2>About</h2><p>First-year MBBS student at Madhubani Medical College — learning medicine the long way, one diagram at a time. Off duty I build small corners of the internet as <b>dradityax</b>.</p></div>
 <div class="vignette"></div>
 <div class="grain"></div>
 <div id="intro"></div>
@@ -252,11 +262,7 @@
     scene.add(grp);
     return grp;
   }
-  var aboutB = makeBoard('About', [
-    'First-year MBBS student,', 'Madhubani Medical College.',
-    'Off duty I build small', 'corners of the internet', 'as dradityax.'
-  ], 1.7, 1.28);
-  aboutB.position.set(2.6, 2.0, 4.40);
+  // (About lives at the night gate now — see below)
   var projB = makeBoard('Projects', [
     'dradityax — Website & Brand', 'Sep 2026 · design + code',
     'The World — a tiny playable', 'universe · press FTC'
@@ -266,6 +272,55 @@
     "MBBS '26 · learning medicine", 'the long way,', 'building in public.'
   ], 1.45, 1.09);
   nowB.position.set(8.75, 1.95, 4.40);
+
+  // ---------- about gate: burgundy night moment on his walking path ----------
+  var BURG = new THREE.MeshStandardMaterial({ color:0x4a1622, roughness:0.9 });
+  box(0.28, 2.6, 0.28, BURG, 4.6, 1.3, -1.15);
+  box(0.28, 2.6, 0.28, BURG, 4.6, 1.3, 0.75);
+  box(0.28, 0.35, 2.45, BURG, 4.6, 2.62, -0.2);
+  ball(0.05, new THREE.MeshBasicMaterial({ color:0xe8a0a0 }), 4.6, 2.40, -1.15);
+  ball(0.05, new THREE.MeshBasicMaterial({ color:0xe8a0a0 }), 4.6, 2.40, 0.75);
+  var gateRing = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.016, 10, 40),
+    new THREE.MeshBasicMaterial({ color:0xe8a0a0, transparent:true, opacity:0.7 }));
+  gateRing.rotation.x = Math.PI/2; gateRing.position.set(4.6, 0.03, -0.2);
+  scene.add(gateRing);
+  var stageGlow = new THREE.PointLight(0xc48b9a, 1.2, 4.5, 2);
+  stageGlow.position.set(4.6, 1.9, -0.2); scene.add(stageGlow);
+  var starGeo = new THREE.BufferGeometry();
+  var starPos = new Float32Array(60*3);
+  for (var st=0; st<60; st++){
+    starPos[st*3] = 3.4 + Math.random()*2.4;
+    starPos[st*3+1] = 0.3 + Math.random()*2.7;
+    starPos[st*3+2] = -1.6 + Math.random()*2.8;
+  }
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({
+    color:0xe8a0a0, size:0.03, transparent:true, opacity:0.75, depthWrite:false })));
+  var scanPlane = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.025, 0.95),
+    new THREE.MeshBasicMaterial({ color:0xf0b4a0, transparent:true, opacity:0 }));
+  scanPlane.visible = false; scene.add(scanPlane);
+  var pctC = document.createElement('canvas'); pctC.width = 160; pctC.height = 80;
+  var pctG = pctC.getContext('2d');
+  var pctTex = new THREE.CanvasTexture(pctC);
+  var pctPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.25),
+    new THREE.MeshBasicMaterial({ map:pctTex, transparent:true, depthWrite:false }));
+  pctPlane.visible = false; scene.add(pctPlane);
+  var pctLast = -1;
+  function drawPct(n){
+    if (n === pctLast) return; pctLast = n;
+    pctG.clearRect(0,0,160,80);
+    pctG.fillStyle = '#f0b4a0'; pctG.font = '700 44px monospace';
+    pctG.fillText(String(n).padStart(3,'0'), 30, 56);
+    pctTex.needsUpdate = true;
+  }
+  var tagC = document.createElement('canvas'); tagC.width = 256; tagC.height = 128;
+  var tagG = tagC.getContext('2d');
+  tagG.fillStyle = '#f5efe0'; tagG.textAlign = 'center';
+  tagG.font = 'italic 600 46px Georgia, serif'; tagG.fillText('Aditya', 128, 58);
+  tagG.font = '30px Georgia, serif'; tagG.fillText('· India ·', 128, 100);
+  var tagPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.85, 0.42),
+    new THREE.MeshBasicMaterial({ map:new THREE.CanvasTexture(tagC), transparent:true, depthWrite:false }));
+  tagPlane.visible = false; scene.add(tagPlane);
 
   // bookshelf
   (function(){
@@ -500,10 +555,12 @@
   var vel = new THREE.Vector3();
   var yaw = 0;
   var waveT = 0, greetDone = false;
+  var stageP = 0;
   var lookYawT = 0, lookTimer = 2;
   var scrollSpd = 0, lastSY = 0;
   var DOOR_FRONT = { x:9.35, z:0.4 }, PORCH = { x:11.7, z:1.30 };
   var wordmark = document.getElementById('wordmark');
+  var aboutPanel = document.getElementById('aboutPanel');
 
   function scrollP(){
     var max = document.body.scrollHeight - innerHeight;
@@ -575,6 +632,7 @@
   ];
   var CIRCLES = [
     { x:2.35, z:1.25, r:0.35 }, { x:6.9, z:2.9, r:0.25 }, { x:8.8, z:3.5, r:0.38 },
+    { x:4.6, z:-1.15, r:0.28 }, { x:4.6, z:0.75, r:0.28 },
   ];
   function collide(){
     fig.position.x = Math.max(-3.6, Math.min(9.7, fig.position.x));
@@ -628,8 +686,9 @@
     // scroll velocity -> walk speed (tight: scroll = walk, stop = stop)
     var sv = (scrollY - lastSY) / Math.max(dt, 1e-4);
     lastSY = scrollY;
-    var target = THREE.MathUtils.clamp(sv/1400, 0, 1) * 0.85;
-    scrollSpd += (target - scrollSpd) * Math.min(1, dt * (target > scrollSpd ? 8 : 5));
+    var target = THREE.MathUtils.clamp(sv/1400, -1, 1) * 0.85;
+    var approaching = Math.abs(target) > Math.abs(scrollSpd);
+    scrollSpd += (target - scrollSpd) * Math.min(1, dt * (approaching ? 8 : 5));
 
     // ----- modes -----
     var scripted = (mode === 'toDoor' || mode === 'doorIn' || mode === 'chill' || mode === 'doorOut' || mode === 'return');
@@ -648,7 +707,7 @@
     chillT += (((mode === 'chill') ? 1 : 0) - chillT) * Math.min(1, dt*2.5);
 
     // ----- locomotion -----
-    var dirX = 0, dirZ = 0, spd = 0;
+    var dirX = 0, dirZ = 0, spd = 0, wsgn = 1;
     var hasInput = false;
     if (!scripted && !orbiting){
       if (joy.active && joy.moved){
@@ -665,9 +724,10 @@
           spd = 0.95 * Math.min(1, mag*1.4);
           hasInput = true;
         }
-      } else if (scrollSpd > 0.05 && mode === 'roam'){
-        dirX = Math.sin(yaw); dirZ = Math.cos(yaw);
-        spd = scrollSpd;
+      } else if (Math.abs(scrollSpd) > 0.05 && mode === 'roam'){
+        wsgn = scrollSpd > 0 ? 1 : -1;
+        dirX = Math.sin(yaw)*wsgn; dirZ = Math.cos(yaw)*wsgn;
+        spd = Math.abs(scrollSpd);
         hasInput = true;
       }
     }
@@ -677,7 +737,7 @@
       fig.position.x += vel.x*dt; fig.position.z += vel.z*dt;
       collide();
       yaw = angleLerp(yaw, Math.atan2(vel.x, vel.z), 1 - Math.pow(0.002, dt));
-      walkPhase += dt * (4 + vel.length()*3.2);
+      walkPhase += dt * (4 + vel.length()*3.2) * wsgn;
     } else if (!scripted){
       vel.multiplyScalar(Math.pow(0.001, dt));
     }
@@ -792,6 +852,24 @@
       var sc2 = 0.07 + pp*0.08;
       sp.scale.set(sc2, sc2, 1);
     });
+
+    // ----- about gate -----
+    var gdx = fig.position.x - 4.6, gdz = fig.position.z + 0.2;
+    var gateT = THREE.MathUtils.clamp(1 - Math.hypot(gdx, gdz)/1.5, 0, 1);
+    stageP += (gateT - stageP) * Math.min(1, dt*4);
+    var scanOn = stageP > 0.03;
+    scanPlane.visible = scanOn; pctPlane.visible = scanOn; tagPlane.visible = scanOn;
+    if (scanOn){
+      scanPlane.position.set(fig.position.x, 0.06 + stageP*1.5, fig.position.z);
+      scanPlane.material.opacity = 0.8 * Math.min(1, stageP*3);
+      drawPct(Math.round(stageP*100));
+      pctPlane.position.set(fig.position.x + 0.9, 1.8, fig.position.z);
+      pctPlane.lookAt(camera.position);
+      tagPlane.position.set(fig.position.x - 0.9, 1.62, fig.position.z);
+      tagPlane.lookAt(camera.position);
+    }
+    stageGlow.intensity = 1.2 + stageP*2.4;
+    aboutPanel.classList.toggle('show', stageP > 0.35);
 
     // ----- camera -----
     camWant.set(fig.position.x, 0.9, fig.position.z);
