@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Aditya X</title>
-<!-- MYSTERY-DESK v11 -->
+<!-- MYSTERY-DESK v12 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
@@ -52,7 +52,7 @@
 </head>
 <body>
 <div class="wordmark" id="wordmark"><h1>Aditya X</h1><span class="badge">Medicinae Studiosus</span></div>
-<a class="ftc" href="https://dradityax.pages.dev/world/">FTC</a>
+<a class="ftc" href="https://dradityax.pages.dev/world/?play=1">FTC</a>
 <div id="aboutPanel"><h2>About</h2><p>First-year MBBS student at Madhubani Medical College — learning medicine the long way, one diagram at a time. Off duty I build small corners of the internet as <b>dradityax</b>.</p></div>
 <div class="vignette"></div>
 <div class="grain"></div>
@@ -449,57 +449,13 @@
   var chairPush = spring(60, 0.86);
   var chairSpin = spring(50, 0.88);
 
-  // ---------- THE FIGURE: chibi, cute ----------
+  // ---------- THE FIGURE: the shared buddy (see /shared/buddy.js) ----------
   var HOME = { x:0, z:-0.30 };
-  var fig = new THREE.Group();
-  fig.position.set(HOME.x, 0, HOME.z);
-  scene.add(fig);
-
-  var hipsG = new THREE.Group(); fig.add(hipsG);
-  ball(0.150, DENIM, 0, 0, 0, 1.0, 0.80, 0.90, hipsG);
-
-  var torsoG = new THREE.Group(); torsoG.position.set(0, 0.08, 0); hipsG.add(torsoG);
-  capsule(0.155, 0.14, TEE, 0, 0.17, 0, torsoG);
-  var shoulders = capsule(0.060, 0.26, TEE, 0, 0.30, 0, torsoG);
-  shoulders.rotation.z = Math.PI/2;
-  ball(0.068, TEE, 0.185, 0.285, 0.01, 1, 1, 1, torsoG);
-  ball(0.068, TEE, -0.185, 0.285, 0.01, 1, 1, 1, torsoG);
-  cyl(0.050, 0.058, 0.08, SKIN, 0, 0.36, 0, torsoG);
-
-  var headG = new THREE.Group(); headG.position.set(0, 0.44, 0.01); torsoG.add(headG);
-  ball(0.210, SKIN, 0, 0.02, 0.01, 1.0, 1.02, 0.96, headG);       // big cute head
-  ball(0.225, HAIR, 0, 0.055, -0.025, 1.02, 0.95, 1.02, headG);   // hair cap
-  ball(0.100, HAIR, 0, 0.160, 0.130, 1.70, 0.65, 0.75, headG);    // fringe
-  ball(0.035, SKIN, 0.205, 0.02, 0.0, 1, 1, 1, headG);            // ears
-  ball(0.035, SKIN, -0.205, 0.02, 0.0, 1, 1, 1, headG);
-  // glossy eyes
-  ball(0.030, EYEB, 0.078, 0.030, 0.175, 1, 1.25, 0.6, headG);
-  ball(0.030, EYEB, -0.078, 0.030, 0.175, 1, 1.25, 0.6, headG);
-  ball(0.010, EYEW, 0.088, 0.042, 0.198, 1, 1, 0.6, headG);
-  ball(0.010, EYEW, -0.068, 0.042, 0.198, 1, 1, 0.6, headG);
-  // blush
-  ball(0.034, BLUSH, 0.128, -0.035, 0.148, 1, 0.65, 0.45, headG);
-  ball(0.034, BLUSH, -0.128, -0.035, 0.148, 1, 0.65, 0.45, headG);
-
-  function buildArm(side){
-    var sh = new THREE.Group(); sh.position.set(0.215*side, 0.28, 0); torsoG.add(sh);
-    capsule(0.052, 0.08, TEE, 0, -0.08, 0.005, sh);
-    var el = new THREE.Group(); el.position.set(0, -0.17, 0.01); sh.add(el);
-    capsule(0.044, 0.08, SKIN, 0, -0.075, 0, el);
-    ball(0.056, SKIN, 0, -0.165, 0.01, 0.9, 1.0, 1.0, el);
-    return { sh:sh, el:el };
-  }
-  var armL = buildArm(-1), armR = buildArm(1);
-
-  function buildLeg(side){
-    var hip = new THREE.Group(); hip.position.set(0.095*side, -0.02, 0); hipsG.add(hip);
-    capsule(0.068, 0.12, DENIM, 0, -0.11, 0, hip);
-    var knee = new THREE.Group(); knee.position.set(0, -0.24, 0); hip.add(knee);
-    capsule(0.054, 0.12, DENIM, 0, -0.12, 0, knee);
-    ball(0.075, SHOE, 0, -0.315, 0.05, 1, 0.6, 1.5, knee);
-    return { hip:hip, knee:knee };
-  }
-  var legL = buildLeg(-1), legR = buildLeg(1);
+  var B = buildBuddy(THREE, { TEE:TEE, SKIN:SKIN, HAIR:HAIR, DENIM:DENIM,
+                              SHOE:SHOE, BLUSH:BLUSH, EYEB:EYEB, EYEW:EYEW });
+  var fig = B.group;
+  var hipsG = B.hipsG, torsoG = B.torsoG, headG = B.headG;
+  var armL = B.armL, armR = B.armR, legL = B.legL, legR = B.legR;
 
   var headLag = spring(90, 0.82);
   var leaner  = spring(70, 0.86);
