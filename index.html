@@ -22,7 +22,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 #bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;opacity:0;transition:opacity 1.2s ease;
  -webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 #bg.show{opacity:1}
@@ -39,9 +39,10 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 @keyframes nameglow{0%,100%{text-shadow:0 0 22px rgba(255,255,255,.40),0 2px 16px rgba(0,0,0,.55)}
  50%{text-shadow:0 0 36px rgba(255,255,255,.55),0 2px 16px rgba(0,0,0,.55)}}
 .tagline{margin-top:.8rem;font-size:clamp(.95rem,2.2vw,1.25rem);font-weight:600;letter-spacing:.05em;color:rgba(255,255,255,.85);white-space:nowrap;
- text-shadow:0 0 14px rgba(255,255,255,.30),0 1px 8px rgba(0,0,0,.5);opacity:0;transition:opacity 1s ease;animation:tagglow 6s ease-in-out 2.2s infinite}
-@keyframes tagglow{0%,100%{text-shadow:0 0 14px rgba(255,255,255,.30),0 1px 8px rgba(0,0,0,.5)}
- 50%{text-shadow:0 0 26px rgba(255,255,255,.5),0 1px 8px rgba(0,0,0,.5)}}
+ text-shadow:0 0 18px rgba(255,255,255,.38),0 1px 8px rgba(0,0,0,.5);opacity:0;transition:opacity 1s ease;animation:tagglow 6s ease-in-out 2.2s infinite,tagdrift 16s ease-in-out infinite}
+@keyframes tagglow{0%,100%{text-shadow:0 0 18px rgba(255,255,255,.38),0 1px 8px rgba(0,0,0,.5)}
+ 50%{text-shadow:0 0 32px rgba(255,255,255,.55),0 1px 8px rgba(0,0,0,.5)}}
+@keyframes tagdrift{0%,100%{transform:translateX(-10px)}50%{transform:translateX(10px)}}
 .tagline.show{opacity:1}
 /* bio : center, karaoke */
 .bio{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;text-align:center;max-width:min(720px,90vw);
