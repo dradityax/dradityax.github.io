@@ -42,10 +42,9 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 @keyframes nameglow{0%,100%{text-shadow:0 0 22px rgba(255,255,255,.40),0 2px 16px rgba(0,0,0,.55)}
  50%{text-shadow:0 0 36px rgba(255,255,255,.55),0 2px 16px rgba(0,0,0,.55)}}
 .tagline{font-family:Quicksand,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;margin-top:.8rem;font-size:clamp(.95rem,2.2vw,1.25rem);font-weight:600;letter-spacing:.06em;color:rgba(255,255,255,.85);white-space:nowrap;
- text-shadow:0 0 18px rgba(255,255,255,.38),0 1px 8px rgba(0,0,0,.5);opacity:0;transition:opacity 1s ease;animation:tagglow 6s ease-in-out 2.2s infinite,tagdrift 16s ease-in-out infinite}
-@keyframes tagglow{0%,100%{text-shadow:0 0 18px rgba(255,255,255,.38),0 1px 8px rgba(0,0,0,.5)}
- 50%{text-shadow:0 0 32px rgba(255,255,255,.55),0 1px 8px rgba(0,0,0,.5)}}
-@keyframes tagdrift{0%,100%{transform:translateX(-10px)}50%{transform:translateX(10px)}}
+ text-shadow:0 0 18px rgba(255,255,255,.38),0 1px 8px rgba(0,0,0,.5);opacity:0;transition:opacity 1s ease;animation:tagglow 7s ease-in-out 2.2s infinite alternate}
+@keyframes tagglow{from{text-shadow:-14px 0 22px rgba(255,255,255,.5),0 1px 8px rgba(0,0,0,.5)}
+ to{text-shadow:14px 0 22px rgba(255,255,255,.5),0 1px 8px rgba(0,0,0,.5)}}
 .tagline.show{opacity:1}
 /* bio : center, karaoke */
 .bio{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;text-align:center;max-width:min(720px,90vw);
