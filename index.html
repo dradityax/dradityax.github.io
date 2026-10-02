@@ -46,6 +46,13 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
  text-shadow:0 0 22px rgba(255,255,255,.40),0 2px 16px rgba(0,0,0,.55);animation:nameglow 5s ease-in-out 1.8s infinite}
 @keyframes nameglow{0%,100%{text-shadow:0 0 22px rgba(255,255,255,.40),0 2px 16px rgba(0,0,0,.55)}
  50%{text-shadow:0 0 36px rgba(255,255,255,.55),0 2px 16px rgba(0,0,0,.55)}}
+/* cute X : dots -> parallel lines -> X */
+.xslot{position:relative;display:inline-block;width:.78em;height:.72em;vertical-align:baseline}
+.dx{position:absolute;inset:0}
+.dx .ln{position:absolute;top:0;left:50%;width:.17em;height:100%;background:#fff;
+ border-radius:50%;box-shadow:0 0 12px rgba(255,255,255,.25);transform-origin:center}
+.dx .l1{transform:translateX(-.20em) scaleY(.236)}
+.dx .l2{transform:translateX(.20em) scaleY(.236)}
 .tagline{font-family:Quicksand,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;margin-top:.8rem;font-size:clamp(.95rem,2.2vw,1.25rem);font-weight:600;letter-spacing:.06em;color:rgba(255,255,255,.85);white-space:nowrap;
  text-shadow:0 0 18px rgba(255,255,255,.38),0 1px 8px rgba(0,0,0,.5);opacity:0;transition:opacity 1s ease;animation:tagglow 7s ease-in-out 2.2s infinite alternate}
 @keyframes tagglow{from{text-shadow:-14px 0 22px rgba(255,255,255,.5),0 1px 8px rgba(0,0,0,.5)}
@@ -135,6 +142,8 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 @media (prefers-reduced-motion:reduce){
  .brand,.brand h1,#bg,.tagline{animation:none!important}
  .opt,.tag,.fab{transition:none!important;animation:none!important}
+ .dx .l1{transform:translateX(-50%) rotate(40deg) scaleY(1)}
+ .dx .l2{transform:translateX(-50%) rotate(-40deg) scaleY(1)}
  .brand{opacity:1}
  .plink{transition:none!important}
 }
@@ -144,7 +153,7 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 <video id="bg" src="assets/bg.mp4" poster="assets/poster.jpg" autoplay muted loop playsinline preload="auto" controlslist="nodownload" disablepictureinpicture oncontextmenu="return false"></video>
 <div id="shade"></div>
 <header class="brand">
-  <h1 id="name">ADITYA X</h1>
+  <h1 id="name" aria-label="ADITYA X">ADITYA <span class="xslot" aria-hidden="true"><span class="dx"><span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span></span></span></h1>
   <p class="tagline" id="tagline">Medicinae Studiosus</p>
 </header>
 <div class="bio" id="bio" aria-label="Mortui vivos docent"></div>
@@ -240,6 +249,44 @@ Array.prototype.slice.call(plinks.querySelectorAll(".plink")).forEach(function(a
   a.addEventListener("click",function(e){ e.preventDefault(); });
 });
 
+
+/* cute X : dots -> lines -> X, slow and natural */
+function dxSet(el, tf, ms, ease){
+  el.style.transition = "transform "+ms+"ms "+(ease||"ease-in-out");
+  el.style.transform = tf;
+  return new Promise(function(r){ setTimeout(r, reduce?0:ms); });
+}
+var dx1=$("dx1"), dx2=$("dx2");
+var DX_DOT1="translateX(-.20em) scaleY(.236)", DX_DOT2="translateX(.20em) scaleY(.236)";
+var DX_BLINK1="translateX(-.20em) scaleY(.02)", DX_BLINK2="translateX(.20em) scaleY(.02)";
+var DX_LINE1="translateX(-.20em) scaleY(1)", DX_LINE2="translateX(.20em) scaleY(1)";
+var DX_X1="translateX(-50%) rotate(40deg) scaleY(1)", DX_X2="translateX(-50%) rotate(-40deg) scaleY(1)";
+function dxBlink(){
+  return Promise.all([
+    dxSet(dx1, DX_BLINK1, 150, "ease-in"), dxSet(dx2, DX_BLINK2, 150, "ease-in")
+  ]).then(function(){
+    return Promise.all([
+      dxSet(dx1, DX_DOT1, 200, "ease-out"), dxSet(dx2, DX_DOT2, 200, "ease-out")
+    ]);
+  });
+}
+async function dxLoop(){
+  while(true){
+    await new Promise(function(r){ setTimeout(r, 1200); });
+    for(var i=0;i<4;i++){ await dxBlink(); await new Promise(function(r){ setTimeout(r, i<3?650:1000); }); }
+    await Promise.all([ dxSet(dx1, DX_LINE1, 1100), dxSet(dx2, DX_LINE2, 1100) ]);
+    await new Promise(function(r){ setTimeout(r, 900); });
+    await Promise.all([
+      dxSet(dx1, DX_X1, 1500, "cubic-bezier(.3,1.2,.4,1)"),
+      dxSet(dx2, DX_X2, 1500, "cubic-bezier(.3,1.2,.4,1)")
+    ]);
+    await new Promise(function(r){ setTimeout(r, 6500); });
+    await Promise.all([ dxSet(dx1, DX_LINE1, 1300), dxSet(dx2, DX_LINE2, 1300) ]);
+    await new Promise(function(r){ setTimeout(r, 700); });
+    await Promise.all([ dxSet(dx1, DX_DOT1, 1100), dxSet(dx2, DX_DOT2, 1100) ]);
+  }
+}
+setTimeout(function(){ if(!reduce) dxLoop(); }, 1500);
 
 setTimeout(revealAll, reduce?0:600);
 })();
