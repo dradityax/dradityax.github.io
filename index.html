@@ -273,14 +273,14 @@ function dxBlink(){
 async function dxLoop(){
   while(true){
     await new Promise(function(r){ setTimeout(r, 1200); });
-    for(var i=0;i<4;i++){ await dxBlink(); await new Promise(function(r){ setTimeout(r, i<3?650:1000); }); }
+    for(var i=0;i<2;i++){ await dxBlink(); await new Promise(function(r){ setTimeout(r, i<1?650:1000); }); }
     await Promise.all([ dxSet(dx1, DX_LINE1, 1100), dxSet(dx2, DX_LINE2, 1100) ]);
     await new Promise(function(r){ setTimeout(r, 900); });
     await Promise.all([
       dxSet(dx1, DX_X1, 1500, "cubic-bezier(.3,1.2,.4,1)"),
       dxSet(dx2, DX_X2, 1500, "cubic-bezier(.3,1.2,.4,1)")
     ]);
-    await new Promise(function(r){ setTimeout(r, 6500); });
+    await new Promise(function(r){ setTimeout(r, 9000); });
     await Promise.all([ dxSet(dx1, DX_LINE1, 1300), dxSet(dx2, DX_LINE2, 1300) ]);
     await new Promise(function(r){ setTimeout(r, 700); });
     await Promise.all([ dxSet(dx1, DX_DOT1, 1100), dxSet(dx2, DX_DOT2, 1100) ]);
