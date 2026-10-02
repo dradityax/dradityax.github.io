@@ -155,7 +155,7 @@
     requestAnimationFrame(loop);
     var ddx=tx-fx, ddy=ty-fy;
     var dist=Math.sqrt(ddx*ddx+ddy*ddy);
-    var deadR=Math.min(W,H)*0.12;
+    var deadR=Math.min(W,H)*0.18;
     if(dist<deadR){ drawCenter(); return; }       /* eye contact */
     var target=Math.atan2(ddy,ddx);
     smooth=lerpAngle(smooth,target,0.26);          /* ~35ms response, zero lag */
