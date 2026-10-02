@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Glacier</title>
+<meta name="description" content="Glacier presents — Frozen in Time. A journey through the silence, light, and slow wonder of the world's vanishing ice." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #000; color: #fff;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  /* ---------- entrance ---------- */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(var(--fy, 18px)); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .rise { opacity: 0; animation: fadeUp 0.8s ease-out forwards; }
+  /* ---------- navbar dock ---------- */
+  .dockwrap {
+    position: fixed; top: 26px; left: 0; right: 0; z-index: 50;
+    display: flex; justify-content: center; padding: 0 20px;
+    opacity: 0; animation: fadeUp 0.6s ease-out 0s forwards; --fy: -14px;
+  }
+  .dock {
+    position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px;
+    border-radius: 999px; background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+    box-shadow: 0 12px 44px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.16);
+  }
+  .dock button {
+    position: relative; width: 58px; height: 30px; border-radius: 999px;
+    border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.62); transition: color 0.2s ease; z-index: 1;
+  }
+  .dock button:hover { color: rgba(255,255,255,0.85); }
+  .dock button.active { color: #fff; }
+  .dock button.active:hover { color: #fff; }
+  .dock button span.ic { position: relative; z-index: 1; display: flex; }
+  #dockhi {
+    position: absolute; top: 5px; left: 10px; width: 58px; height: 30px; border-radius: 999px;
+    background: rgba(0,0,0,0.34); border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: left 0.38s cubic-bezier(0.34, 1.3, 0.64, 1); z-index: 0;
+  }
+  /* ---------- hero ---------- */
+  .hero { position: relative; width: 100%; height: 100vh; height: 100svh; overflow: hidden; }
+  .hero video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .ov1 { position: absolute; inset: 0; background: rgba(0,0,0,0.20); }
+  .ov2 { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.26) 0%, transparent 22%, transparent 60%, rgba(0,0,0,0.38) 100%); }
+  .ov3 { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.15) 100%); }
+  .glow {
+    position: absolute; top: -14%; left: 50%; transform: translateX(-50%);
+    width: 1000px; height: 720px; max-width: 100%;
+    background: radial-gradient(ellipse at 50% 30%, rgba(14,116,144,0.05) 0%, transparent 68%);
+    pointer-events: none;
+  }
+  .lockup {
+    position: relative; z-index: 10; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 0 24px;
+  }
+  .brand { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 26px; animation-delay: 0.1s; animation-duration: 0.7s; }
+  .brand .row { display: flex; align-items: center; gap: 10px; }
+  .brand .word {
+    font-size: 15px; font-weight: 500; letter-spacing: 0.28em; text-transform: uppercase;
+    color: #fff; font-family: 'Inter', sans-serif; padding-left: 0.28em;
+  }
+  .brand .presents {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.34em; text-transform: uppercase;
+    color: rgba(255,255,255,0.65); font-family: 'Inter', sans-serif; padding-left: 0.34em;
+  }
+  h1.head {
+    margin: 0; font-family: 'Playfair Display', Georgia, serif; text-transform: uppercase;
+    color: #fff; text-shadow: 0 2px 40px rgba(0,0,0,0.4);
+    animation-delay: 0.24s; animation-duration: 0.85s;
+  }
+  h1.head span { display: block; }
+  h1.head .l1 { font-weight: 400; font-size: clamp(3.3rem, 8.6vw, 6.4rem); line-height: 1; letter-spacing: 0.02em; }
+  h1.head .l2 { font-weight: 700; font-size: clamp(3rem, 8.2vw, 6.2rem); line-height: 0.98; letter-spacing: 0.01em; }
+  p.sub {
+    margin: 24px 0 0; max-width: 500px;
+    font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400;
+    font-size: 18px; line-height: 1.5; color: rgba(255,255,255,0.85);
+    text-shadow: 0 1px 20px rgba(0,0,0,0.45);
+    animation-delay: 0.42s;
+  }
+  a.enter {
+    margin-top: 38px; padding: 20px 58px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.6); color: #fff; text-decoration: none;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
+    font-family: 'Inter', sans-serif; background: rgba(255,255,255,0);
+    transition: background-color 0.25s ease, transform 0.15s ease;
+    animation-delay: 0.58s;
+  }
+  a.enter:hover { background: rgba(255,255,255,0.12); }
+  a.enter:active { transform: scale(0.97); }
+  /* ---------- footer ---------- */
+  .foot {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px 26px;
+    opacity: 0; animation: fadeIn 0.8s ease-out 0.8s forwards;
+  }
+  .foot .left, .foot .right { display: flex; align-items: center; gap: 20px; }
+  .foot .right { gap: 18px; }
+  .foot .socials { display: flex; align-items: center; gap: 14px; }
+  .flabel {
+    font-size: 10.5px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif; text-decoration: none;
+  }
+  a.flabel:hover { color: rgba(255,255,255,0.9); }
+  .foot .center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 5px;
+    font-size: 10.5px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); font-family: 'Inter', sans-serif;
+  }
+  .foot .center b { color: rgba(255,255,255,0.9); font-weight: 600; }
+  @media (max-width: 640px) {
+    .foot { padding: 0 20px 20px; }
+    .foot .center { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rise, .dockwrap, .foot { opacity: 1 !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- floating glass icon dock -->
+<div class="dockwrap">
+  <nav class="dock" id="dock" aria-label="Sections">
+    <span id="dockhi" aria-hidden="true"></span>
+    <button class="active" data-k="home" aria-label="home"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.3 4.6 L4.7 10.1 c-.44.37-.7.92-.7 1.5 V19 a1.6 1.6 0 001.6 1.6 H9 v-4.4 a3 3 0 016 0 V20.6 h3.4 A1.6 1.6 0 0020 19 v-7.4 c0-.58-.26-1.13-.7-1.5 L12.7 4.6 a1.1 1.1 0 00-1.4 0 Z" fill="currentColor"/></svg></span></button>
+    <button data-k="tasks" aria-label="tasks"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 12.2 L11 14.7 L15.6 9.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+    <button data-k="calendar" aria-label="calendar"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="5.5" width="16" height="15" rx="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M4 9.6 H20" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 3.6 V6.4 M15.5 3.6 V6.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><g fill="currentColor"><circle cx="8.4" cy="13" r="0.9"/><circle cx="12" cy="13" r="0.9"/><circle cx="15.6" cy="13" r="0.9"/><circle cx="8.4" cy="16.6" r="0.9"/><circle cx="12" cy="16.6" r="0.9"/><circle cx="15.6" cy="16.6" r="0.9"/></g></svg></span></button>
+    <button data-k="goals" aria-label="goals"><span class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="13" r="7.4" stroke="currentColor" stroke-width="1.6"/><circle cx="11" cy="13" r="3.3" stroke="currentColor" stroke-width="1.6"/><path d="M11 13 L19 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M15.5 5 H19 V8.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+  </nav>
+</div>
+
+<section class="hero">
+  <video src="hero.mp4" autoplay muted loop playsinline></video>
+  <div class="ov1"></div>
+  <div class="ov2"></div>
+  <div class="ov3"></div>
+  <div class="glow"></div>
+
+  <div class="lockup">
+    <div class="brand rise">
+      <div class="row">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 2 L20 9 L12 22 L4 9 Z" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M4 9 H20 M12 2 V22 M8 9 L12 22 L16 9" stroke="#fff" stroke-width="0.7" opacity="0.55"/>
+        </svg>
+        <span class="word">Glacier</span>
+      </div>
+      <span class="presents">Presents</span>
+    </div>
+
+    <h1 class="head rise"><span class="l1">Frozen</span><span class="l2">In Time</span></h1>
+
+    <p class="sub rise">A journey through the silence, light, and slow wonder of the world&rsquo;s vanishing ice.</p>
+
+    <a class="enter rise" href="#exhibit">Enter Exhibit</a>
+  </div>
+
+  <div class="foot">
+    <div class="left">
+      <div class="socials">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 8h-2a1 1 0 00-1 1v2h3l-.4 3H12v6H9v-6H7v-3h2V8.5A3.5 3.5 0 0112.5 5H15z"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 4l6.8 8.2L4.3 20H6l5.6-6.3L16.5 20H20l-7.1-8.6L19.4 4h-1.7l-5.1 5.8L7.6 4z"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4.5 9H7v11H4.5zM5.75 4a1.6 1.6 0 100 3.2 1.6 1.6 0 000-3.2zM9.5 9H12v1.6c.4-.8 1.6-1.7 3.2-1.7 2.6 0 3.3 1.6 3.3 4.2V20H16v-4.9c0-1.3-.5-2.1-1.6-2.1S12.5 13.8 12.5 15V20H9.5z"/></svg>
+      </div>
+      <a class="flabel" href="#privacy">Privacy Policy</a>
+    </div>
+    <div class="center"><b>Scroll</b><span>To Navigate</span></div>
+    <div class="right">
+      <a class="flabel" href="#terms">Terms of Service</a>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.7" aria-hidden="true"><path d="M5 15V9M10 19V5M15 16V8M20 13v-2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+  var dock = document.getElementById("dock");
+  var hi = document.getElementById("dockhi");
+  var btns = dock.querySelectorAll("button");
+  function move(btn){
+    hi.style.left = btn.offsetLeft + "px";
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove("active");
+    btn.classList.add("active");
+  }
+  for (var i = 0; i < btns.length; i++){
+    btns[i].addEventListener("click", function(){ move(this); });
+  }
+  window.addEventListener("resize", function(){
+    var cur = dock.querySelector("button.active") || btns[0];
+    hi.style.left = cur.offsetLeft + "px";
+  });
+})();
+</script>
+</body>
+</html>
