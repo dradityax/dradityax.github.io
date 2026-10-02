@@ -31,13 +31,8 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 #shade.show{opacity:1}
 /* name : top-left, slanted like the mockup */
 .brand{position:fixed;top:max(5vh,22px);left:6vw;z-index:10;text-align:left}
-.brand h1{font-size:clamp(2.4rem,7vw,4.6rem);font-weight:800;font-style:italic;letter-spacing:.01em;line-height:1;white-space:nowrap;color:#fff;
- transform:skewX(-6deg);text-shadow:0 0 22px rgba(255,255,255,.40),0 2px 16px rgba(0,0,0,.55)}
-.brand h1 .lt{display:inline-block;opacity:0}
-.brand h1 .lt.in{opacity:1}
-.caret{display:inline-block;width:.09em;height:1em;background:#fff;margin-left:.07em;vertical-align:-.1em;border-radius:2px;
- box-shadow:0 0 12px rgba(255,255,255,.8);animation:blink 1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
+.brand h1{font-size:clamp(2.4rem,7vw,4.6rem);font-weight:800;letter-spacing:.01em;line-height:1;white-space:nowrap;color:#fff;
+ text-shadow:0 0 22px rgba(255,255,255,.40),0 2px 16px rgba(0,0,0,.55)}
 .tagline{margin-top:.8rem;font-size:clamp(.95rem,2.2vw,1.25rem);font-weight:600;letter-spacing:.05em;color:rgba(255,255,255,.85);white-space:nowrap;
  text-shadow:0 0 14px rgba(255,255,255,.30),0 1px 8px rgba(0,0,0,.5);opacity:0;transition:opacity 1s ease}
 .tagline.show{opacity:1}
@@ -88,7 +83,7 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
  .hbtn svg{width:18px;height:18px}
 }
 @media (prefers-reduced-motion:reduce){
- .hbtn,.caret{animation:none!important}
+ .hbtn{animation:none!important}
 }
 </style>
 </head>
@@ -96,7 +91,7 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 <video id="bg" src="assets/bg.mp4" poster="assets/poster.jpg" autoplay muted loop playsinline preload="auto" controlslist="nodownload" disablepictureinpicture oncontextmenu="return false"></video>
 <div id="shade"></div>
 <header class="brand">
-  <h1 id="name" aria-label="Aditya X"></h1>
+  <h1 id="name">ADITYA X</h1>
   <p class="tagline" id="tagline">Medicinae Studiosus</p>
 </header>
 <div class="bio" id="bio" aria-label="Mortui vivos docent"></div>
@@ -119,50 +114,10 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var $ = function(id){ return document.getElementById(id); };
 var bg=$("bg"), shade=$("shade"),
-    nameEl=$("name"), tagline=$("tagline"), bio=$("bio"),
+    tagline=$("tagline"), bio=$("bio"),
     plinks=$("plinks"), panel=$("panel");
 
-/* typing sound : always on, no toggle */
-var actx=null;
-function ensureAudio(){
-  if(actx) return;
-  try{ var AC=window.AudioContext||window.webkitAudioContext; if(AC) actx=new AC(); }catch(e){}
-}
-function click(){
-  if(!actx||actx.state!=="running") return;
-  try{
-    var t=actx.currentTime, o=actx.createOscillator(), g=actx.createGain(), f=actx.createBiquadFilter();
-    o.type="square"; o.frequency.value=1300+Math.random()*1000;
-    f.type="bandpass"; f.frequency.value=2300; f.Q.value=1.1;
-    g.gain.setValueAtTime(0.05,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
-    o.connect(f); f.connect(g); g.connect(actx.destination);
-    o.start(t); o.stop(t+0.06);
-  }catch(e){}
-}
-["pointerdown","keydown","touchstart"].forEach(function(ev){
-  window.addEventListener(ev,function(){ ensureAudio(); if(actx&&actx.state==="suspended") actx.resume(); },{passive:true});
-});
 
-/* name typing */
-var NAME="ADITYA X", nameSpans=[], ti=0;
-for(var ni=0;ni<NAME.length;ni++){
-  (function(ch){
-    var s=document.createElement("span");
-    s.className="lt"; s.textContent = ch===" " ? "\u00A0" : ch;
-    nameEl.appendChild(s); nameSpans.push(s);
-  })(NAME[ni]);
-}
-var caret=document.createElement("span");
-caret.className="caret"; nameEl.appendChild(caret);
-function typeStep(){
-  if(ti<nameSpans.length){
-    nameSpans[ti].classList.add("in");
-    click(); ti++;
-    setTimeout(typeStep, reduce?0:95+Math.random()*80);
-  } else {
-    setTimeout(revealAll, reduce?0:500);
-  }
-}
 
 /* bio karaoke */
 var WORDS=["Mortui","vivos","docent."];
@@ -232,8 +187,7 @@ btns.forEach(function(b){
   },true);
 });
 
-ensureAudio();
-setTimeout(typeStep, reduce?0:450);
+setTimeout(revealAll, reduce?0:600);
 })();
 </script>
 </body>
