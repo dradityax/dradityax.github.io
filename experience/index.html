@@ -6,6 +6,9 @@
 <title>LUMEN — An Aditya X Experience</title>
 <meta name="description" content="LUMEN — a bioluminescent forest you can walk through. A cinematic web experience by Aditya X. Headphones recommended.">
 <meta name="theme-color" content="#04060e">
+<meta property="og:title" content="LUMEN — An Aditya X Experience">
+<meta property="og:description" content="A bioluminescent forest you can walk through.">
+<meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,12 +24,35 @@ html,body{background:var(--night);color:var(--moon);overflow-x:hidden}
 body{font-family:"Unbounded",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 ::selection{background:var(--cyan);color:#001318}
 
-/* ---------- canvas stage ---------- */
-#stage{position:fixed;inset:0;z-index:0}
-#stage canvas{display:block;width:100%;height:100%}
+/* ---------- layered world ---------- */
+#world{position:fixed;inset:0;z-index:0;overflow:hidden;background:#01020a}
+.layer{position:absolute;inset:-9%;background-size:cover;background-position:center 62%;
+  will-change:transform;transform:translate3d(0,0,0)}
+#l-sky{background-image:url("assets/sky.jpg");filter:brightness(1.02) saturate(1.05)}
+#l-mountains{background-image:url("assets/mountains.jpg");filter:brightness(.82) saturate(.92)}
+#l-islands{background-image:url("assets/islands.jpg");filter:brightness(.94) saturate(1.05)}
+#l-forest{background-image:url("assets/forest.jpg");filter:brightness(1) saturate(1.08)}
+#l-foreground{background-image:url("assets/foreground.jpg");filter:brightness(.72) contrast(1.06)}
+.fogbank{position:absolute;left:-20%;width:140%;height:34%;pointer-events:none;will-change:transform;
+  background:linear-gradient(180deg,transparent,rgba(160,220,235,.10) 45%,rgba(160,220,235,.05) 70%,transparent);
+  filter:blur(28px)}
+#fog1{top:38%;animation:fogdrift 46s ease-in-out infinite alternate}
+#fog2{top:58%;animation:fogdrift 64s ease-in-out infinite alternate-reverse;opacity:.8}
+#fog3{top:74%;height:26%;animation:fogdrift 38s ease-in-out infinite alternate;opacity:.6}
+@keyframes fogdrift{from{transform:translateX(-6%)}to{transform:translateX(6%)}}
+#spores{position:absolute;inset:0;pointer-events:none}
+/* lantern: light that follows the visitor */
+#lantern{position:absolute;left:0;top:0;width:74vmax;height:74vmax;margin:-37vmax 0 0 -37vmax;
+  pointer-events:none;mix-blend-mode:soft-light;will-change:transform;
+  background:radial-gradient(circle,rgba(200,245,255,.85) 0%,rgba(160,220,255,.35) 28%,transparent 62%)}
+#firefly{position:absolute;left:0;top:0;width:130px;height:130px;margin:-65px 0 0 -65px;
+  pointer-events:none;mix-blend-mode:screen;will-change:transform;opacity:.9;
+  background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(160,240,255,.5) 22%,transparent 60%)}
 #vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
-  background:radial-gradient(ellipse at 50% 45%, transparent 52%, rgba(2,3,8,.55) 100%)}
-#grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.055;mix-blend-mode:overlay;
+  background:radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(2,3,8,.62) 100%)}
+#grade{position:fixed;inset:0;z-index:2;pointer-events:none;mix-blend-mode:overlay;opacity:.5;
+  background:linear-gradient(180deg,rgba(20,40,90,.25),transparent 35%,transparent 65%,rgba(4,2,12,.45))}
+#grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.06;mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")}
 
 /* ---------- HUD ---------- */
@@ -48,10 +74,10 @@ body{font-family:"Unbounded",system-ui,sans-serif;-webkit-font-smoothing:antiali
 #hud-tele .v{color:var(--cyan)}
 #hud-hint{bottom:24px;right:52px;text-align:right;line-height:1.9}
 #scanring{position:fixed;z-index:1;left:50%;top:44%;width:min(78vmin,560px);height:min(78vmin,560px);
-  transform:translate(-50%,-50%);pointer-events:none;opacity:.5;animation:spin 90s linear infinite}
+  transform:translate(-50%,-50%);pointer-events:none;opacity:.34;animation:spin 90s linear infinite}
 @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-/* ---------- content chapters ---------- */
+/* ---------- chapters ---------- */
 #scroll{position:relative;z-index:10}
 .chapter{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;
   align-items:center;text-align:center;padding:0 8vw;pointer-events:none;
@@ -59,18 +85,20 @@ body{font-family:"Unbounded",system-ui,sans-serif;-webkit-font-smoothing:antiali
 .chapter.visible{opacity:1;transform:none}
 .chapter .no{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.4em;color:var(--cyan);margin-bottom:1.4rem}
 .chapter h2{font-weight:900;font-size:clamp(2.2rem,7.5vw,5.6rem);line-height:1.04;letter-spacing:.02em;
-  text-shadow:0 0 42px rgba(77,243,255,.35)}
-.chapter h2 .m{color:var(--magenta);text-shadow:0 0 42px rgba(255,79,216,.4)}
-.chapter h2 .l{color:var(--lime);text-shadow:0 0 42px rgba(172,255,70,.35)}
+  text-shadow:0 0 42px rgba(77,243,255,.35),0 2px 24px rgba(0,0,0,.8)}
+.chapter h2 .m{color:var(--magenta);text-shadow:0 0 42px rgba(255,79,216,.4),0 2px 24px rgba(0,0,0,.8)}
+.chapter h2 .l{color:var(--lime);text-shadow:0 0 42px rgba(172,255,70,.35),0 2px 24px rgba(0,0,0,.8)}
 .chapter p{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:500;
-  font-size:clamp(1.15rem,2.6vw,1.7rem);color:rgba(232,246,255,.82);margin-top:1.6rem;max-width:34em;line-height:1.5}
-.hero-kicker{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.5em;color:var(--dim);margin-bottom:1.6rem}
+  font-size:clamp(1.15rem,2.6vw,1.7rem);color:rgba(232,246,255,.88);margin-top:1.6rem;max-width:34em;
+  line-height:1.5;text-shadow:0 2px 18px rgba(0,0,0,.85)}
+.hero-kicker{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.5em;color:var(--dim);
+  margin-bottom:1.6rem;text-shadow:0 2px 14px rgba(0,0,0,.9)}
 .hero-title{font-weight:900;font-size:clamp(3.4rem,13vw,10rem);letter-spacing:.06em;line-height:1;
   background:linear-gradient(180deg,#fff 20%,var(--cyan) 65%,var(--violet) 100%);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 0 34px rgba(77,243,255,.45))}
+  filter:drop-shadow(0 0 34px rgba(77,243,255,.45)) drop-shadow(0 4px 22px rgba(0,0,0,.7))}
 .hero-sub{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:clamp(1.2rem,3vw,1.9rem);
-  color:rgba(232,246,255,.85);margin-top:1.8rem}
+  color:rgba(232,246,255,.9);margin-top:1.8rem;text-shadow:0 2px 18px rgba(0,0,0,.9)}
 .scroll-cue{margin-top:4rem;font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.4em;
   color:var(--dim);animation:cue 2.6s ease-in-out infinite}
 @keyframes cue{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(10px)}}
@@ -104,27 +132,39 @@ body{font-family:"Unbounded",system-ui,sans-serif;-webkit-font-smoothing:antiali
   #hud-brand{left:44px}#hud-btns{right:44px}
   .tick.tl{left:12px}.tick.tr{right:12px}.tick.bl{left:12px}.tick.br{right:12px}
   #hud-brand{top:18px}#hud-btns{top:14px}
+  #lantern{width:110vmax;height:110vmax;margin:-55vmax 0 0 -55vmax}
 }
 @media (prefers-reduced-motion:reduce){
-  #scanring,.chapter,.scroll-cue,#gate .glyph{animation:none!important;transition:none!important}
+  #scanring,.chapter,.scroll-cue,#gate .glyph,.fogbank{animation:none!important;transition:none!important}
   .chapter{opacity:1;transform:none}
 }
 </style>
 </head>
 <body>
 
-<div id="stage"></div>
+<div id="world" aria-hidden="true">
+  <div class="layer" id="l-sky"></div>
+  <div class="layer" id="l-mountains"></div>
+  <div class="layer" id="l-islands"></div>
+  <div class="fogbank" id="fog1"></div>
+  <div class="layer" id="l-forest"></div>
+  <div class="fogbank" id="fog2"></div>
+  <div class="layer" id="l-foreground"></div>
+  <div class="fogbank" id="fog3"></div>
+  <canvas id="spores"></canvas>
+  <div id="lantern"></div>
+  <div id="firefly"></div>
+</div>
 <div id="vignette"></div>
+<div id="grade"></div>
 <div id="grain"></div>
 
-<!-- scan ring -->
 <svg id="scanring" viewBox="0 0 200 200" fill="none" aria-hidden="true">
   <circle cx="100" cy="100" r="96" stroke="rgba(77,243,255,.28)" stroke-width="1" stroke-dasharray="2 7"/>
   <circle cx="100" cy="100" r="82" stroke="rgba(255,79,216,.20)" stroke-width="1" stroke-dasharray="1 10"/>
   <circle cx="100" cy="100" r="96" stroke="rgba(77,243,255,.5)" stroke-width="1.5" stroke-dasharray="26 580" stroke-linecap="round"/>
 </svg>
 
-<!-- HUD -->
 <div class="hud" aria-hidden="true">
   <div class="tick tl"></div><div class="tick tr"></div>
   <div class="tick bl"></div><div class="tick br"></div>
@@ -140,9 +180,8 @@ body{font-family:"Unbounded",system-ui,sans-serif;-webkit-font-smoothing:antiali
   SPORES <span class="v" id="tele-spore">12,408</span>/m³<br>
   <span id="tele-clock">00:00:00</span> LOCAL
 </div>
-<div id="hud-hint" class="hud" aria-hidden="true">scroll to descend<br>headphones recommended</div>
+<div id="hud-hint" class="hud" aria-hidden="true">scroll to descend<br>move to look around</div>
 
-<!-- chapters -->
 <main id="scroll">
   <section class="chapter" id="ch-hero">
     <div class="hero-kicker">ADITYA X PRESENTS</div>
@@ -184,7 +223,6 @@ body{font-family:"Unbounded",system-ui,sans-serif;-webkit-font-smoothing:antiali
   </section>
 </main>
 
-<!-- loading gate -->
 <div id="gate" role="dialog" aria-label="Enter the experience">
   <svg class="glyph" viewBox="0 0 64 64" fill="none" aria-hidden="true">
     <circle cx="32" cy="32" r="29" stroke="#4df3ff" stroke-width="1.5" opacity=".8"/>
@@ -195,7 +233,7 @@ body{font-family:"Unbounded",system-ui,sans-serif;-webkit-font-smoothing:antiali
     <circle cx="40" cy="16" r="1.5" fill="#8a5cff"/>
   </svg>
   <div class="g-title">LUMEN</div>
-  <div class="g-sub" id="gateStatus">GROWING THE FOREST…</div>
+  <div class="g-sub" id="gateStatus">GATHERING LIGHT…</div>
   <div id="barwrap"><div id="bar"></div></div>
   <button id="enterBtn" type="button">Click to enter</button>
   <div class="g-sub">SOUND TURNS ON WHEN YOU ENTER · HEADPHONES RECOMMENDED</div>
@@ -203,466 +241,211 @@ body{font-family:"Unbounded",system-ui,sans-serif;-webkit-font-smoothing:antiali
 
 <script>
 "use strict";
-/* ============ tiny utils ============ */
 var $=function(id){return document.getElementById(id);};
-var reduceM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-var isMobile = Math.min(window.screen.width, window.screen.height) < 700 || ("ontouchstart" in window && window.innerWidth < 700);
+var reduceM=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var isMobile=Math.min(window.screen.width,window.screen.height)<700||("ontouchstart" in window&&window.innerWidth<700);
 function rand(a,b){return a+Math.random()*(b-a);}
-function pick(arr){return arr[(Math.random()*arr.length)|0];}
-var BAR=$("bar"), STATUS=$("gateStatus"), ENTER=$("enterBtn");
-function setProgress(p,label){ BAR.style.width=Math.round(p*100)+"%"; if(label) STATUS.textContent=label; }
+function pick(a){return a[(Math.random()*a.length)|0];}
+var BAR=$("bar"),STATUS=$("gateStatus"),ENTER=$("enterBtn");
+function setProgress(p,label){BAR.style.width=Math.round(p*100)+"%";if(label)STATUS.textContent=label;}
 
 /* ============ procedural ambient audio (WebAudio, no files) ============ */
 var AudioScape=(function(){
-  var ctx=null, master=null, on=false, chimeTimer=null;
+  var ctx=null,master=null,on=false,chimeTimer=null;
   var SCALE=[523.25,587.33,659.25,783.99,880.00,1046.50];
   function init(){
-    if(ctx) return;
-    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
-    ctx=new AC(); master=ctx.createGain(); master.gain.value=0; master.connect(ctx.destination);
-    // deep drone: two detuned sines through lowpass
-    var lp=ctx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=220; lp.connect(master);
+    if(ctx)return;
+    var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    ctx=new AC();master=ctx.createGain();master.gain.value=0;master.connect(ctx.destination);
+    var lp=ctx.createBiquadFilter();lp.type="lowpass";lp.frequency.value=220;lp.connect(master);
     [55,55.6,110.4].forEach(function(f,i){
-      var o=ctx.createOscillator(), g=ctx.createGain();
-      o.type="sine"; o.frequency.value=f; g.gain.value=i<2?0.16:0.05;
-      o.connect(g); g.connect(lp); o.start();
+      var o=ctx.createOscillator(),g=ctx.createGain();
+      o.type="sine";o.frequency.value=f;g.gain.value=i<2?0.16:0.05;
+      o.connect(g);g.connect(lp);o.start();
     });
-    // slow breathing on the drone
-    var lfo=ctx.createOscillator(), lg=ctx.createGain();
-    lfo.frequency.value=0.07; lg.gain.value=0.05;
-    lfo.connect(lg); lg.connect(lp.frequency); lfo.start();
-    // wind: looped noise through wandering bandpass
-    var len=ctx.sampleRate*4, buf=ctx.createBuffer(1,len,ctx.sampleRate), d=buf.getChannelData(0);
-    for(var i=0;i<len;i++) d[i]=Math.random()*2-1;
-    var noise=ctx.createBufferSource(); noise.buffer=buf; noise.loop=true;
-    var bp=ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=480; bp.Q.value=0.6;
-    var ng=ctx.createGain(); ng.gain.value=0.028;
-    noise.connect(bp); bp.connect(ng); ng.connect(master); noise.start();
-    var wlfo=ctx.createOscillator(), wlg=ctx.createGain();
-    wlfo.frequency.value=0.11; wlg.gain.value=260;
-    wlfo.connect(wlg); wlg.connect(bp.frequency); wlfo.start();
-    // echo bus for chimes
-    var delay=ctx.createDelay(1); delay.delayTime.value=0.46;
-    var fb=ctx.createGain(); fb.gain.value=0.38;
-    var wet=ctx.createGain(); wet.gain.value=0.5;
-    delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(master);
+    var lfo=ctx.createOscillator(),lg=ctx.createGain();
+    lfo.frequency.value=0.07;lg.gain.value=0.05;
+    lfo.connect(lg);lg.connect(lp.frequency);lfo.start();
+    var len=ctx.sampleRate*4,buf=ctx.createBuffer(1,len,ctx.sampleRate),d=buf.getChannelData(0);
+    for(var i=0;i<len;i++)d[i]=Math.random()*2-1;
+    var noise=ctx.createBufferSource();noise.buffer=buf;noise.loop=true;
+    var bp=ctx.createBiquadFilter();bp.type="bandpass";bp.frequency.value=480;bp.Q.value=0.6;
+    var ng=ctx.createGain();ng.gain.value=0.028;
+    noise.connect(bp);bp.connect(ng);ng.connect(master);noise.start();
+    var wlfo=ctx.createOscillator(),wlg=ctx.createGain();
+    wlfo.frequency.value=0.11;wlg.gain.value=260;
+    wlfo.connect(wlg);wlg.connect(bp.frequency);wlfo.start();
+    var delay=ctx.createDelay(1);delay.delayTime.value=0.46;
+    var fb=ctx.createGain();fb.gain.value=0.38;
+    var wet=ctx.createGain();wet.gain.value=0.5;
+    delay.connect(fb);fb.connect(delay);delay.connect(wet);wet.connect(master);
     AudioScape._echo=delay;
   }
   function chime(){
-    if(!ctx||!on) return;
-    var t=ctx.currentTime, f=pick(SCALE)*(Math.random()<0.3?0.5:1);
-    var o=ctx.createOscillator(), g=ctx.createGain();
-    o.type="sine"; o.frequency.value=f;
+    if(!ctx||!on)return;
+    var t=ctx.currentTime,f=pick(SCALE)*(Math.random()<0.3?0.5:1);
+    var o=ctx.createOscillator(),g=ctx.createGain();
+    o.type="sine";o.frequency.value=f;
     g.gain.setValueAtTime(0.0001,t);
     g.gain.exponentialRampToValueAtTime(0.05,t+0.05);
     g.gain.exponentialRampToValueAtTime(0.0001,t+4.2);
-    o.connect(g); g.connect(master); g.connect(AudioScape._echo);
-    o.start(t); o.stop(t+4.5);
-    chimeTimer=setTimeout(chime, rand(5000,13000));
+    o.connect(g);g.connect(master);g.connect(AudioScape._echo);
+    o.start(t);o.stop(t+4.5);
+    chimeTimer=setTimeout(chime,rand(5000,13000));
   }
-  return {
+  return{
     _echo:null,
-    start:function(){
-      init(); if(!ctx) return false;
-      if(ctx.state==="suspended") ctx.resume();
-      on=true; master.gain.cancelScheduledValues(ctx.currentTime);
-      master.gain.linearRampToValueAtTime(0.9, ctx.currentTime+3);
-      clearTimeout(chimeTimer); chimeTimer=setTimeout(chime, 2500);
-      return true;
-    },
-    stop:function(){
-      on=false; clearTimeout(chimeTimer);
-      if(ctx) master.gain.linearRampToValueAtTime(0.0001, ctx.currentTime+1.2);
-    },
-    toggle:function(){ return on ? (this.stop(),false) : (this.start(),true); },
-    isOn:function(){ return on; }
+    start:function(){init();if(!ctx)return false;
+      if(ctx.state==="suspended")ctx.resume();
+      on=true;master.gain.cancelScheduledValues(ctx.currentTime);
+      master.gain.linearRampToValueAtTime(0.9,ctx.currentTime+3);
+      clearTimeout(chimeTimer);chimeTimer=setTimeout(chime,2500);return true;},
+    stop:function(){on=false;clearTimeout(chimeTimer);
+      if(ctx)master.gain.linearRampToValueAtTime(0.0001,ctx.currentTime+1.2);},
+    toggle:function(){return on?(this.stop(),false):(this.start(),true);},
+    isOn:function(){return on;}
   };
 })();
 $("soundBtn").addEventListener("click",function(){
-  var on=AudioScape.toggle();
-  this.innerHTML=on?"Sound&nbsp;On":"Sound&nbsp;Off";
+  var on=AudioScape.toggle();this.innerHTML=on?"Sound&nbsp;On":"Sound&nbsp;Off";
 });
-$("exitBtn").addEventListener("click",function(){ window.location.href="../"; });
+$("exitBtn").addEventListener("click",function(){window.location.href="../";});
 </script>
 <script>
-/* ============ LUMEN world ============ */
+"use strict";
 (function(){
-var stage=$("stage"), entered=false, scrollP=0;
-var mouseX=0, mouseY=0;
-window.addEventListener("mousemove",function(e){
-  mouseX=(e.clientX/window.innerWidth-0.5)*2;
-  mouseY=(e.clientY/window.innerHeight-0.5)*2;
+var entered=false,scrollP=0;
+/* ---------- pointer (mouse + touch) ---------- */
+var tx=0,ty=0,cx=0,cy=0,lx=0,ly=0,clx=0,cly=0; // target, current, lantern
+function onPoint(px,py){
+  tx=(px/window.innerWidth-0.5)*2;
+  ty=(py/window.innerHeight-0.5)*2;
+  lx=px;ly=py;
+}
+window.addEventListener("mousemove",function(e){onPoint(e.clientX,e.clientY);},{passive:true});
+window.addEventListener("touchmove",function(e){
+  if(e.touches.length)onPoint(e.touches[0].clientX,e.touches[0].clientY);
 },{passive:true});
 window.addEventListener("scroll",function(){
   var h=document.documentElement;
-  scrollP=Math.min(1,Math.max(0,h.scrollTop/(h.scrollHeight-h.clientHeight||1)));
+  scrollP=Math.min(1,Math.max(0,h.scrollTop/((h.scrollHeight-h.clientHeight)||1)));
 },{passive:true});
 document.body.style.overflow="hidden";
 
-/* ---------- canvas texture factories ---------- */
-function cnv(w,h){var c=document.createElement("canvas");c.width=w;c.height=h;return c;}
-function glowTex(){
-  var c=cnv(128,128),x=c.getContext("2d");
-  var g=x.createRadialGradient(64,64,0,64,64,64);
-  g.addColorStop(0,"rgba(255,255,255,1)");g.addColorStop(0.25,"rgba(255,255,255,.55)");
-  g.addColorStop(0.6,"rgba(255,255,255,.12)");g.addColorStop(1,"rgba(255,255,255,0)");
-  x.fillStyle=g;x.fillRect(0,0,128,128);return c;
-}
-function ridgeTex(seed){
-  var c=cnv(1024,256),x=c.getContext("2d"),s=seed||1;
-  function rnd(){s=(s*16807)%2147483647;return s/2147483647;}
-  x.beginPath();x.moveTo(0,256);
-  var y=150;
-  for(var px=0;px<=1024;px+=32){ y+= (rnd()-0.5)*90; y=Math.max(40,Math.min(210,y)); x.lineTo(px,y); }
-  x.lineTo(1024,256);x.closePath();
-  var g=x.createLinearGradient(0,40,0,256);
-  g.addColorStop(0,"#0a1226");g.addColorStop(1,"#04060e");
-  x.fillStyle=g;x.fill();
-  return c;
-}
-function fogTex(){
-  var c=cnv(256,128),x=c.getContext("2d");
-  for(var i=0;i<26;i++){
-    var px=rand(20,236),py=rand(30,98),r=rand(24,70);
-    var g=x.createRadialGradient(px,py,0,px,py,r);
-    g.addColorStop(0,"rgba(255,255,255,.16)");g.addColorStop(1,"rgba(255,255,255,0)");
-    x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill();
+/* ---------- layers ---------- */
+var layers=[
+  {el:$("l-sky"),       d:0.015},
+  {el:$("l-mountains"), d:0.045},
+  {el:$("l-islands"),   d:0.08, bob:true},
+  {el:$("l-forest"),    d:0.13},
+  {el:$("l-foreground"),d:0.21}
+];
+var lantern=$("lantern"),firefly=$("firefly");
+
+/* ---------- spores canvas ---------- */
+var sc=$("spores"),sx=sc.getContext("2d");
+var sprites=[],parts=[];
+(function(){
+  var cols=["77,243,255","255,79,216","172,255,70","138,92,255","220,250,255"];
+  for(var i=0;i<cols.length;i++){
+    var c=document.createElement("canvas");c.width=c.height=48;
+    var x=c.getContext("2d");
+    var g=x.createRadialGradient(24,24,0,24,24,24);
+    g.addColorStop(0,"rgba("+cols[i]+",1)");g.addColorStop(0.35,"rgba("+cols[i]+",.5)");
+    g.addColorStop(1,"rgba("+cols[i]+",0)");
+    x.fillStyle=g;x.fillRect(0,0,48,48);sprites.push(c);
   }
-  return c;
+})();
+function sizeSpores(){
+  sc.width=window.innerWidth;sc.height=window.innerHeight;
 }
-function shaftTex(){
-  var c=cnv(64,256),x=c.getContext("2d");
-  var g=x.createLinearGradient(0,0,0,256);
-  g.addColorStop(0,"rgba(255,255,255,.5)");g.addColorStop(1,"rgba(255,255,255,0)");
-  x.fillStyle=g;x.fillRect(0,0,64,256);return c;
-}
-function skyTex(){
-  var c=cnv(16,256),x=c.getContext("2d");
-  var g=x.createLinearGradient(0,0,0,256);
-  g.addColorStop(0,"#01020a");g.addColorStop(0.45,"#071426");
-  g.addColorStop(0.72,"#0b2f3a");g.addColorStop(0.86,"#0e3f46");g.addColorStop(1,"#04060e");
-  x.fillStyle=g;x.fillRect(0,0,16,256);return c;
-}
-function islandTex(){
-  var c=cnv(256,256),x=c.getContext("2d");
-  // floating rock: jagged top, tapering root
-  x.beginPath();
-  x.moveTo(28,96);
-  var pts=[[40,70],[70,58],[110,52],[150,56],[190,66],[222,88],[228,96]];
-  pts.forEach(function(p){x.lineTo(p[0],p[1]);});
-  x.lineTo(200,110);x.lineTo(170,150);x.lineTo(150,196);x.lineTo(138,232);
-  x.lineTo(128,196);x.lineTo(104,152);x.lineTo(70,112);x.closePath();
-  var g=x.createLinearGradient(0,50,0,232);
-  g.addColorStop(0,"#0c1526");g.addColorStop(0.5,"#070c18");g.addColorStop(1,"rgba(4,6,14,0)");
-  x.fillStyle=g;x.fill();
-  // glowing rim under the island
-  var g2=x.createLinearGradient(0,80,0,130);
-  g2.addColorStop(0,"rgba(77,243,255,0)");g2.addColorStop(0.5,"rgba(77,243,255,.55)");g2.addColorStop(1,"rgba(77,243,255,0)");
-  x.fillStyle=g2;x.fillRect(24,80,208,52);
-  // tiny glowing trees on top
-  for(var i=0;i<9;i++){
-    var tx=rand(55,200),ty=rand(52,72);
-    var gg=x.createRadialGradient(tx,ty,0,tx,ty,rand(6,12));
-    var col=pick(["77,243,255","255,79,216","172,255,70","138,92,255"]);
-    gg.addColorStop(0,"rgba("+col+",.9)");gg.addColorStop(1,"rgba("+col+",0)");
-    x.fillStyle=gg;x.beginPath();x.arc(tx,ty,12,0,7);x.fill();
-  }
-  return c;
-}
-
-/* ---------- WebGL scene ---------- */
-var renderer,scene,camera,clock;
-var spores,sporeBase,sporePhase,fireflies,mountains=[],islands=[],trees=[],shafts=[],fogPlanes=[];
-var TREE_COLS=[0x4df3ff,0x4df3ff,0xff4fd8,0x8a5cff,0xacff46,0xbfefff];
-function webglOK(){
-  try{var c=document.createElement("canvas");
-    return !!(window.WebGLRenderingContext&&(c.getContext("webgl2")||c.getContext("webgl")));}
-  catch(e){return false;}
-}
-function sprite(tex,color,sx,sy,op){
-  var m=new THREE.SpriteMaterial({map:tex,color:color,transparent:true,opacity:op==null?1:op,
-    blending:THREE.AdditiveBlending,depthWrite:false});
-  var s=new THREE.Sprite(m);s.scale.set(sx,sy,1);return s;
-}
-function buildWorld(T){
-  var GT=T.CanvasTexture;
-  var glowT=new GT(glowTex()), ridgeT1=new GT(ridgeTex(7)), ridgeT2=new GT(ridgeTex(31)),
-      ridgeT3=new GT(ridgeTex(97)), fogT=new GT(fogTex()), shaftT=new GT(shaftTex()),
-      skyT=new GT(skyTex()), islT=new GT(islandTex());
-  renderer=new T.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,isMobile?1.5:2));
-  renderer.setSize(window.innerWidth,window.innerHeight);
-  stage.appendChild(renderer.domElement);
-  scene=new T.Scene();
-  scene.fog=new T.FogExp2(0x04060e,0.011);
-  camera=new T.PerspectiveCamera(58,window.innerWidth/window.innerHeight,0.1,500);
-  camera.position.set(0,6.5,34);
-  clock=new T.Clock();
-
-  // sky dome
-  var sky=new T.Mesh(new T.PlaneGeometry(460,240),
-    new T.MeshBasicMaterial({map:skyT,fog:false,depthWrite:false}));
-  sky.position.set(0,50,-150);scene.add(sky);
-  // stars
-  (function(){
-    var n=isMobile?220:520,pos=new Float32Array(n*3);
-    for(var i=0;i<n;i++){pos[i*3]=rand(-190,190);pos[i*3+1]=rand(8,130);pos[i*3+2]=rand(-145,-95);}
-    var g=new T.BufferGeometry();g.setAttribute("position",new T.BufferAttribute(pos,3));
-    var m=new T.PointsMaterial({color:0xcfe8ff,size:1.6,sizeAttenuation:false,transparent:true,opacity:0.75,fog:false,depthWrite:false});
-    scene.add(new T.Points(g,m));
-  })();
-  // moon + halo
-  var moon=sprite(glowT,0xe8f6ff,26,26,0.95);moon.position.set(44,36,-120);scene.add(moon);
-  var halo=sprite(glowT,0x4df3ff,80,80,0.28);halo.position.copy(moon.position);scene.add(halo);
-
-  // mountain layers
-  [[ridgeT1,300,64,-100,0.9],[ridgeT2,340,78,-72,0.75],[ridgeT3,380,92,-48,0.6]].forEach(function(L,i){
-    var m=new T.Mesh(new T.PlaneGeometry(L[1],L[2]),
-      new T.MeshBasicMaterial({map:L[0],transparent:true,depthWrite:false,opacity:L[4]}));
-    m.position.set(0,-4,L[3]);scene.add(m);mountains.push(m);
+sizeSpores();window.addEventListener("resize",sizeSpores);
+(function(){
+  var n=isMobile?55:130;
+  for(var i=0;i<n;i++)parts.push({
+    x:rand(0,window.innerWidth),y:rand(0,window.innerHeight),
+    s:rand(6,26),vy:rand(6,26),ph:rand(0,6.28),
+    sp:(Math.random()*sprites.length)|0,tw:rand(1.5,4)
   });
-  // floating islands (the Avatar beat)
-  [[-34,26,-58,34],[30,32,-70,44],[-6,20,-44,26],[58,16,-52,22]].forEach(function(I,i){
-    var grp=new T.Group();
-    var m=new T.Mesh(new T.PlaneGeometry(I[3],I[3]),
-      new T.MeshBasicMaterial({map:islT,transparent:true,depthWrite:false}));
-    grp.add(m);grp.position.set(I[0],I[1],I[2]);
-    grp.userData={baseY:I[1],ph:rand(0,6.28),sp:rand(0.25,0.45)};
-    scene.add(grp);islands.push(grp);
-  });
-  // ground + floor glow
-  var ground=new T.Mesh(new T.PlaneGeometry(420,220),
-    new T.MeshBasicMaterial({color:0x030510}));
-  ground.rotation.x=-Math.PI/2;ground.position.set(0,-7.5,-40);scene.add(ground);
-  var fg=sprite(glowT,0x1a5f6e,150,44,0.16);fg.position.set(0,-5,-34);scene.add(fg);
+})();
+var t0=performance.now();
+function frame(){
+  var t=(performance.now()-t0)/1000;
+  // slow-motion easing: everything lerps, nothing snaps
+  cx+=(tx-cx)*0.045; cy+=(ty-cy)*0.045;
+  clx+=(lx-clx)*0.08; cly+=(ly-cly)*0.08;
+  var i,L,bx,by;
+  for(i=0;i<layers.length;i++){
+    L=layers[i];bx=0;by=0;
+    if(L.bob&&!reduceM){bx=Math.sin(t*0.24)*10;by=Math.sin(t*0.31)*8;}
+    var px=cx*L.d*70+bx, py=cy*L.d*46+scrollP*L.d*520+by;
+    L.el.style.transform="translate3d("+px.toFixed(1)+"px,"+py.toFixed(1)+"px,0)";
+  }
+  lantern.style.transform="translate3d("+clx.toFixed(1)+"px,"+cly.toFixed(1)+"px,0)";
+  var fl=0.82+0.18*Math.sin(t*2.2);
+  firefly.style.transform="translate3d("+clx.toFixed(1)+"px,"+cly.toFixed(1)+"px,0) scale("+fl.toFixed(3)+")";
+  // spores
+  sx.clearRect(0,0,sc.width,sc.height);
+  sx.globalCompositeOperation="lighter";
+  for(i=0;i<parts.length;i++){
+    var p=parts[i];
+    if(!reduceM){
+      p.y-=p.vy*0.016;p.x+=Math.sin(t*0.8+p.ph)*0.35;
+      if(p.y<-30){p.y=sc.height+30;p.x=rand(0,sc.width);}
+    }
+    var a=0.35+0.3*Math.sin(t*p.tw+p.ph);
+    sx.globalAlpha=Math.max(0.06,a);
+    var sz=p.s*(1+0.15*Math.sin(t*2+p.ph));
+    sx.drawImage(sprites[p.sp],p.x-sz/2,p.y-sz/2,sz,sz);
+  }
+  sx.globalAlpha=1;sx.globalCompositeOperation="source-over";
+  requestAnimationFrame(frame);
+}
+frame();
 
-  // bioluminescent trees
-  var trunkG=new T.CylinderGeometry(0.14,0.34,7,5);
-  var trunkM=new T.MeshBasicMaterial({color:0x05070d});
-  var NT=isMobile?26:52, placed=0, guard=0;
-  while(placed<NT&&guard++<800){
-    var tx=rand(-64,64),tz=rand(-42,4);
-    var clearHalf=5+(6-tz)*0.28;
-    if(Math.abs(tx)<clearHalf) continue; // keep a glowing path open
-    var g=new T.Group();
-    var trunk=new T.Mesh(trunkG,trunkM);trunk.position.y=3.5;g.add(trunk);
-    var hgt=rand(5,8.5);
-    var nGlow=4+(Math.random()*3|0);
-    for(var k=0;k<nGlow;k++){
-      var col=pick(TREE_COLS);
-      var s=sprite(glowT,col,rand(2.2,5.5),rand(2.2,5.5),rand(0.5,0.9));
-      s.position.set(rand(-2.4,2.4),hgt+rand(-1.6,1.8),rand(-1.4,1.4));
-      g.add(s);
-    }
-    var gg=sprite(glowT,pick(TREE_COLS),rand(8,13),rand(3,5),0.22);
-    gg.position.y=0.4;g.add(gg);
-    var sc=rand(0.8,1.5);g.scale.set(sc,sc,sc);
-    g.position.set(tx,-7.5,tz);
-    g.userData={ph:rand(0,6.28),amp:rand(0.1,0.35)};
-    scene.add(g);trees.push(g);placed++;
-  }
-  // drifting spores
-  (function(){
-    var n=isMobile?380:950;
-    sporeBase=new Float32Array(n*3);sporePhase=new Float32Array(n);
-    var pos=new Float32Array(n*3),col=new Float32Array(n*3);
-    var c=new T.Color();
-    for(var i=0;i<n;i++){
-      sporeBase[i*3]=rand(-70,70);sporeBase[i*3+1]=rand(-4,44);sporeBase[i*3+2]=rand(-60,14);
-      sporePhase[i]=rand(0,6.28);
-      c.setHex(pick(TREE_COLS));
-      col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
-      pos[i*3]=sporeBase[i*3];pos[i*3+1]=sporeBase[i*3+1];pos[i*3+2]=sporeBase[i*3+2];
-    }
-    var g=new T.BufferGeometry();
-    g.setAttribute("position",new T.BufferAttribute(pos,3));
-    g.setAttribute("color",new T.BufferAttribute(col,3));
-    spores=new T.Points(g,new T.PointsMaterial({size:0.55,vertexColors:true,transparent:true,
-      opacity:0.9,blending:T.AdditiveBlending,depthWrite:false,sizeAttenuation:true}));
-    scene.add(spores);
-  })();
-  // near fireflies
-  (function(){
-    var n=isMobile?30:70,pos=new Float32Array(n*3);
-    for(var i=0;i<n;i++){pos[i*3]=rand(-30,30);pos[i*3+1]=rand(0,20);pos[i*3+2]=rand(-14,10);}
-    var g=new T.BufferGeometry();g.setAttribute("position",new T.BufferAttribute(pos,3));
-    fireflies=new T.Points(g,new T.PointsMaterial({color:0xd8fbff,size:1.1,transparent:true,
-      opacity:0.85,blending:T.AdditiveBlending,depthWrite:false}));
-    scene.add(fireflies);
-  })();
-  // low fog banks
-  for(var f=0;f<5;f++){
-    var fm=new T.Mesh(new T.PlaneGeometry(210,42),
-      new T.MeshBasicMaterial({map:fogT,transparent:true,opacity:0.10+f*0.02,depthWrite:false,
-        color:0x9fd8e8}));
-    fm.position.set(rand(-40,40),rand(-2,7),-34+f*7);
-    fm.userData={sp:rand(0.4,1.1)*(f%2?1:-1)};
-    scene.add(fm);fogPlanes.push(fm);
-  }
-  // light shafts
-  for(var s2=0;s2<4;s2++){
-    var sm=new T.Mesh(new T.PlaneGeometry(rand(4,8),78),
-      new T.MeshBasicMaterial({map:shaftT,transparent:true,opacity:rand(0.05,0.1),
-        blending:T.AdditiveBlending,depthWrite:false,color:0x9fefff}));
-    sm.position.set(rand(-32,32),26,rand(-28,-12));
-    sm.rotation.z=rand(-0.14,0.14);
-    sm.userData={baseR:sm.rotation.z,ph:rand(0,6.28)};
-    scene.add(sm);shafts.push(sm);
-  }
-  window.addEventListener("resize",function(){
-    camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth,window.innerHeight);
-  });
+/* ---------- preload with real progress ---------- */
+var files=["assets/sky.jpg","assets/mountains.jpg","assets/islands.jpg","assets/forest.jpg","assets/foreground.jpg"];
+var done=0,ready=false;
+function armEnter(){
+  if(ready)return;ready=true;
+  setProgress(1,"THE FOREST IS AWAKE");
+  ENTER.classList.add("ready");
+  ENTER.addEventListener("click",enterWorld,{once:true});
 }
-function tickWorld(){
-  if(!renderer) return;
-  requestAnimationFrame(tickWorld);
-  var dt=Math.min(clock.getDelta(),0.05), t=clock.elapsedTime;
-  if(reduceM) dt=0;
-  // camera: drift + parallax + scroll descent
-  var cx=Math.sin(t*0.06)*3.5+mouseX*4,
-      cy=6.5+Math.sin(t*0.083)*0.9+mouseY*1.6,
-      cz=34-scrollP*16;
-  camera.position.set(cx,cy,cz);
-  camera.lookAt(cx*0.35,9.5,-30);
-  scene.fog.density=0.010+scrollP*0.007;
-  var i;
-  for(i=0;i<mountains.length;i++) mountains[i].position.x=Math.sin(t*0.02+i*2)*7;
-  for(i=0;i<islands.length;i++){
-    var isl=islands[i];
-    isl.position.y=isl.userData.baseY+Math.sin(t*isl.userData.sp+isl.userData.ph)*1.4;
-    isl.position.x+=Math.sin(t*0.1+isl.userData.ph)*dt*0.7;
-  }
-  for(i=0;i<trees.length;i++){
-    var tr=trees[i];
-    tr.rotation.z=Math.sin(t*0.7+tr.userData.ph)*0.02;
-    tr.position.x+=Math.sin(t*0.5+tr.userData.ph)*dt*tr.userData.amp*0.3;
-  }
-  // spores rise + sway
-  var p=spores.geometry.attributes.position.array;
-  for(i=0;i<sporePhase.length;i++){
-    var y=p[i*3+1]+dt*0.7;
-    if(y>46) y=-4;
-    p[i*3+1]=y;
-    p[i*3]=sporeBase[i*3]+Math.sin(t*0.6+sporePhase[i])*2.2;
-  }
-  spores.geometry.attributes.position.needsUpdate=true;
-  fireflies.material.opacity=0.55+0.35*Math.sin(t*2.6);
-  for(i=0;i<fogPlanes.length;i++){
-    var f=fogPlanes[i];
-    f.position.x+=f.userData.sp*dt*2;
-    if(f.position.x>120)f.position.x=-120; if(f.position.x<-120)f.position.x=120;
-  }
-  for(i=0;i<shafts.length;i++){
-    shafts[i].rotation.z=shafts[i].userData.baseR+Math.sin(t*0.25+shafts[i].userData.ph)*0.025;
-  }
-  renderer.render(scene,camera);
-}
+files.forEach(function(f){
+  var im=new Image();
+  im.onload=im.onerror=function(){
+    done++;setProgress(0.12+0.83*(done/files.length),
+      done<files.length?("GATHERING LIGHT · "+done+"/"+files.length):"WAKING THE FOREST…");
+    if(done>=files.length)setTimeout(armEnter,400);
+  };
+  im.src=f;
+});
+setProgress(0.1,"GATHERING LIGHT…");
+setTimeout(armEnter,14000); // fail-safe: never trap the visitor
 
-/* ---------- 2D fallback (no WebGL / CDN blocked: never a blank page) ---------- */
-function bootFallback(){
-  var c=document.createElement("canvas"),x=c.getContext("2d");
-  c.width=window.innerWidth;c.height=window.innerHeight;
-  c.style.width="100%";c.style.height="100%";
-  stage.appendChild(c);
-  var orbs=[],parts=[];
-  var cols=["77,243,255","255,79,216","172,255,70","138,92,255"];
-  for(var i=0;i<36;i++)orbs.push({x:rand(0,c.width),y:rand(0,c.height),r:rand(30,130),
-    col:pick(cols),sp:rand(4,16),ph:rand(0,6.28)});
-  for(var j=0;j<130;j++)parts.push({x:rand(0,c.width),y:rand(0,c.height),r:rand(0.8,2.6),
-    col:pick(cols),vy:rand(8,30),ph:rand(0,6.28)});
-  function ridge2d(){
-    x.beginPath();x.moveTo(0,c.height);
-    for(var px=0;px<=c.width;px+=40)x.lineTo(px,c.height*0.72+Math.sin(px*0.01+2)*40+rand(-14,14));
-    x.lineTo(c.width,c.height);x.closePath();
-    x.fillStyle="#04060e";x.fill();
-  }
-  var t0=performance.now();
-  function frame(){
-    var t=(performance.now()-t0)/1000;
-    var g=x.createLinearGradient(0,0,0,c.height);
-    g.addColorStop(0,"#01020a");g.addColorStop(0.6,"#071426");g.addColorStop(0.85,"#0e3f46");g.addColorStop(1,"#04060e");
-    x.fillStyle=g;x.fillRect(0,0,c.width,c.height);
-    // moon
-    var mg=x.createRadialGradient(c.width*0.78,c.height*0.2,0,c.width*0.78,c.height*0.2,90);
-    mg.addColorStop(0,"rgba(232,246,255,.9)");mg.addColorStop(0.3,"rgba(232,246,255,.25)");mg.addColorStop(1,"rgba(232,246,255,0)");
-    x.fillStyle=mg;x.beginPath();x.arc(c.width*0.78,c.height*0.2,90,0,7);x.fill();
-    var i,o;
-    for(i=0;i<orbs.length;i++){o=orbs[i];
-      if(!reduceM){o.x+=Math.sin(t*0.3+o.ph)*o.sp*0.016;o.y+=Math.cos(t*0.22+o.ph)*o.sp*0.012;}
-      var og=x.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
-      og.addColorStop(0,"rgba("+o.col+",.20)");og.addColorStop(1,"rgba("+o.col+",0)");
-      x.fillStyle=og;x.beginPath();x.arc(o.x,o.y,o.r,0,7);x.fill();
-    }
-    for(i=0;i<parts.length;i++){var p=parts[i];
-      if(!reduceM){p.y-=p.vy*0.016;p.x+=Math.sin(t+p.ph)*0.3;if(p.y<-10){p.y=c.height+10;p.x=rand(0,c.width);}}
-      x.fillStyle="rgba("+p.col+","+(0.35+0.3*Math.sin(t*2+p.ph))+")";
-      x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill();
-    }
-    ridge2d();
-    if(!reduceM)requestAnimationFrame(frame);
-  }
-  frame();
-  window.addEventListener("resize",function(){c.width=window.innerWidth;c.height=window.innerHeight;});
-}
-
-/* ---------- boot sequence ---------- */
-function boot(T){
-  setProgress(0.35,"WAKING THE SPORES…");
-  var frames=0;
-  try{
-    if(T&&webglOK()){
-      buildWorld(T);
-      setProgress(0.6,"RAISING THE MOUNTAINS…");
-      tickWorld();
-      var warm=setInterval(function(){
-        frames++;
-        setProgress(0.6+0.35*(frames/24));
-        if(frames>=24){clearInterval(warm);ready();}
-      },50);
-    }else{
-      bootFallback();setProgress(0.8,"PAINTING THE NIGHT…");
-      setTimeout(ready,900);
-    }
-  }catch(err){ bootFallback(); setTimeout(ready,900); }
-  function ready(){
-    setProgress(1,"THE FOREST IS AWAKE");
-    ENTER.classList.add("ready");
-    ENTER.addEventListener("click",enterWorld,{once:true});
-  }
-}
 function enterWorld(){
-  if(entered)return;entered=true;
-  var gate=$("gate");
-  gate.classList.add("done");
+  if(!ready)return;
+  var gate=$("gate");gate.classList.add("done");
   document.body.style.overflow="";
   setTimeout(function(){gate.style.display="none";},1600);
   if(AudioScape.start())$("soundBtn").innerHTML="Sound&nbsp;On";
-  // reveal chapters on scroll
   var io=new IntersectionObserver(function(es){
     es.forEach(function(e){if(e.isIntersecting)e.target.classList.add("visible");});
   },{threshold:0.35});
   Array.prototype.forEach.call(document.querySelectorAll(".chapter"),function(c){io.observe(c);});
   $("ch-hero").classList.add("visible");
+  // center the lantern to start
+  lx=clx=window.innerWidth/2;ly=cly=window.innerHeight*0.42;
 }
-function loadScript(src,ok,fail){
-  var s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=fail;
-  document.head.appendChild(s);
-}
-setProgress(0.12,"CONTACTING THE DEEP…");
-loadScript("https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js",
-  function(){boot(window.THREE);},
-  function(){loadScript("https://unpkg.com/three@0.158.0/build/three.min.js",
-    function(){boot(window.THREE);},
-    function(){boot(null);});});
 
 /* ---------- HUD telemetry ---------- */
 (function(){
-  var t0=Date.now();
+  var s0=Date.now();
   function pad(n){return (n<10?"0":"")+n;}
   setInterval(function(){
     var el=$("tele-clock");if(!el)return;
-    var s=((Date.now()-t0)/1000)|0;
+    var s=((Date.now()-s0)/1000)|0;
     el.textContent=pad((s/3600)|0)+":"+pad(((s/60)|0)%60)+":"+pad(s%60);
     $("tele-bio").textContent=(86+Math.random()*6).toFixed(1)+"%";
     $("tele-spore").textContent=(11000+(Math.random()*4000|0)).toLocaleString("en-US");
