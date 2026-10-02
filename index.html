@@ -20,7 +20,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Person","name":"Aditya X","alternateName":"dradityax","description":"Medicinae Studiosus | Mortui vivos docent — first-year MBBS student at Madhubani Medical College","url":"https://dradityax.pages.dev/","sameAs":["https://www.instagram.com/dradityax","https://x.com/dradityax","https://www.linkedin.com/in/dradityax","https://github.com/dradityax","https://www.youtube.com/@dradityax","https://www.facebook.com/profile.php?id=61594790049229"]}
 </script>
-<!-- JOURNEY v13 -->
+<!-- JOURNEY v13.1 — dark knight edition -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
@@ -55,8 +55,6 @@ section{min-height:100vh;position:relative;padding:9vh 8vw;display:flex;flex-dir
 .pcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.2rem}
 .pcard{background:#faf6ec;border:1px solid rgba(61,18,32,.14);border-radius:6px;padding:1.6rem;text-decoration:none;color:inherit;display:block;transition:transform .25s,box-shadow .25s}
 .pcard:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(61,18,32,.12)}
-.pcard h3{font-size:1.35rem;margin-bottom:.55rem}
-.pcard p{font-family:system-ui,-apple-system,sans-serif;font-size:.85rem;line-height:1.65;color:rgba(61,18,32,.72)}
 .pcard.more{border-style:dashed;text-align:center}
 .pcard.more h3{font-size:2.4rem;color:var(--burg)}
 #s-end{background:#060b14;color:#f5efe0;align-items:center;text-align:center}
@@ -106,7 +104,7 @@ section{min-height:100vh;position:relative;padding:9vh 8vw;display:flex;flex-dir
     <h2>selected work</h2>
     <div class="pcards">
       <a class="pcard" href="https://dradityax.pages.dev/" target="_blank" rel="noopener"><h3>Personal Website</h3><p>dradityax.pages.dev &mdash; a mysterious corner of the internet.</p></a>
-      <a class="pcard" href="https://dradityax.pages.dev/world/" target="_blank" rel="noopener"><h3>World</h3><p>dradityax.pages.dev/world/ &mdash; a tiny multiplayer universe.</p></a>
+      <a class="pcard" href="https://dradityax.pages.dev/world/" target="_blank" rel="noopener" title="World"><h3>World</h3><p>dradityax.pages.dev/world/ &mdash; a tiny multiplayer universe.</p></a>
       <div class="pcard more"><h3>+</h3><p>more soon</p></div>
     </div>
   </section>
@@ -117,14 +115,18 @@ section{min-height:100vh;position:relative;padding:9vh 8vw;display:flex;flex-dir
     <footer>&copy; 2026 Aditya X &middot; dradityax</footer>
   </section>
 </main>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.158.0/three.min.js"></script>
-<script src="/shared/buddy.js"></script>
-<script>
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+}}
+</script>
+<script type="module">
 /* ============================================================
-   DEMO v13 — scroll-driven fall journey (NOT the live site)
+   JOURNEY v13.1 — dark knight edition (Quaternius knight, FBX)
    ============================================================ */
-(function(){
-"use strict";
+import * as THREE from 'three';
+import {FBXLoader} from 'three/addons/loaders/FBXLoader.js';
 
 function lerp(a,b,t){return a+(b-a)*t;}
 function clamp(v,a,b){return v<a?a:(v>b?b:v);}
@@ -151,16 +153,12 @@ function el(id){return document.getElementById(id);}
 function setOp(id,v){var e=el(id);if(e)e.style.opacity=v.toFixed(3);}
 function fail(msg){
   var n=el('nogl');n.hidden=false;
-  n.querySelector('p').textContent='3D scene unavailable ('+msg+'). The page still scrolls — this is only a demo.';
+  n.querySelector('p').textContent='3D scene unavailable ('+msg+'). The page content is still readable below.';
 }
 
-try{
-  if(typeof THREE==='undefined')throw new Error('three.js failed to load');
-  if(typeof buildBuddy!=='function')throw new Error('character builder missing');
-  boot();
-}catch(err){fail(err&&err.message?err.message:'unknown error');}
+boot().catch(function(err){fail(err&&err.message?err.message:'unknown error');});
 
-function boot(){
+async function boot(){
   var canvas=el('gl');
   var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
@@ -174,21 +172,14 @@ function boot(){
 
   var hemi=new THREE.HemisphereLight(0xfff6e8,0x8a6a4a,0.95);scene.add(hemi);
   var dir=new THREE.DirectionalLight(0xffe9c4,1.15);dir.position.set(4,7,4);scene.add(dir);
-  var portalLight=new THREE.PointLight(0x7ef0ff,0,14,2);portalLight.position.set(0,0.8,0.5);scene.add(portalLight);
-  var platLight=new THREE.PointLight(0x7ef0ff,0,20,2);platLight.position.set(0,-23.2,1.6);scene.add(platLight);
+  var portalLight=new THREE.PointLight(0x7ef0ff,0,16,2);portalLight.position.set(0,0.8,0.5);scene.add(portalLight);
+  var platLight=new THREE.PointLight(0x7ef0ff,0,22,2);platLight.position.set(0,-23.2,1.6);scene.add(platLight);
 
   function std(c,r){return new THREE.MeshStandardMaterial({color:c,roughness:(r==null?0.85:r)});}
   function box(w,h,d,c,x,y,z,ry){
     var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),std(c));
     m.position.set(x,y,z);if(ry)m.rotation.y=ry;scene.add(m);return m;
   }
-
-  /* ---------------- buddy ---------------- */
-  var M={TEE:std(0x6e1423),SKIN:std(0xe8b98a),HAIR:std(0x2b2320),DENIM:std(0x2e3a4a),
-         SHOE:std(0x1d1d20),BLUSH:std(0xd97b6c),EYEB:std(0x141414,0.4),
-         EYEW:new THREE.MeshBasicMaterial({color:0xffffff})};
-  var B=buildBuddy(THREE,M);
-  var buddy=B.group;scene.add(buddy);
 
   /* ---------------- hero set: desk world ---------------- */
   box(1.7,0.09,0.85,0x8a6a4a, 0,0.72,-0.6);                       // desk top
@@ -221,11 +212,49 @@ function boot(){
     leg.position.set(q[0],0.225,q[1]);scene.add(leg);
   });
 
-  /* ---------------- portal ---------------- */
-  var portal=new THREE.Mesh(new THREE.TorusGeometry(0.55,0.06,16,48),
+  /* ---------------- portal (bigger, brighter) ---------------- */
+  var portal=new THREE.Mesh(new THREE.TorusGeometry(0.8,0.09,16,64),
     new THREE.MeshBasicMaterial({color:0x7ef0ff,transparent:true,opacity:0}));
   portal.rotation.x=-Math.PI/2;portal.position.set(0,0.03,0.5);
   portal.scale.setScalar(0.001);scene.add(portal);
+  var portal2=new THREE.Mesh(new THREE.TorusGeometry(0.55,0.05,16,48),
+    new THREE.MeshBasicMaterial({color:0xbdf6ff,transparent:true,opacity:0}));
+  portal2.rotation.x=-Math.PI/2;portal2.position.set(0,0.05,0.5);
+  portal2.scale.setScalar(0.001);scene.add(portal2);
+
+  /* ---------------- fall streak particles ---------------- */
+  var SN=130,sgeo=new THREE.BoxGeometry(0.025,1.5,0.025),
+      streakMat=new THREE.MeshBasicMaterial({color:0x9fe8ff,transparent:true,opacity:0});
+  var streaks=new THREE.InstancedMesh(sgeo,streakMat,SN);
+  streaks.frustumCulled=false;scene.add(streaks);
+  var sdat=[],sd;
+  for(sd=0;sd<SN;sd++){
+    var an=Math.random()*Math.PI*2,rr=2.5+Math.random()*4.5;
+    sdat.push({x:Math.cos(an)*rr,z:0.5+Math.sin(an)*rr,y:-1-Math.random()*25,sp:13+Math.random()*10});
+  }
+  var dummy=new THREE.Object3D();
+
+  /* ---------------- landing: shockwave + dust ---------------- */
+  var shock=new THREE.Mesh(new THREE.RingGeometry(0.35,0.52,64),
+    new THREE.MeshBasicMaterial({color:0x7ef0ff,transparent:true,opacity:0,side:THREE.DoubleSide}));
+  shock.rotation.x=-Math.PI/2;shock.position.set(0,-25.78,0);scene.add(shock);
+  var shockT=1;
+  var DN=90,dgeo=new THREE.BufferGeometry(),dpos=new Float32Array(DN*3),dvel=new Float32Array(DN*3),di;
+  for(di=0;di<DN;di++){dpos[di*3]=0;dpos[di*3+1]=-25.8;dpos[di*3+2]=0;}
+  dgeo.setAttribute('position',new THREE.BufferAttribute(dpos,3));
+  var dustMat=new THREE.PointsMaterial({color:0x9fd8c8,size:0.09,transparent:true,opacity:0});
+  var dust=new THREE.Points(dgeo,dustMat);dust.frustumCulled=false;scene.add(dust);
+  var dustLife=0;
+  function dustBurst(){
+    for(var i=0;i<DN;i++){
+      var a=Math.random()*Math.PI*2,r=Math.random()*0.5;
+      dpos[i*3]=Math.cos(a)*r;dpos[i*3+1]=-25.75+Math.random()*0.1;dpos[i*3+2]=Math.sin(a)*r;
+      var sp=1.2+Math.random()*2.4;
+      dvel[i*3]=Math.cos(a)*sp;dvel[i*3+1]=1.0+Math.random()*2.2;dvel[i*3+2]=Math.sin(a)*sp;
+    }
+    dgeo.attributes.position.needsUpdate=true;
+    dustLife=1.3;
+  }
 
   /* ---------------- anatomy world (deep below) ---------------- */
   var grid=new THREE.GridHelper(70,44,0x7ef0ff,0x14406a);
@@ -252,29 +281,65 @@ function boot(){
   var dnaSMat=new THREE.MeshBasicMaterial({color:0x7ef0ff,transparent:true,opacity:0});
   var dnaRMat=new THREE.MeshBasicMaterial({color:0xc9a86a,transparent:true,opacity:0});
   var dnaMats=[dnaSMat,dnaRMat];
-  for(var di=0;di<=26;di++){
-    var t=di/26,yy=-27.5+t*4.4,an=t*Math.PI*4;
+  for(var ddi=0;ddi<=26;ddi++){
+    var t=ddi/26,yy=-27.5+t*4.4,an=t*Math.PI*4;
     var s1=new THREE.Mesh(new THREE.SphereGeometry(0.085,10,10),dnaSMat);
     s1.position.set(Math.cos(an)*0.42,yy,Math.sin(an)*0.42);dna.add(s1);
     var s2=new THREE.Mesh(new THREE.SphereGeometry(0.085,10,10),dnaSMat);
     s2.position.set(-Math.cos(an)*0.42,yy,-Math.sin(an)*0.42);dna.add(s2);
-    if(di%4===0){
+    if(ddi%4===0){
       var rung=new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,0.84,8),dnaRMat);
       rung.position.set(0,yy,0);rung.rotation.z=Math.PI/2;rung.rotation.y=-an;dna.add(rung);
     }
   }
   dna.position.set(-4.2,0,-3.5);scene.add(dna);
 
+  /* NEW: abstract wireframe ribcage (tasteful) */
+  var ribs=new THREE.Group();
+  var ribMat=new THREE.MeshBasicMaterial({color:0x7ef0ff,wireframe:true,transparent:true,opacity:0});
+  for(var ri=0;ri<7;ri++){
+    var rr=1.15-ri*0.105;
+    var rib=new THREE.Mesh(new THREE.TorusGeometry(rr,0.035,8,42,4.6),ribMat);
+    rib.rotation.x=Math.PI/2;rib.rotation.z=-0.7;
+    rib.position.y=-ri*0.30;
+    ribs.add(rib);
+  }
+  ribs.position.set(4.8,-23.0,-4.5);scene.add(ribs);
+
+  /* NEW: floating bone-like capsules */
+  var bonesG=new THREE.Group();
+  var boneMat=new THREE.MeshBasicMaterial({color:0x4fc3e8,transparent:true,opacity:0});
+  var boneDat=[];
+  for(var bi=0;bi<9;bi++){
+    var bm=new THREE.Mesh(new THREE.CapsuleGeometry(0.09,0.5,4,10),boneMat);
+    var ba=Math.random()*Math.PI*2,brad=5+Math.random()*4.5;
+    bm.position.set(Math.cos(ba)*brad,-22-Math.random()*6,Math.sin(ba)*brad);
+    bm.rotation.set(Math.random()*3,Math.random()*3,Math.random()*3);
+    bonesG.add(bm);
+    boneDat.push({m:bm,rs:(Math.random()-0.5)*0.8,ph:Math.random()*6.28,by:bm.position.y});
+  }
+  scene.add(bonesG);
+
+  /* NEW: heartbeat pulse rings around the platform */
+  var pulseMat=new THREE.MeshBasicMaterial({color:0x7ef0ff,transparent:true,opacity:0,side:THREE.DoubleSide});
+  var pulses=[];
+  for(var qi=0;qi<2;qi++){
+    var pr=new THREE.Mesh(new THREE.RingGeometry(1.2,1.32,48),pulseMat.clone());
+    pr.rotation.x=-Math.PI/2;pr.position.set(0,-25.79,0);scene.add(pr);
+    pulses.push({m:pr,off:qi*0.5});
+  }
+
   /* ---------------- hologram scan ---------------- */
-  var scan=new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.5),
+  var scan=new THREE.Mesh(new THREE.PlaneGeometry(2.3,2.3),
     new THREE.MeshBasicMaterial({color:0x7ef0ff,transparent:true,opacity:0,
       blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false}));
   scan.rotation.x=-Math.PI/2;scan.position.set(0,-25.83,0);scene.add(scan);
   var holoMat=new THREE.MeshBasicMaterial({color:0x7ef0ff,wireframe:true,transparent:true,opacity:0});
   var holoOn=false;
+  var knightG=null; // set once the FBX loads
   function setHologram(on){
-    if(on===holoOn)return;holoOn=on;
-    buddy.traverse(function(o){
+    if(on===holoOn||!knightG)return;holoOn=on;
+    knightG.traverse(function(o){
       if(o.isMesh){
         if(on){if(!o.userData.om)o.userData.om=o.material;o.material=holoMat;}
         else if(o.userData.om){o.material=o.userData.om;}
@@ -282,32 +347,94 @@ function boot(){
     });
   }
 
-  /* ---------------- choreography keyframes ---------------- */
+  /* ---------------- dark knight (FBX, async) ---------------- */
+  var mixer=null,clips={},curAct=null,palmR=null,bladeMesh=null;
+  var KSCALE=1.5/558.7; // knight ~1.5 units tall
+  function darkKnightMat(orig){
+    var n=((orig&&orig.name)||'').toLowerCase();
+    var c=0x15151c,mt=0.85,rg=0.48;              // armor: near-black, metallic
+    if(n.indexOf('skin')>=0){c=0x241a12;mt=0.05;rg=0.9;}
+    else if(n.indexOf('boot')>=0){c=0x0a0a0c;mt=0.3;rg=0.7;}
+    return new THREE.MeshStandardMaterial({color:c,metalness:mt,roughness:rg});
+  }
+  function swordMat(orig){
+    var n=((orig&&orig.name)||'').toLowerCase();
+    var c=0xd7dee6,mt=1.0,rg=0.25;               // blade: bright steel
+    if(n.indexOf('red')>=0){c=0x6e1423;mt=0.4;rg=0.6;}
+    else if(n.indexOf('gold')>=0){c=0x8a6a2a;mt=1.0;rg=0.42;}
+    else if(n.indexOf('brown')>=0){c=0x1b0c05;mt=0.1;rg=0.85;}
+    return new THREE.MeshStandardMaterial({color:c,metalness:mt,roughness:rg});
+  }
+  function playAnim(name,once){
+    var c=clips[name];if(!c||!mixer)return;
+    var nxt=mixer.clipAction(c);
+    nxt.loop=once?THREE.LoopOnce:THREE.LoopRepeat;
+    nxt.clampWhenFinished=!!once;
+    if(curAct===nxt){if(once){nxt.reset();}return;}
+    if(curAct)curAct.fadeOut(0.3);
+    nxt.reset().fadeIn(0.3).play();
+    curAct=nxt;
+  }
+  async function loadKnight(){
+    var loader=new FBXLoader();
+    var k=await loader.loadAsync('assets/models/knight.fbx');
+    k.traverse(function(o){if(o.isMesh){o.material=darkKnightMat(o.material);}});
+    k.scale.setScalar(KSCALE);
+    knightG=new THREE.Group();
+    knightG.add(k);
+    scene.add(knightG);
+    k.animations.forEach(function(a){clips[a.name.split('|').pop()]=a;});
+    mixer=new THREE.AnimationMixer(k);
+    playAnim('Idle_swordRight',false);
+    palmR=k.getObjectByName('PalmR');
+    /* attach sword to right hand (grip-verified: hilt lands in the palm) */
+    try{
+      var sw=await loader.loadAsync('assets/models/sword.fbx');
+      var blade=null;
+      sw.traverse(function(o){if(o.isMesh){o.material=swordMat(o.material);if(!blade)blade=o;}});
+      if(blade&&palmR){
+        bladeMesh=blade;
+        var holder=new THREE.Object3D(); /* isolates grip orientation from the blade's FBX transform */
+        palmR.add(holder);
+        holder.add(blade);
+        blade.scale.setScalar(0.62); /* counter the 100x FBX mesh scale inside 100x bone space */
+        holder.position.set(0,-0.075,0.04);
+        knightG.updateMatrixWorld(true);
+        var qpw=new THREE.Quaternion();palmR.getWorldQuaternion(qpw);
+        /* blade rest: angled down-forward, like a relaxed held sword */
+        var fwdH=new THREE.Vector3(Math.sin(-1.7),0,Math.cos(-1.7));
+        var aimDir=new THREE.Vector3(0,-1,0).add(fwdH.multiplyScalar(0.8)).normalize();
+        var qAim=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),aimDir);
+        holder.quaternion.copy(qpw.invert().multiply(qAim));
+      }
+    }catch(e){/* sword optional — knight still works */}
+  }
+
+  /* ---------------- choreography keyframes (knight scale) ---------------- */
   var CAM=[
-    {p:0.00,v:[3.0,2.0,3.8]},{p:0.14,v:[3.0,2.0,3.8]},
-    {p:0.24,v:[2.4,1.4,3.2]},{p:0.36,v:[2.2,-5.0,3.4]},
-    {p:0.46,v:[2.8,-22.6,4.0]},{p:0.58,v:[3.6,-23.8,3.2]},
-    {p:0.70,v:[-3.4,-23.6,3.4]},{p:0.80,v:[0.0,-23.4,5.6]},
-    {p:1.00,v:[0.0,-23.4,5.6]}
+    {p:0.00,v:[3.2,1.9,4.3]},{p:0.14,v:[3.2,1.9,4.3]},
+    {p:0.24,v:[2.6,1.5,3.4]},{p:0.36,v:[2.4,-5.5,3.6]},
+    {p:0.46,v:[3.0,-22.8,4.2]},{p:0.58,v:[3.8,-23.6,3.4]},
+    {p:0.70,v:[-3.6,-23.4,3.6]},{p:0.80,v:[0.0,-23.2,6.0]},
+    {p:1.00,v:[0.0,-23.2,6.0]}
   ];
   var LOOK=[
-    {p:0.00,v:[0,0.9,-0.2]},{p:0.14,v:[0,0.9,0.0]},
+    {p:0.00,v:[0.3,0.85,0.0]},{p:0.14,v:[0.2,0.8,0.2]},
     {p:0.24,v:[0,0.1,0.5]},{p:0.36,v:[0,-8.0,0.5]},
-    {p:0.46,v:[0,-25.0,0]},{p:1.00,v:[0,-25.0,0]}
+    {p:0.46,v:[0,-24.9,0]},{p:1.00,v:[0,-24.9,0]}
   ];
   var BPOS=[
-    {p:0.00,v:[0,-0.05,0.5]},{p:0.14,v:[0,0.0,0.5]},
-    {p:0.24,v:[0,-0.6,0.5]},{p:0.36,v:[0,-13.0,0.4]},
+    {p:0.00,v:[0.95,0,0.35]},{p:0.14,v:[0.55,0,0.45]},
+    {p:0.24,v:[0,-0.7,0.5]},{p:0.36,v:[0,-13.5,0.4]},
     {p:0.46,v:[0,-25.83,0]},{p:1.00,v:[0,-25.83,0]}
   ];
-  var BROTY=[{p:0,v:Math.PI},{p:0.14,v:Math.PI},{p:0.24,v:0.4},{p:0.46,v:0.5},{p:1,v:0.5}];
-  var BROTX=[{p:0,v:0},{p:0.24,v:0.35},{p:0.36,v:3.6},{p:0.46,v:0},{p:1,v:0}];
-  var SIT=[{p:0,v:1},{p:0.10,v:1},{p:0.16,v:0},{p:1,v:0}];
+  var BROTY=[{p:0,v:-1.7},{p:0.14,v:-1.2},{p:0.24,v:0.4},{p:0.46,v:0.5},{p:1,v:0.5}];
+  var BROTX=[{p:0,v:0},{p:0.24,v:0.3},{p:0.36,v:4.4},{p:0.46,v:0},{p:1,v:0}];
 
-  var S={cam:[3,2,3.8],look:[0,0.9,-0.2],bp:[0,-0.05,0.5],ry:Math.PI,rx:0,sit:1};
+  var S={cam:[3.2,1.9,4.3],look:[0.3,0.85,0.0],bp:[0.95,0,0.35],ry:-1.7,rx:0};
   var clock=new THREE.Clock();
 
-  /* ---------------- audio (opt-in) ---------------- */
+  /* ---------------- audio: SFX only, no music ---------------- */
   var actx=null,masterGain=null,soundOn=false,scanPlayed=false;
   var sndBtn=el('snd');
   function ensureAudio(){
@@ -315,44 +442,31 @@ function boot(){
     var AC=window.AudioContext||window.webkitAudioContext;
     if(!AC)return;
     actx=new AC();
-    masterGain=actx.createGain();masterGain.gain.value=0;masterGain.connect(actx.destination);
-    var o1=actx.createOscillator();o1.type='sine';o1.frequency.value=110;
-    var o2=actx.createOscillator();o2.type='triangle';o2.frequency.value=164.81;o2.detune.value=7;
-    var lp=actx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=380;lp.Q.value=0.6;
-    var g=actx.createGain();g.gain.value=0.05;
-    o1.connect(lp);o2.connect(lp);lp.connect(g);g.connect(masterGain);
-    o1.start();o2.start();
-    var lfo=actx.createOscillator();lfo.frequency.value=0.07;
-    var lg=actx.createGain();lg.gain.value=0.02;
-    lfo.connect(lg);lg.connect(g.gain);lfo.start();
+    masterGain=actx.createGain();masterGain.gain.value=1;masterGain.connect(actx.destination);
   }
-  function scanSweep(){
+  function blip(freqA,freqB,dur,vol){
     if(!soundOn||!actx||!masterGain)return;
     try{
       var t0=actx.currentTime;
       var o=actx.createOscillator(),g=actx.createGain();
       o.type='sine';
-      o.frequency.setValueAtTime(160,t0);
-      o.frequency.exponentialRampToValueAtTime(1500,t0+2.2);
+      o.frequency.setValueAtTime(freqA,t0);
+      o.frequency.exponentialRampToValueAtTime(Math.max(1,freqB),t0+dur);
       g.gain.setValueAtTime(0.0001,t0);
-      g.gain.exponentialRampToValueAtTime(0.07,t0+0.35);
-      g.gain.exponentialRampToValueAtTime(0.0001,t0+2.4);
+      g.gain.exponentialRampToValueAtTime(vol,t0+0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
       o.connect(g);g.connect(masterGain);
-      o.start(t0);o.stop(t0+2.6);
+      o.start(t0);o.stop(t0+dur+0.05);
     }catch(e){}
   }
+  function scanSweep(){blip(160,1500,2.2,0.07);}
+  function landThud(){blip(70,30,0.55,0.28);blip(140,55,0.3,0.12);}
   sndBtn.addEventListener('click',function(){
     soundOn=!soundOn;
     sndBtn.innerHTML=soundOn?'&#x1F50A;':'&#x1F507;';
     if(soundOn){
       ensureAudio();
-      if(actx){
-        if(actx.state==='suspended')actx.resume();
-        masterGain.gain.cancelScheduledValues(actx.currentTime);
-        masterGain.gain.setTargetAtTime(1.0,actx.currentTime,0.4);
-      }
-    }else if(actx&&masterGain){
-      masterGain.gain.setTargetAtTime(0.0,actx.currentTime,0.25);
+      if(actx&&actx.state==='suspended')actx.resume();
     }
   });
 
@@ -362,6 +476,9 @@ function boot(){
     renderer.setSize(window.innerWidth,window.innerHeight);
   });
 
+  /* ---------------- landing trigger state ---------------- */
+  var landed=false,shake=0,landGlow=0,attacking=false,attackEnd=0;
+
   /* ---------------- main loop ---------------- */
   function tick(){
     requestAnimationFrame(tick);
@@ -369,33 +486,58 @@ function boot(){
     var max=document.body.scrollHeight-window.innerHeight;
     var p=max>0?clamp(window.scrollY/max,0,1):0;
 
+    if(mixer)mixer.update(dt);
+
     var tCam=keyLerp(CAM,p),tLook=keyLerp(LOOK,p),tBp=keyLerp(BPOS,p);
-    var k=0.085,i;
+    var k2=0.085,i;
     for(i=0;i<3;i++){
-      S.cam[i]=lerp(S.cam[i],tCam[i],k);
-      S.look[i]=lerp(S.look[i],tLook[i],k);
-      S.bp[i]=lerp(S.bp[i],tBp[i],k);
+      S.cam[i]=lerp(S.cam[i],tCam[i],k2);
+      S.look[i]=lerp(S.look[i],tLook[i],k2);
+      S.bp[i]=lerp(S.bp[i],tBp[i],k2);
     }
-    S.ry=lerp(S.ry,keyNum(BROTY,p),k);
-    S.rx=lerp(S.rx,keyNum(BROTX,p),k);
-    S.sit=lerp(S.sit,keyNum(SIT,p),k);
+    S.ry=lerp(S.ry,keyNum(BROTY,p),k2);
+    S.rx=lerp(S.rx,keyNum(BROTX,p),k2);
     camera.position.set(S.cam[0],S.cam[1],S.cam[2]);
+    if(shake>0.003){
+      camera.position.x+=(Math.random()-0.5)*0.22*shake;
+      camera.position.y+=(Math.random()-0.5)*0.22*shake;
+      shake*=Math.exp(-5*dt);
+    }
     camera.lookAt(S.look[0],S.look[1],S.look[2]);
 
-    buddy.position.set(S.bp[0],S.bp[1],S.bp[2]);
-    buddy.rotation.set(S.rx,S.ry,0);
-    var s=S.sit;
-    B.hipsG.position.y=lerp(0.62,0.40,s);
-    B.legL.hip.rotation.x=B.legR.hip.rotation.x=lerp(0,-1.45,s);
-    B.legL.knee.rotation.x=B.legR.knee.rotation.x=lerp(0,1.5,s);
-    var fallW=smooth((p-0.24)/0.05)*(1-smooth((p-0.40)/0.06));
-    B.armL.sh.rotation.x=lerp(0,-0.55,s)-0.9*fallW;
-    B.armR.sh.rotation.x=lerp(0,-0.55,s)-0.9*fallW;
-    B.armL.sh.rotation.z=0.12*(1-s)+1.15*fallW;
-    B.armR.sh.rotation.z=-0.12*(1-s)-1.15*fallW;
-    var bl=((time%3.6)<0.12)?0.12:1;
-    B.eyeL.scale.y=1.25*bl;B.eyeR.scale.y=1.25*bl;
-    B.headG.rotation.y=Math.sin(time*0.55)*0.09;
+    if(knightG){
+      knightG.position.set(S.bp[0],S.bp[1],S.bp[2]);
+      knightG.rotation.set(S.rx,S.ry,0);
+    }
+
+    /* landing impact: trigger once per descent */
+    if(p>=0.46&&!landed){
+      landed=true;shake=1;landGlow=1;shockT=0;dustBurst();landThud();
+      playAnim('Run_swordAttack',true);attacking=true;attackEnd=time+0.9;
+    }
+    if(p<0.38)landed=false;
+    if(attacking&&time>attackEnd){attacking=false;playAnim('Idle_swordRight',false);}
+
+    /* shockwave */
+    if(shockT<1){
+      shockT=Math.min(1,shockT+dt*1.15);
+      var sc=1+9*shockT;
+      shock.scale.set(sc,sc,sc);
+      shock.material.opacity=0.85*(1-shockT);
+    }else shock.material.opacity=0;
+
+    /* dust */
+    if(dustLife>0){
+      dustLife-=dt;
+      for(var ddi2=0;ddi2<DN;ddi2++){
+        dpos[ddi2*3]+=dvel[ddi2*3]*dt;
+        dpos[ddi2*3+1]+=dvel[ddi2*3+1]*dt;
+        dpos[ddi2*3+2]+=dvel[ddi2*3+2]*dt;
+        dvel[ddi2*3+1]-=3.2*dt;
+      }
+      dgeo.attributes.position.needsUpdate=true;
+      dustMat.opacity=0.7*clamp(dustLife/1.3,0,1);
+    }else dustMat.opacity=0;
 
     var wt=smooth((p-0.20)/0.28);
     scene.background.copy(CREAM).lerp(NAVY,wt);
@@ -403,25 +545,63 @@ function boot(){
     hemi.intensity=lerp(0.95,0.5,wt);
     dir.intensity=lerp(1.15,0.2,wt);
 
+    /* portal: bigger + brighter */
     var por=smooth((p-0.15)/0.05)*(1-smooth((p-0.40)/0.10));
     portal.scale.setScalar(Math.max(0.001,por));
-    portal.material.opacity=0.92*por;
-    portal.rotation.z+=dt*1.6;
-    portalLight.intensity=36*por;
+    portal.material.opacity=0.95*por;
+    portal.rotation.z+=dt*1.8;
+    portal2.scale.setScalar(Math.max(0.001,por*0.9));
+    portal2.material.opacity=0.7*por;
+    portal2.rotation.z-=dt*2.6;
+    portalLight.intensity=60*por;
 
+    /* fall streaks */
+    var fallW=win(p,0.20,0.26,0.42,0.48);
+    streakMat.opacity=0.75*fallW;
+    if(fallW>0.01){
+      for(var si=0;si<SN;si++){
+        var sd2=sdat[si];
+        sd2.y+=sd2.sp*dt;
+        if(sd2.y>-0.5)sd2.y=-26.5;
+        dummy.position.set(sd2.x,sd2.y,sd2.z);
+        dummy.rotation.set(0,0,0);
+        dummy.updateMatrix();
+        streaks.setMatrixAt(si,dummy.matrix);
+      }
+      streaks.instanceMatrix.needsUpdate=true;
+    }
+
+    /* anatomy world */
     var anat=smooth((p-0.36)/0.12);
     grid.material.opacity=0.38*anat;
     pts.material.opacity=0.85*anat;
     platRing.material.opacity=0.9*anat;
-    platLight.intensity=46*anat;
+    landGlow*=Math.exp(-3*dt);
+    platLight.intensity=46*anat+70*landGlow*anat;
     dnaMats[0].opacity=0.95*anat;
     dnaMats[1].opacity=0.9*anat;
     dna.rotation.y+=dt*0.35;
     pts.rotation.y+=dt*0.02;
+    ribMat.opacity=0.55*anat;
+    ribs.rotation.y+=dt*0.22;
+    ribs.position.y=-23.0+Math.sin(time*0.5)*0.25;
+    boneMat.opacity=0.4*anat;
+    for(var bbi=0;bbi<boneDat.length;bbi++){
+      var bd=boneDat[bbi];
+      bd.m.rotation.x+=bd.rs*dt;bd.m.rotation.y+=bd.rs*0.7*dt;
+      bd.m.position.y=bd.by+Math.sin(time*0.6+bd.ph)*0.4;
+    }
+    for(var pii=0;pii<pulses.length;pii++){
+      var pu=pulses[pii],ph2=((time+pii*0.575)%1.15)/1.15;
+      var psc=1+2.4*ph2;
+      pu.m.scale.set(psc,psc,psc);
+      pu.m.material.opacity=0.26*(1-ph2)*anat;
+    }
 
+    /* hologram about scan */
     var about=smooth((p-0.58)/0.10)*(1-smooth((p-0.80)/0.06));
     var scanP=smooth((p-0.60)/0.14);
-    scan.position.set(0,lerp(-25.83,-24.45,scanP),0);
+    scan.position.set(0,lerp(-25.83,-24.1,scanP),0);
     scan.material.opacity=0.8*about*Math.sin(Math.PI*clamp(scanP,0.001,0.999));
     setHologram(about>0.04);
     holoMat.opacity=0.55*about;
@@ -444,9 +624,12 @@ function boot(){
 
     renderer.render(scene,camera);
   }
+
+  /* start the loop immediately; knight joins when loaded */
   tick();
+  try{await loadKnight();}
+  catch(err){fail('character failed to load ('+(err&&err.message?err.message:'unknown')+')');}
 }
-})();
 </script>
 </body>
 </html>
