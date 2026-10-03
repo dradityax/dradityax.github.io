@@ -101,32 +101,45 @@
 <script>
 (function(){
   "use strict";
-  var BG="#090a0e", FW=440, N=64, COLS=8;
+  var BG="#090a0e", FW=360, N=64;
   var cv=document.getElementById('stage'), ctx=cv.getContext('2d');
   var gate=document.getElementById('gate'), gfill=document.getElementById('gfill'), gpct=document.getElementById('gpct');
   var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer=window.matchMedia('(hover:hover) and (pointer:fine)').matches;
 
-  var W=0,H=0,dx=0,dy=0,dw=0,dh=0,fx=0,fy=0;
+  var W=0,H=0,dx=0,dy=0,ds=0,fx=0,fy=0;
   function resize(){
     var dpr=Math.min(window.devicePixelRatio||1,2);
     W=window.innerWidth; H=window.innerHeight;
     cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
-    var s=Math.max(W/FW,H/FW); dw=FW*s; dh=FW*s;
-    dx=(W-dw)/2; dy=(H-dh)/2;
-    fx=dx+0.5*dw; fy=dy+0.40*dh; /* owl face centre in canvas px */
+    /* owl drawn smaller now: fits fully on screen, never cropped */
+    ds=Math.min(H*0.72, W*0.88);
+    dx=(W-ds)/2; dy=(H-ds)/2;
+    fx=dx+0.5*ds; fy=dy+0.40*ds; /* owl face centre in canvas px */
   }
   window.addEventListener('resize',resize); resize();
 
-  /* ---------- preload ---------- */
-  var sprite=new Image(), center=new Image(), loaded=0;
-  function prog(){ loaded++; var p=Math.round(loaded/2*100); gfill.style.width=p+'%'; gpct.textContent=p>=100?'she sees you':('waking the owl… '+p+'%'); if(loaded>=2) start(); }
-  sprite.onload=prog; sprite.onerror=prog; center.onload=prog; center.onerror=prog;
-  sprite.src='frames/sprite.webp'; center.src='frames/center.webp';
-  setTimeout(function(){ if(loaded<2){ loaded=2; start(); } },9000); /* fail-safe */
+  /* ---------- preload 64 frames + center ---------- */
+  var frames=new Array(N), center=new Image(), loaded=0, total=N+1, started=false;
+  function pad(n){ return (n<10?'0':'')+n; }
+  function prog(){
+    loaded++;
+    var p=Math.round(loaded/total*100);
+    gfill.style.width=p+'%';
+    gpct.textContent=p>=100?'she sees you':('waking the owl… '+p+'%');
+    if(loaded>=total) start();
+  }
+  for(var i=0;i<N;i++){
+    frames[i]=new Image();
+    frames[i].onload=prog; frames[i].onerror=prog;
+    frames[i].src='frames/f_'+pad(i)+'.webp';
+  }
+  center.onload=prog; center.onerror=prog;
+  center.src='frames/center.webp';
+  setTimeout(function(){ if(!started){ start(); } },12000); /* fail-safe */
 
   /* ---------- cursor tracking ---------- */
-  var mx=W/2,my=H*0.3,tx=mx,ty=my,lastMove=0,started=false;
+  var tx=W/2, ty=H*0.3, mx=tx, my=ty;
   var smooth=-Math.PI/2; /* start looking up = frame 0 */
   function lerpAngle(a,b,t){ var d=(b-a)%(Math.PI*2); if(d>Math.PI)d-=Math.PI*2; if(d<-Math.PI)d+=Math.PI*2; return a+d*t; }
   function frameFor(th){
@@ -136,40 +149,30 @@
     t=Math.max(0,Math.min(1,t));
     return Math.round(t*(N-1));
   }
-  function onMove(x,y){ tx=x; ty=y; mx=x; my=y; lastMove=performance.now(); }
+  function onMove(x,y){ tx=x; ty=y; mx=x; my=y; }
   window.addEventListener('mousemove',function(e){ onMove(e.clientX,e.clientY); },{passive:true});
   window.addEventListener('touchmove',function(e){ var t=e.touches[0]; if(t) onMove(t.clientX,t.clientY); },{passive:true});
   window.addEventListener('touchstart',function(e){ var t=e.touches[0]; if(t) onMove(t.clientX,t.clientY); },{passive:true});
 
-  function draw(idx){
-    var col=idx%COLS, row=(idx/COLS)|0;
+  function paint(img){
     ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
-    ctx.drawImage(sprite, col*FW, row*FW, FW, FW, dx, dy, dw, dh);
+    if(img&&img.complete&&img.naturalWidth) ctx.drawImage(img,dx,dy,ds,ds);
   }
-  function drawCenter(){
-    ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
-    ctx.drawImage(center, dx, dy, dw, dh);
-  }
-
-  function loop(now){
+  function loop(){
     requestAnimationFrame(loop);
     var ddx=tx-fx, ddy=ty-fy;
     var dist=Math.sqrt(ddx*ddx+ddy*ddy);
-    var deadR=Math.min(W,H)*0.18;
-    if(dist<deadR){ drawCenter(); return; }       /* eye contact */
+    if(dist<Math.min(W,H)*0.18){ paint(center); return; }  /* eye contact */
     var target=Math.atan2(ddy,ddx);
-    smooth=lerpAngle(smooth,target,0.26);          /* ~35ms response, zero lag */
-    var ang=smooth;
-    if(now-lastMove>4000) ang+=Math.sin(now/1600)*0.3;  /* idle sway, alive */
-    draw(frameFor(ang));
+    smooth=lerpAngle(smooth,target,0.26);
+    paint(frames[frameFor(smooth)]);
   }
 
   function start(){
     if(started) return; started=true;
     gate.classList.add('done'); document.body.classList.add('ready');
-    lastMove=performance.now();
-    if(reduced){ drawCenter(); return; }
-    draw(0); requestAnimationFrame(loop);
+    if(reduced){ paint(center); return; }
+    paint(frames[0]); requestAnimationFrame(loop);
   }
 
   /* ---------- custom magnetic cursor ---------- */
@@ -189,7 +192,6 @@
       el.addEventListener('mouseenter',function(){ ring.classList.add('big'); });
       el.addEventListener('mouseleave',function(){ ring.classList.remove('big'); });
     });
-    /* magnetic buttons */
     document.querySelectorAll('.mag').forEach(function(b){
       b.addEventListener('mousemove',function(e){
         var r=b.getBoundingClientRect();
