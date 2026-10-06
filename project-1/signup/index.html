@@ -67,7 +67,7 @@
   <div class="card on" id="step1">
     <label>Full name</label><input type="text" id="s_name" placeholder="As on your Class 10 certificate" autocomplete="name">
     <label>Email address</label><input type="email" id="s_email" placeholder="you@example.com" autocomplete="email">
-    <div class="warnline" id="emailWarn" style="display:none">⚠ Unusual email domain — double-check this is your real email. OTP comes here.</div>
+    <div class="warnline" id="emailWarn" style="display:none">⚠ Unusual email domain — double-check this is your real email. The confirmation link comes here.</div>
     <label>Mobile number (optional)</label><input type="tel" id="s_mob" placeholder="10-digit mobile — only if you want SMS alerts later" maxlength="10" inputmode="numeric" autocomplete="tel">
     <div class="row">
       <div><label>Exam</label><select id="s_exam"><option value="">Select</option><option>NEET-UG</option><option>JEE</option><option>CUET</option></select></div>
@@ -77,22 +77,24 @@
       <div><label>State</label><select id="s_state"><option value="">Select</option></select></div>
       <div><label>Category</label><select id="s_cat"><option value="">Select</option><option>UR</option><option>EWS</option><option>OBC-NCL</option><option>SC</option><option>ST</option></select></div>
     </div>
-    <button class="go" id="sendOtp">SEND OTP →</button>
-    <p class="note">We never ask for passwords — login is OTP-only. Your NTA password is yours alone; we will never ask for it.</p>
+    <button class="go" id="sendOtp">SEND LINK →</button>
+    <p class="note">We never ask for passwords — one tap on the email link signs you in. Your NTA password is yours alone; we will never ask for it.</p>
   </div>
 
   <div class="card" id="step2">
-    <label>Enter the 6-digit OTP sent to <b id="otpEcho"></b></label>
-    <input type="tel" id="s_otp" placeholder="••••••" maxlength="6" inputmode="numeric" style="text-align:center;letter-spacing:6px;font-size:1.3rem">
-    <button class="go" id="verifyOtp">VERIFY &amp; CREATE ACCOUNT</button>
-    <p class="note" id="mockNote" style="display:none">Preview mode: the OTP pops up on your screen, like the practice form.</p>
-    <div class="okmsg" id="otpOk" style="display:none">✓ Verified</div>
+    <div class="done">
+      <div class="tick">✉</div>
+      <h2>CHECK YOUR EMAIL</h2>
+      <p class="sub">We sent a confirmation link to <b id="linkEcho"></b>.<br>Tap the link in the email — you'll land right back here, signed in.</p>
+      <button class="go" id="mockTap" style="display:none">SIMULATE LINK TAP (PREVIEW)</button>
+      <p class="note">No email? Check spam, then <a href="#" id="resendLink" style="color:#f2f0ea">tap here to go back &amp; resend</a>.</p>
+    </div>
   </div>
 
   <div class="card" id="step3">
     <div class="done">
       <div class="tick">✓</div>
-      <h2>ACCOUNT CREATED</h2>
+      <h2>YOU'RE IN</h2>
       <p class="sub" id="doneMsg">Welcome aboard. This is a preview — real accounts activate soon.</p>
       <a class="backbtn" href="../" style="margin-top:10px">← BACK TO PROJECT ONE</a>
     </div>
@@ -113,7 +115,7 @@ $("s_state").innerHTML = '<option value="">Select</option>' + STATES.map(s => `<
 if (MOCK_MODE) { $("prevBanner").style.display = "block"; $("mockNote").style.display = "block"; }
 else {
   $("prevBanner").style.display = "none";
-  $("fineLine").innerHTML = "Project One · Secure accounts via Supabase (free tier).<br>OTP login only — we never see or store passwords.";
+  $("fineLine").innerHTML = "Project One · Secure accounts via Supabase (free tier).<br>Passwordless login — we email you a confirmation link. We never see or store passwords.";
 }
 
 let sb = null;
@@ -143,7 +145,6 @@ function emailProblem(v){
 }
 function need(id){ const el = $(id); const bad = !el.value; el.classList.toggle("err", bad); if (bad) el.focus(); return !bad; }
 
-let mockOtp = null;
 $("sendOtp").addEventListener("click", async () => {
   let msg = "Please fix the highlighted fields.";
   let ok = true;
@@ -168,54 +169,80 @@ $("sendOtp").addEventListener("click", async () => {
   $("sendOtp").disabled = true; $("sendOtp").textContent = "SENDING…";
   try {
     if (MOCK_MODE){
-      mockOtp = String(Math.floor(100000 + Math.random()*900000));
-      $("smsBody").innerHTML = `Your Project One OTP is <b>${mockOtp}</b>. <span style="color:#9a958a;font-size:.8rem">(PREVIEW — shown on screen, not by email)</span>`;
+      $("smsBody").innerHTML = `Preview: confirmation link "sent" — no real email. <span style="color:#9a958a;font-size:.8rem">Use the simulate button on the next screen.</span>`;
       $("sms").classList.add("show");
       setTimeout(() => $("sms").classList.remove("show"), 9000);
     } else {
+      /* NOTE: the email's confirmation link points at the dashboard's Site URL
+         (Authentication → URL Configuration). It must be set to
+         https://dradityax.pages.dev/project-1/signup/ for the link to land back here. */
       const { error } = await sb.auth.signInWithOtp({
         email: $("s_email").value.trim(),
-        options: { data: { full_name: $("s_name").value.trim() } }
-      });
-      if (error) throw error;
-    }
-    $("otpEcho").textContent = $("s_email").value.trim();
-    $("step1").classList.remove("on"); $("step2").classList.add("on");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  } catch(e){ alert("Could not send OTP: " + (e.message || e)); }
-  $("sendOtp").disabled = false; $("sendOtp").textContent = "SEND OTP →";
-});
-
-$("verifyOtp").addEventListener("click", async () => {
-  const code = $("s_otp").value.trim();
-  if (!/^\d{6}$/.test(code)){ $("s_otp").classList.add("err"); alert("Enter the 6-digit OTP."); return; }
-  $("verifyOtp").disabled = true; $("verifyOtp").textContent = "VERIFYING…";
-  try {
-    if (MOCK_MODE){
-      if (code !== mockOtp) throw new Error("Wrong OTP. Hint: it is shown in the on-screen message above.");
-    } else {
-      const { error } = await sb.auth.verifyOtp({ email: $("s_email").value.trim(), token: code, type: "email" });
-      if (error) throw error;
-      /* create/update profile row — best-effort: the auth account is created regardless */
-      const { data: { user } } = await sb.auth.getUser();
-      try {
-        await sb.from("profiles").upsert({
-          id: user.id,
+        options: { data: {
           full_name: $("s_name").value.trim(),
           mobile: $("s_mob").value.trim() || null,
           exam: $("s_exam").value,
-          target_year: parseInt($("s_year").value, 10),
+          target_year: $("s_year").value,
           state: $("s_state").value,
           category: $("s_cat").value
-        });
-      } catch (e) { console.warn("profile save pending table setup:", e.message); }
-      $("doneMsg").textContent = "Welcome aboard, " + $("s_name").value.trim().split(" ")[0] + ". Your account is live.";
+        } }
+      });
+      if (error) throw error;
     }
-    $("otpOk").style.display = "block";
-    setTimeout(() => { $("step2").classList.remove("on"); $("step3").classList.add("on"); window.scrollTo({ top: 0, behavior: "smooth" }); }, 600);
-  } catch(e){ $("s_otp").classList.add("err"); alert(e.message || e); }
-  $("verifyOtp").disabled = false; $("verifyOtp").textContent = "VERIFY & CREATE ACCOUNT";
+    $("linkEcho").textContent = $("s_email").value.trim();
+    if (MOCK_MODE) $("mockTap").style.display = "block";
+    $("step1").classList.remove("on"); $("step2").classList.add("on");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch(e){ alert("Could not send the link: " + (e.message || e)); }
+  $("sendOtp").disabled = false; $("sendOtp").textContent = "SEND LINK →";
 });
+
+/* ---- magic-link landing: complete signup whenever a session exists ---- */
+async function completeSignup(user){
+  const md = user.user_metadata || {};
+  const prof = {
+    id: user.id,
+    full_name: md.full_name || $("s_name").value.trim() || null,
+    mobile: md.mobile || $("s_mob").value.trim() || null,
+    exam: md.exam || $("s_exam").value || null,
+    target_year: parseInt(md.target_year || $("s_year").value, 10) || null,
+    state: md.state || $("s_state").value || null,
+    category: md.category || $("s_cat").value || null
+  };
+  if (sb) {
+    try { await sb.from("profiles").upsert(prof); }
+    catch(e){ console.warn("profile save pending table setup:", e.message); }
+  }
+  const first = (prof.full_name || "friend").split(" ")[0];
+  $("doneMsg").textContent = "Welcome aboard, " + first + ". Your account is live.";
+  ["step1","step2"].forEach(s => $(s).classList.remove("on"));
+  if (!$("step3").classList.contains("on")) $("step3").classList.add("on");
+  try { history.replaceState(null, "", location.pathname); } catch(e){}
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+$("mockTap").addEventListener("click", async () => {
+  await completeSignup({ id: "preview-user", user_metadata: {
+    full_name: $("s_name").value.trim(), mobile: $("s_mob").value.trim() || null,
+    exam: $("s_exam").value, target_year: $("s_year").value,
+    state: $("s_state").value, category: $("s_cat").value } });
+});
+
+$("resendLink").addEventListener("click", (e) => {
+  e.preventDefault();
+  $("step2").classList.remove("on"); $("step1").classList.add("on");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+if (!MOCK_MODE) {
+  /* fires when returning from the email's confirmation link, or with an existing session */
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session && session.user
+        && !$("step3").classList.contains("on")) {
+      try { await completeSignup(session.user); } catch(e){ console.warn("completeSignup:", e.message); }
+    }
+  });
+}
 </script>
 <script>
 (function(){
