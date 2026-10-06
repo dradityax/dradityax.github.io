@@ -29,6 +29,7 @@
          min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 32px 16px; }
   .wrap { width: 100%; max-width: 560px; }
   h1 { font-size: 1.5rem; letter-spacing: 2px; text-align: center; margin-bottom: 6px; }
+  .pbadge { text-align: center; font-size: .72rem; letter-spacing: 3px; color: #f2f0ea; margin-bottom: 10px; opacity: .9; }
   .sub { text-align: center; color: #9a958a; font-size: 0.85rem; margin-bottom: 24px; }
   .card { background: #141414; border: 1px solid #2a2a2a; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
   label { display: block; font-size: 0.8rem; letter-spacing: 1px; color: #b9b3a6; margin-bottom: 8px; text-transform: uppercase; }
@@ -65,6 +66,7 @@
   <span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span>
 </span></span></div>
 <div class="wrap">
+  <div class="pbadge">PROJECT ONE · FREE TOOL</div>
   <h1>NEET DOC CONVERTER</h1>
   <p class="sub">Upload any image. Get it in exact NTA format. 100% in your browser — nothing is uploaded anywhere.</p>
 
@@ -100,8 +102,8 @@
     <a class="dl" id="dlLink" download="neet-document.jpg">DOWNLOAD CONVERTED JPG</a>
   </div>
 </div>
-<p class="fine">Demo build — Project One, Phase 1. Conversion happens fully on your device via canvas.
-No account, no server, no upload. Final page will carry the site's full styling.</p>
+<p class="fine">Project One · Free tool. Conversion happens fully on your device via canvas —
+no account, no server, no upload. Your files never leave this browser.</p>
 
 <script>
 const PRESETS = {
@@ -189,7 +191,8 @@ goBtn.addEventListener('click', async () => {
     (inRange ? '<br><span class="ok">✓ Within NTA range — ready to upload.</span>'
              : '<br><span class="bad">Outside range — try the Custom preset with adjusted limits.</span>');
   dlLink.href = url;
-  dlLink.download = srcName + '-' + presetEl.value + '.jpg';
+  const FILENAMES = { passport: 'photograph.jpg', postcard: 'postcard-photo.jpg', signature: 'signature.jpg', thumb: 'thumb-impression.jpg', custom: 'neet-document.jpg' };
+  dlLink.download = FILENAMES[presetEl.value] || 'neet-document.jpg';
   dlLink.style.display = 'block';
   goBtn.disabled = false; goBtn.textContent = 'CONVERT';
 });
