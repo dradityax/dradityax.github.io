@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin — Project One</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Quicksand', system-ui, sans-serif; background: #0a0a0c; color: #f2f0ea; min-height: 100vh; }
+  #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .topbar { position: relative; z-index: 2; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .backbtn { display: inline-flex; align-items: center; gap: 8px; color: #f2f0ea; background: rgba(255,255,255,.04);
+             border: 1px solid #f2f0ea; border-radius: 22px; padding: 9px 18px; font-size: .78rem; font-weight: 700;
+             text-decoration: none; letter-spacing: 1px; }
+  .wrap { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; padding: 8px 18px 60px; }
+  h1 { font-size: 1.5rem; letter-spacing: 3px; text-align: center; margin: 10px 0 4px; }
+  .sub { text-align: center; color: rgba(255,255,255,.55); font-size: .92rem; margin-bottom: 18px; }
+  .card { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.1); border-radius: 16px;
+          padding: 22px; margin-bottom: 16px; }
+  label { display: block; font-size: .78rem; letter-spacing: 1.5px; color: rgba(255,255,255,.6); margin: 14px 0 6px; }
+  input, select, textarea { width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16);
+                  border-radius: 10px; color: #f2f0ea; padding: 12px; font-size: 1rem; font-family: inherit; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: #f2f0ea; }
+  textarea { min-height: 90px; resize: vertical; }
+  select option { background: #16181d; }
+  button.go { width: 100%; margin-top: 20px; background: #f2f0ea; color: #111; border: none; border-radius: 12px;
+              padding: 15px; font-size: 1rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; font-family: inherit; }
+  button.go:disabled { opacity: .5; }
+  button.danger { background: transparent; color: #f0506e; border: 1px solid #f0506e; border-radius: 8px;
+              padding: 6px 12px; font-size: .75rem; font-weight: 700; letter-spacing: 1px; cursor: pointer; font-family: inherit; }
+  button.ghost { width: 100%; margin-top: 12px; background: transparent; color: #f2f0ea; border: 1px solid rgba(255,255,255,.25);
+              border-radius: 12px; padding: 13px; font-size: .9rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; font-family: inherit; }
+  .note { font-size: .82rem; color: rgba(255,255,255,.5); margin-top: 12px; line-height: 1.5; }
+  .sechd { font-size: .85rem; letter-spacing: 3px; color: rgba(255,255,255,.6); margin: 22px 0 10px; text-align: center; }
+  .stats { display: flex; gap: 12px; margin-bottom: 6px; }
+  .stat { flex: 1; background: rgba(242,240,234,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 14px; text-align: center; }
+  .stat .n { font-size: 1.6rem; font-weight: 700; }
+  .stat .l { font-size: .72rem; letter-spacing: 2px; color: rgba(255,255,255,.5); margin-top: 4px; }
+  table.students { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  table.students th { text-align: left; font-size: .7rem; letter-spacing: 2px; color: rgba(255,255,255,.45); padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,.12); }
+  table.students td { padding: 10px 6px; border-bottom: 1px solid rgba(255,255,255,.06); vertical-align: top; }
+  table.students tr:last-child td { border-bottom: none; }
+  .tblwrap { overflow-x: auto; }
+  .empty { text-align: center; color: rgba(255,255,255,.4); font-size: .88rem; padding: 18px 0; }
+  .loading { text-align: center; padding: 40px 0; color: rgba(255,255,255,.5); }
+  .fine { text-align: center; font-size: .75rem; color: rgba(255,255,255,.35); margin-top: 26px; line-height: 1.6; }
+  .sentlog { font-size: .82rem; color: rgba(255,255,255,.65); }
+  .sentlog div { padding: 8px 2px; border-bottom: 1px solid rgba(255,255,255,.06); }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="topbar">
+  <a class="backbtn" href="../">&larr; PROJECT ONE</a>
+  <span style="font-size:.72rem;letter-spacing:3px;color:rgba(255,255,255,.4)">ADMIN</span>
+</div>
+<div class="wrap">
+  <div class="loading" id="viewLoading">Checking access…</div>
+
+  <div class="card" id="viewSignin" style="display:none">
+    <h1>ADMIN SIGN IN</h1>
+    <p class="sub">Restricted area. Sign in with your admin email.</p>
+    <label>Email address</label>
+    <input type="email" id="a_email" placeholder="you@example.com" autocomplete="email">
+    <button class="go" id="a_send">SEND LINK →</button>
+  </div>
+
+  <div class="card" id="viewNope" style="display:none">
+    <h1>NOT AUTHORIZED</h1>
+    <p class="sub">This area is for the admin only.</p>
+    <button class="ghost" id="a_out1">SIGN OUT</button>
+  </div>
+
+  <div id="viewAdmin" style="display:none">
+    <h1>ADMIN PORTAL</h1>
+    <p class="sub">Students, enrolments &amp; notifications — no dashboard needed.</p>
+    <div class="stats">
+      <div class="stat"><div class="n" id="stTotal">–</div><div class="l">STUDENTS</div></div>
+      <div class="stat"><div class="n" id="stNeet">–</div><div class="l">NEET-UG</div></div>
+      <div class="stat"><div class="n" id="stNotif">–</div><div class="l">NOTIFICATIONS SENT</div></div>
+    </div>
+    <div class="sechd">ALL STUDENTS</div>
+    <div class="card"><div class="tblwrap" id="studentTbl"></div>
+      <p class="note">Delete removes the student's profile data from the site. To fully revoke their login, also delete the user in Supabase → Authentication → Users.</p>
+    </div>
+    <div class="sechd">SEND NOTIFICATION</div>
+    <div class="card">
+      <label>To</label>
+      <select id="n_to"><option value="all">Everyone (all students)</option></select>
+      <label>Title</label>
+      <input type="text" id="n_title" placeholder="e.g. NEET form date announced" maxlength="80">
+      <label>Message</label>
+      <textarea id="n_msg" placeholder="Write the personal message…" maxlength="1000"></textarea>
+      <button class="go" id="n_send">SEND →</button>
+      <p class="note">It appears instantly in the student's dashboard under Notifications.</p>
+    </div>
+    <div class="sechd">RECENT NOTIFICATIONS</div>
+    <div class="card"><div class="sentlog" id="sentLog"><div class="empty">None sent yet.</div></div></div>
+    <button class="ghost" id="a_out2">SIGN OUT</button>
+  </div>
+</div>
+<p class="fine">Project One · Admin portal. Hidden URL, admin login only.<br>Students never see this page.</p>
+
+<script src="../signup/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://vpduxwujkzahjhkaehyz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GnnsBs6fTl_z-I7JkOcyRA_qoObJFhU";
+const ADMIN_UID = "49d78b74-391f-47bc-b382-ba8066281b79";
+const ADMIN_URL = "https://dradityax.pages.dev/project-1/admin/";
+const $ = id => document.getElementById(id);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let students = [];
+
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function fmtDate(iso){ try { return new Date(iso).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" }); } catch(e){ return ""; } }
+
+async function loadAdmin(){
+  $("viewLoading").style.display = "none";
+  $("viewAdmin").style.display = "block";
+  // students
+  let rows = [];
+  try {
+    const r = await sb.from("profiles").select("*").order("created_at", { ascending: false });
+    if (r.error) throw r.error;
+    rows = r.data || [];
+  } catch(e){ $("studentTbl").innerHTML = `<div class="empty">Could not load students: ${esc(e.message)}<br>Run the admin SQL first.</div>`; return; }
+  students = rows;
+  $("stTotal").textContent = rows.length;
+  $("stNeet").textContent = rows.filter(x => x.exam === "NEET-UG").length;
+  if (!rows.length){
+    $("studentTbl").innerHTML = `<div class="empty">No students yet.</div>`;
+  } else {
+    $("studentTbl").innerHTML =
+      `<table class="students"><tr><th>NAME</th><th>ENROLLED FOR</th><th>CONTACT</th><th></th></tr>` +
+      rows.map(p => `<tr>
+        <td><b>${esc(p.full_name || "—")}</b><br><span style="color:rgba(255,255,255,.45);font-size:.75rem">${esc(p.state || "")} · ${esc(p.category || "")}</span></td>
+        <td>${esc(p.exam || "—")}<br><span style="color:rgba(255,255,255,.45);font-size:.75rem">${esc(p.target_year || "")}</span></td>
+        <td style="font-size:.78rem">${esc(p.email || "—")}${p.mobile ? "<br>" + esc(p.mobile) : ""}<br><span style="color:rgba(255,255,255,.35)">joined ${fmtDate(p.created_at)}</span></td>
+        <td><button class="danger" data-del="${p.id}">DELETE</button></td>
+      </tr>`).join("") + `</table>`;
+    $("studentTbl").querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", async () => {
+      const row = students.find(x => x.id === b.dataset.del);
+      if (!confirm(`Delete profile of ${row.full_name || row.email}? This cannot be undone.`)) return;
+      const { error } = await sb.from("profiles").delete().eq("id", b.dataset.del);
+      if (error) alert("Delete failed: " + error.message);
+      else loadAdmin();
+    }));
+  }
+  // recipient dropdown
+  $("n_to").innerHTML = `<option value="all">Everyone (all ${rows.length} students)</option>` +
+    rows.map(p => `<option value="${p.id}">${esc(p.full_name || p.email || p.id)}</option>`).join("");
+  // recent notifications
+  try {
+    const r = await sb.from("notifications").select("title,message,created_at,user_id").order("created_at", { ascending: false }).limit(10);
+    const list = (r.error || !r.data || !r.data.length) ? null : r.data;
+    $("stNotif").textContent = "–";
+    if (list){
+      const byId = Object.fromEntries(students.map(s => [s.id, s.full_name || s.email]));
+      $("sentLog").innerHTML = list.map(n =>
+        `<div><b>${esc(n.title)}</b> → ${esc(byId[n.user_id] || "a student")}<br><span style="color:rgba(255,255,255,.4)">${fmtDate(n.created_at)} · ${esc(String(n.message).slice(0,80))}</span></div>`).join("");
+    }
+  } catch(e){}
+}
+
+$("n_send").addEventListener("click", async () => {
+  const to = $("n_to").value, title = $("n_title").value.trim(), msg = $("n_msg").value.trim();
+  if (!title || !msg){ alert("Title and message are both needed."); return; }
+  const targets = to === "all" ? students.map(s => s.id) : [to];
+  if (!targets.length){ alert("No students to send to."); return; }
+  $("n_send").disabled = true; $("n_send").textContent = "SENDING…";
+  const rows = targets.map(uid => ({ user_id: uid, title, message: msg }));
+  const { error } = await sb.from("notifications").insert(rows);
+  $("n_send").disabled = false; $("n_send").textContent = "SEND →";
+  if (error) alert("Send failed: " + error.message);
+  else { $("n_title").value = ""; $("n_msg").value = ""; alert(`Sent to ${targets.length} student${targets.length > 1 ? "s" : ""}.`); loadAdmin(); }
+});
+
+$("a_send").addEventListener("click", async () => {
+  const em = $("a_email").value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){ alert("Please enter a valid email address."); return; }
+  $("a_send").disabled = true; $("a_send").textContent = "SENDING…";
+  try {
+    const { error } = await sb.auth.signInWithOtp({ email: em, options: { emailRedirectTo: ADMIN_URL } });
+    if (error) throw error;
+    alert("Link sent! Tap the button in the email — you'll land right back here.");
+  } catch(e){ alert("Could not send the link: " + (e.message || e)); }
+  $("a_send").disabled = false; $("a_send").textContent = "SEND LINK →";
+});
+const doOut = async () => { await sb.auth.signOut(); location.reload(); };
+$("a_out1").addEventListener("click", doOut);
+$("a_out2").addEventListener("click", doOut);
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  $("viewLoading").style.display = "none";
+  ["viewSignin","viewNope"].forEach(v => $(v).style.display = "none");
+  $("viewAdmin").style.display = "none";
+  if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session && session.user){
+    try { history.replaceState(null, "", location.pathname); } catch(e){}
+    if (session.user.id === ADMIN_UID) loadAdmin();
+    else { $("viewNope").style.display = "block"; }
+  } else if (event === "SIGNED_OUT" || !session){
+    $("viewSignin").style.display = "block";
+  }
+});
+(async () => {
+  const { data } = await sb.auth.getSession();
+  $("viewLoading").style.display = "none";
+  if (data && data.session && data.session.user){
+    if (data.session.user.id === ADMIN_UID) loadAdmin();
+    else $("viewNope").style.display = "block";
+  } else $("viewSignin").style.display = "block";
+})();
+</script>
+<script>
+(function(){
+  var cv = document.getElementById("stars"), cx = cv.getContext("2d"), stars = [], W, H;
+  function rs(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+  addEventListener("resize", rs); rs();
+  for (var i = 0; i < 90; i++) stars.push({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.3+.3, p: Math.random()*6.28, s: .4+Math.random()*.8 });
+  (function loop(t){
+    cx.clearRect(0,0,W,H);
+    for (var i = 0; i < stars.length; i++){ var st = stars[i];
+      cx.globalAlpha = .25 + .35*Math.abs(Math.sin(t/1600*st.s + st.p));
+      cx.fillStyle = "#fff"; cx.beginPath(); cx.arc(st.x, st.y, st.r, 0, 6.29); cx.fill(); }
+    cx.globalAlpha = 1; requestAnimationFrame(loop);
+  })(0);
+})();
+</script>
+</body>
+</html>
