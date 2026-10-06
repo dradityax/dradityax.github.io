@@ -101,7 +101,7 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 /* bio : center, karaoke */
 .bio{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;text-align:center;max-width:min(720px,90vw);
  font-size:clamp(2rem,5.6vw,3.6rem);font-weight:800;letter-spacing:-.01em;white-space:nowrap;
- opacity:0;transition:opacity 1.1s ease}
+ opacity:0;transition:opacity .7s ease}
 .bio.show{opacity:1}
 .bio .w{display:inline-block;margin:0 .16em;color:rgba(255,255,255,.30);text-shadow:0 0 12px rgba(255,255,255,.16);transition:color .5s ease,text-shadow .5s ease,transform .5s ease}
 .bio .w.on{color:#fff;transform:scale(1.06);text-shadow:0 0 20px rgba(255,255,255,.9),0 0 52px rgba(255,255,255,.45),0 2px 14px rgba(0,0,0,.5)}
@@ -260,9 +260,9 @@ function karaoke(){
 /* reveal : video fades in directly, rest follows */
 function revealAll(){
   bg.classList.add("show"); shade.classList.add("show");
+  bio.classList.add("show");
   setTimeout(function(){
     tagline.classList.add("show");
-    bio.classList.add("show");
     plinks.classList.add("show");
     fabwrap.classList.add("show");
     setTimeout(karaoke, 500);
