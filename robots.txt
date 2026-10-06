@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /project-1/admin/
 
 Sitemap: https://dradityax.pages.dev/sitemap.xml
