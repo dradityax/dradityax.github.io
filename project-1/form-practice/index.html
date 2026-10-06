@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEET Form Practice — Project One | Aditya X</title>
+<meta name="description" content="Free NEET-UG form practice: fill the exact form pattern — OTP, payment, captcha, all simulated. Project One by Aditya X.">
+<link rel="canonical" href="https://dradityax.pages.dev/project-1/form-practice/">
+<style>
+  @font-face { font-family: 'Quicksand'; src: url('/assets/quicksand.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
+  #stars { position: fixed; inset: 0; z-index: 0; }
+  body { font-family: Quicksand, -apple-system, "Segoe UI", sans-serif; }
+  .wrap, .prac { position: relative; z-index: 1; }
+  .topbar { position: relative; z-index: 1; max-width: 620px; margin: 0 auto; padding: 18px 16px 0; }
+  .backbtn { display: inline-flex; align-items: center; gap: 8px; color: #f2f0ea; background: rgba(255,255,255,.04);
+             border: 1px solid #f2f0ea; border-radius: 22px; padding: 9px 18px; font-size: .78rem; font-weight: 700;
+             letter-spacing: 2px; cursor: pointer; font-family: inherit; text-decoration: none;
+             transition: transform .16s ease; }
+  .backbtn:active { transform: scale(.94); }
+  .mini-x { text-align: center; position: relative; z-index: 1; margin-top: 2px; }
+  .mini-x .xslot { position: relative; display: inline-block; width: .78em; height: .72em; font-size: 56px; }
+  .mini-x .dx { position: absolute; inset: 0; }
+  .mini-x .dx .ln { position: absolute; top: 0; left: 50%; width: .17em; height: 100%; background: #fff;
+             border-radius: 50%; box-shadow: 0 0 6px #f2f0ea; transform-origin: center; }
+  .mini-x .dx .l1 { transform: translateX(-.20em) scaleY(.236); }
+  .mini-x .dx .l2 { transform: translateX(.20em) scaleY(.236); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; color: #f0ede6; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; padding: 0 0 40px; }
+  .prac { background: #f2f0ea; color: #111; text-align: center; font-weight: 800; letter-spacing: 1px;
+          padding: 10px 12px; font-size: 0.85rem; position: sticky; top: 0; z-index: 50; }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 1.4rem; letter-spacing: 2px; text-align: center; margin-bottom: 4px; }
+  .sub { text-align: center; color: #9a958a; font-size: 0.85rem; margin-bottom: 20px; }
+  .steps { display: flex; gap: 6px; margin-bottom: 20px; }
+  .steps div { flex: 1; text-align: center; font-size: 0.68rem; padding: 8px 2px; border-radius: 8px;
+               background: #141414; border: 1px solid #2a2a2a; color: #6f6a5e; }
+  .steps div.on { background: #f2f0ea; color: #111; font-weight: 700; border-color: #f2f0ea; }
+  .steps div.done { border-color: #7fd08a; color: #7fd08a; }
+  .card { background: #141414; border: 1px solid #2a2a2a; border-radius: 14px; padding: 20px; margin-bottom: 16px; display: none; }
+  .card.on { display: block; }
+  label { display: block; font-size: 0.75rem; letter-spacing: 1px; color: #b9b3a6; margin: 14px 0 6px; text-transform: uppercase; }
+  label:first-child { margin-top: 0; }
+  input[type=text], input[type=email], input[type=tel], input[type=date], input[type=number], select {
+    width: 100%; background: #0a0a0a; color: #f0ede6; border: 1px solid #3a3a3a; border-radius: 10px;
+    padding: 12px; font-size: 1rem; }
+  input.err { border-color: #e07a7a; }
+  .row { display: flex; gap: 10px; } .row > div { flex: 1; }
+  .radio-row { display: flex; gap: 16px; margin-top: 6px; }
+  .radio-row label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; color: #f0ede6;
+                     text-transform: none; letter-spacing: 0; margin: 0; }
+  .nav { display: flex; gap: 10px; margin-top: 18px; }
+  button { flex: 1; border-radius: 12px; padding: 14px; font-size: 1rem; font-weight: 700; letter-spacing: 1px; cursor: pointer; }
+  .next { background: #f2f0ea; color: #111; border: none; }
+  .back { background: transparent; color: #9a958a; border: 1px solid #3a3a3a; }
+  .note { font-size: 0.8rem; color: #9a958a; line-height: 1.6; margin-top: 10px; }
+  .note b { color: #f2f0ea; }
+  /* mock SMS toast */
+  #sms { position: fixed; top: 64px; left: 50%; transform: translateX(-50%) translateY(-140%); width: min(92vw, 420px);
+         background: #1c1c1c; border: 1px solid #f2f0ea; border-radius: 14px; padding: 14px 16px; z-index: 60;
+         transition: transform .35s; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+  #sms.show { transform: translateX(-50%) translateY(0); }
+  #sms .from { font-size: 0.72rem; color: #f2f0ea; letter-spacing: 1px; margin-bottom: 4px; }
+  #sms .body { font-size: 0.95rem; } #sms .body b { font-size: 1.3rem; letter-spacing: 3px; }
+  .otpbox { display: flex; gap: 8px; margin-top: 8px; }
+  .otpbox input { flex: 1; text-align: center; font-size: 1.3rem; letter-spacing: 4px; }
+  .okmsg { color: #7fd08a; font-size: 0.85rem; margin-top: 8px; }
+  /* review table */
+  table.rev { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 8px; }
+  table.rev td { border-bottom: 1px solid #2a2a2a; padding: 8px 4px; vertical-align: top; }
+  table.rev td.k { color: #9a958a; width: 42%; }
+  table.rev td .edit { color: #f2f0ea; font-size: 0.75rem; cursor: pointer; margin-left: 8px; text-decoration: underline; }
+  .captcha { background: #0a0a0a; border: 1px solid #3a3a3a; border-radius: 10px; padding: 14px; text-align: center; margin-top: 14px; }
+  .captcha .code { font-size: 1.8rem; letter-spacing: 8px; font-weight: 800; color: #f2f0ea;
+                   text-decoration: line-through; user-select: none; }
+  /* confirmation sheet */
+  #sheet { background: #fff; color: #111; border-radius: 14px; padding: 28px 24px; display: none; }
+  #sheet.on { display: block; }
+  #sheet h2 { text-align: center; letter-spacing: 2px; font-size: 1.2rem; margin-bottom: 2px; }
+  #sheet .psub { text-align: center; font-size: 0.8rem; color: #555; margin-bottom: 16px; }
+  #sheet table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  #sheet td { border: 1px solid #bbb; padding: 7px 8px; }
+  #sheet td.k { background: #f2f2f2; width: 40%; font-weight: 600; }
+  #sheet .stamp { margin-top: 18px; border: 2px dashed #2a7a3a; color: #2a7a3a; border-radius: 10px;
+                  padding: 12px; text-align: center; font-weight: 800; letter-spacing: 1px; }
+  #dlPdf { display: none; width: 100%; margin-top: 14px; background: #2a7a3a; color: #fff; border: none; }
+  #dlPdf.on { display: block; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    body * { display: none !important; }
+    #sheet, #sheet * { display: block !important; }
+    #sheet { border-radius: 0; }
+    #sheet table, #sheet tr, #sheet td, #sheet h2, #sheet .psub, #sheet .stamp { display: revert !important; }
+    #sheet table { display: table !important; } #sheet tr { display: table-row !important; }
+    #sheet td { display: table-cell !important; }
+  }
+</style>
+</head>
+<body>
+<div class="prac">⚠ PRACTICE FORM — this is NOT the real NTA form. Nothing here registers you.</div>
+<div id="sms"><div class="from">SMS · SIMULATED — no real message was sent</div><div class="body" id="smsBody"></div></div>
+
+<canvas id="stars"></canvas>
+<div class="topbar"><a class="backbtn" href="../">&larr; PROJECT ONE</a></div>
+<div class="mini-x"><span class="xslot"><span class="dx">
+  <span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span>
+</span></span></div>
+<div class="wrap" id="app">
+  <h1>NEET-UG FORM PRACTICE</h1>
+  <p class="sub">Fill it exactly like the real one. Make every mistake here, not there.</p>
+  <div class="steps" id="steps"></div>
+
+  <!-- PAGE 1 : REGISTRATION -->
+  <div class="card on" data-page="1">
+    <label>Candidate's name (exactly as on Class 10 certificate)</label><input type="text" id="f_name">
+    <label>Father's name</label><input type="text" id="f_fname">
+    <label>Mother's name</label><input type="text" id="f_mname">
+    <div class="row">
+      <div><label>Date of birth</label><input type="date" id="f_dob"></div>
+      <div><label>Gender</label><select id="f_gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Third Gender</option></select></div>
+    </div>
+    <div class="row">
+      <div><label>Category</label><select id="f_cat"><option value="">Select</option><option>UR</option><option>EWS</option><option>OBC-NCL</option><option>SC</option><option>ST</option></select></div>
+      <div><label>Person with Disability?</label><select id="f_pwd"><option value="">Select</option><option>No</option><option>Yes</option></select></div>
+    </div>
+    <label>Email address</label><input type="email" id="f_email" placeholder="you@example.com">
+    <label>Mobile number</label>
+    <div class="otpbox"><input type="tel" id="f_mob" placeholder="10-digit mobile" maxlength="10" inputmode="numeric">
+      <button class="back" id="otpSend" style="flex:0 0 auto">Send OTP</button></div>
+    <div class="otpbox" id="otpRow" style="display:none"><input type="tel" id="f_otp" placeholder="Enter OTP" maxlength="6" inputmode="numeric">
+      <button class="back" id="otpVerify" style="flex:0 0 auto">Verify</button></div>
+    <div class="okmsg" id="otpOk" style="display:none">✓ Mobile verified (simulated)</div>
+    <label>Address</label><input type="text" id="f_addr" placeholder="House no, street, area">
+    <div class="row">
+      <div><label>City</label><input type="text" id="f_city"></div>
+      <div><label>PIN code</label><input type="tel" id="f_pin" maxlength="6" inputmode="numeric"></div>
+    </div>
+    <p class="note">On the real form, the OTP arrives by real SMS. Here it pops up on your screen — <b>same experience, clearly fake.</b> Use any number, even a random one.</p>
+    <div class="nav"><button class="next" data-go="2">Save &amp; Next →</button></div>
+  </div>
+
+  <!-- PAGE 2 : APPLICATION -->
+  <div class="card" data-page="2">
+    <label>Exam city — choice 1</label><select class="city" id="f_c1"></select>
+    <label>Exam city — choice 2</label><select class="city" id="f_c2"></select>
+    <label>Exam city — choice 3</label><select class="city" id="f_c3"></select>
+    <label>Exam city — choice 4</label><select class="city" id="f_c4"></select>
+    <label>Question paper medium</label><select id="f_med"><option value="">Select</option><option>English</option><option>Hindi</option><option>English + Hindi</option><option>Assamese</option><option>Bengali</option><option>Gujarati</option><option>Kannada</option><option>Malayalam</option><option>Marathi</option><option>Odia</option><option>Punjabi</option><option>Tamil</option><option>Telugu</option><option>Urdu</option></select>
+    <div class="row">
+      <div><label>Class 10 board</label><input type="text" id="f_b10" placeholder="e.g. BSEB"></div>
+      <div><label>Passing year</label><input type="number" id="f_y10" placeholder="2023"></div>
+    </div>
+    <div class="row">
+      <div><label>Class 12 board</label><input type="text" id="f_b12" placeholder="e.g. BSEB"></div>
+      <div><label>Status</label><select id="f_s12"><option value="">Select</option><option>Passed</option><option>Appearing</option></select></div>
+    </div>
+    <div id="marks12">
+      <label>Class 12 subject marks <span style="text-transform:none;letter-spacing:0">(out of 100 each — required if Passed)</span></label>
+      <div class="row">
+        <div><label>Physics</label><input type="number" id="f_mphy" min="0" max="100" placeholder="0–100"></div>
+        <div><label>Chemistry</label><input type="number" id="f_mche" min="0" max="100" placeholder="0–100"></div>
+      </div>
+      <div class="row">
+        <div><label>Biology</label><input type="number" id="f_mbio" min="0" max="100" placeholder="0–100"></div>
+        <div><label>English</label><input type="number" id="f_meng" min="0" max="100" placeholder="0–100"></div>
+      </div>
+    </div>
+    <div class="nav"><button class="back" data-go="1">← Back</button><button class="next" data-go="3">Save &amp; Next →</button></div>
+  </div>
+
+  <!-- PAGE 3 : DOCUMENTS -->
+  <div class="card" data-page="3">
+    <p class="note" style="margin-top:0">On the <b>real</b> form these uploads are <b>mandatory</b> and rejected if the size is off.
+      Here they are optional — practice the flow. Prepare real files with our <b>Doc Converter</b> tool.</p>
+    <label>Passport photograph (JPG, 10–200 KB)</label><input type="file" id="f_photo" accept="image/*">
+    <label>Postcard photograph 4"×6" (JPG, 10–200 KB)</label><input type="file" id="f_post" accept="image/*">
+    <label>Signature (JPG, 4–30 KB)</label><input type="file" id="f_sign" accept="image/*">
+    <label>Left thumb impression (JPG, 10–200 KB)</label><input type="file" id="f_thumb" accept="image/*">
+    <div class="nav"><button class="back" data-go="2">← Back</button><button class="next" data-go="4">Save &amp; Next →</button></div>
+  </div>
+
+  <!-- PAGE 4 : PAYMENT (SIMULATED) -->
+  <div class="card" data-page="4">
+    <p class="note" style="margin-top:0">💳 <b>SIMULATED PAYMENT — no real money moves.</b> On the real form this step charges your actual fee.</p>
+    <label>Application fee (auto-set from your category)</label>
+    <input type="text" id="f_fee" readonly style="font-size:1.4rem;font-weight:800;color:#f2f0ea">
+    <label>Card number (test card pre-filled)</label><input type="text" id="f_card" value="4111 1111 1111 1111">
+    <div class="row">
+      <div><label>Expiry</label><input type="text" value="12/29"></div>
+      <div><label>CVV</label><input type="tel" value="123" maxlength="3"></div>
+    </div>
+    <div class="nav"><button class="back" data-go="3">← Back</button><button class="next" id="payBtn">Pay (SIMULATED)</button></div>
+    <div class="okmsg" id="payOk" style="display:none">✓ Payment successful — simulated. No money was charged.</div>
+  </div>
+
+  <!-- PAGE 5 : REVIEW + CAPTCHA -->
+  <div class="card" data-page="5">
+    <label style="margin-top:0">Review everything — this is your last chance before "submit"</label>
+    <table class="rev" id="revTable"></table>
+    <div class="captcha">
+      <div style="font-size:.75rem;letter-spacing:1px;color:#9a958a;margin-bottom:8px">TYPE THE CHARACTERS (SIMULATED CAPTCHA)</div>
+      <div class="code" id="capCode"></div>
+      <input type="text" id="capIn" placeholder="Enter captcha" style="margin-top:10px;text-align:center;letter-spacing:4px">
+    </div>
+    <div class="nav"><button class="back" data-go="4">← Back</button><button class="next" id="submitBtn">Final Submit</button></div>
+  </div>
+
+  <!-- CONFIRMATION SHEET -->
+  <div id="sheet">
+    <h2>NEET-UG PRACTICE — CONFIRMATION</h2>
+    <p class="psub">Practice copy · NOT a real registration · Generated on <span id="genDate"></span></p>
+    <table id="sheetTable"></table>
+    <div class="stamp">✓ PRACTICE COMPLETE — use this sheet beside the real form</div>
+  </div>
+  <button id="dlPdf">DOWNLOAD CONFIRMATION PDF</button>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const FEE = { 'UR': 1700, 'EWS': 1600, 'OBC-NCL': 1600, 'SC': 1000, 'ST': 1000 };
+const CITIES = ['Patna','Gaya','Muzaffarpur','Bhagalpur','Darbhanga','Purnia','Arrah','Chhapra','Kolkata','Ranchi','Varanasi','Delhi','Lucknow','Guwahati'];
+document.querySelectorAll('.city').forEach(s => {
+  s.innerHTML = '<option value="">Select city</option>' + CITIES.map(c => `<option>${c}</option>`).join('');
+});
+const STEPS = ['Registration','Application','Documents','Payment','Review'];
+$('steps').innerHTML = STEPS.map((s,i) => `<div data-s="${i+1}">${i+1}. ${s}</div>`).join('');
+function markStep(n) {
+  document.querySelectorAll('#steps div').forEach(d => {
+    const k = +d.dataset.s;
+    d.className = k === n ? 'on' : (k < n ? 'done' : '');
+  });
+}
+markStep(1);
+function go(n) {
+  document.querySelectorAll('.card').forEach(c => c.classList.toggle('on', +c.dataset.page === n));
+  $('sheet').classList.remove('on'); $('dlPdf').classList.remove('on');
+  markStep(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (n === 4) $('f_fee').value = '₹' + (FEE[$('f_cat').value] || 1700) + ' (SIMULATED)';
+  if (n === 5) buildReview();
+}
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => {
+  const from = +b.closest('.card').dataset.page, to = +b.dataset.go;
+  if (to > from && !validate(from)) return;
+  go(to);
+}));
+function need(id) {
+  const el = $(id);
+  const bad = !el.value || (el.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(el.value));
+  el.classList.toggle('err', bad);
+  if (bad) el.focus();
+  return !bad;
+}
+function validate(p) {
+  let ok = true;
+  if (p === 1) {
+    ['f_name','f_fname','f_mname','f_dob','f_gender','f_cat','f_pwd','f_email','f_addr','f_city'].forEach(id => { if (!need(id)) ok = false; });
+    const m = $('f_mob');
+    if (!/^\d{10}$/.test(m.value)) { m.classList.add('err'); m.focus(); ok = false; }
+    if ($('otpOk').style.display === 'none') { alert('Please verify your mobile with the (simulated) OTP first.'); ok = false; }
+    if (!/^\d{6}$/.test($('f_pin').value)) { $('f_pin').classList.add('err'); ok = false; }
+  }
+  if (p === 2) {
+    ['f_c1','f_med','f_b10','f_y10','f_b12','f_s12'].forEach(id => { if (!need(id)) ok = false; });
+    if ($('f_s12').value === 'Passed') {
+      ['f_mphy','f_mche','f_mbio','f_meng'].forEach(id => {
+        const el = $(id), v = parseInt(el.value, 10);
+        const bad = isNaN(v) || v < 0 || v > 100;
+        el.classList.toggle('err', bad);
+        if (bad) { el.focus(); ok = false; }
+      });
+    }
+  }
+  if (!ok) alert('Please fix the highlighted fields — exactly like the real form would stop you.');
+  return ok;
+}
+/* ---- fake OTP ---- */
+let otp = null;
+$('otpSend').addEventListener('click', () => {
+  const m = $('f_mob');
+  if (!/^\d{10}$/.test(m.value)) { m.classList.add('err'); m.focus(); alert('Enter a 10-digit mobile number first (any number — even a random one).'); return; }
+  otp = String(Math.floor(100000 + Math.random() * 900000));
+  $('smsBody').innerHTML = `Your NEET practice OTP is <b>${otp}</b>. <span style="color:#9a958a;font-size:.8rem">(SIMULATED — shown on screen, not by SMS)</span>`;
+  $('sms').classList.add('show');
+  $('otpRow').style.display = 'flex';
+  setTimeout(() => $('sms').classList.remove('show'), 9000);
+});
+$('otpVerify').addEventListener('click', () => {
+  if ($('f_otp').value === otp) { $('otpOk').style.display = 'block'; $('otpRow').style.display = 'none'; }
+  else { $('f_otp').classList.add('err'); alert('Wrong OTP. Hint: it is shown in the simulated SMS above.'); }
+});
+/* ---- fake payment ---- */
+$('payBtn').addEventListener('click', () => {
+  $('payBtn').textContent = 'PROCESSING… (SIMULATED)';
+  setTimeout(() => {
+    $('payBtn').textContent = 'Pay (SIMULATED)';
+    $('payOk').style.display = 'block';
+    setTimeout(() => go(5), 900);
+  }, 1200);
+});
+/* ---- review + captcha ---- */
+const FIELDS = [
+  ['f_name','Full name'],['f_dob','Date of birth'],['f_gender','Gender'],['f_cat','Category'],['f_pwd','PwD'],
+  ['f_email','Email'],['f_mob','Mobile'],['f_addr','Address'],['f_city','City'],['f_pin','PIN'],
+  ['f_c1','City choice 1'],['f_c2','City choice 2'],['f_c3','City choice 3'],['f_c4','City choice 4'],
+  ['f_med','Paper medium'],['f_b10','Class 10 board'],['f_y10','Class 10 year'],['f_b12','Class 12 board'],['f_s12','Class 12 status'],
+  ['f_mphy','Physics (/100)'],['f_mche','Chemistry (/100)'],['f_mbio','Biology (/100)'],['f_meng','English (/100)'],
+  ['f_fee','Fee paid']
+];
+let cap = '';
+function buildReview() {
+  cap = Array.from({length:5}, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');
+  $('capCode').textContent = cap; $('capIn').value = '';
+  $('revTable').innerHTML = FIELDS.map(([id,lab]) => {
+    const v = $(id) ? ($(id).value || '—') : '—';
+    const pg = id.startsWith('f_c')||['f_med','f_b10','f_y10','f_b12','f_s12','f_mphy','f_mche','f_mbio','f_meng'].includes(id) ? 2 : 1;
+    return `<tr><td class="k">${lab}<span class="edit" data-goto="${pg}">edit</span></td><td>${v}</td></tr>`;
+  }).join('') + `<tr><td class="k">Payment</td><td>✓ Simulated — no real money</td></tr>`;
+  document.querySelectorAll('.edit').forEach(e => e.addEventListener('click', () => go(+e.dataset.goto)));
+}
+$('submitBtn').addEventListener('click', () => {
+  if ($('capIn').value.trim().toUpperCase() !== cap) { $('capIn').classList.add('err'); alert('Captcha did not match. Try again.'); return; }
+  // confirmation sheet
+  $('genDate').textContent = new Date().toLocaleString('en-IN');
+  $('sheetTable').innerHTML = FIELDS.map(([id,lab]) => {
+    const v = $(id) ? ($(id).value || '—') : '—';
+    return `<tr><td class="k">${lab}</td><td>${v}</td></tr>`;
+  }).join('') + `<tr><td class="k">Payment</td><td>Simulated — no real money</td></tr>
+                 <tr><td class="k">Application No.</td><td>PRAC-${Date.now().toString().slice(-8)} (practice only)</td></tr>`;
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('on'));
+  $('sheet').classList.add('on'); $('dlPdf').classList.add('on');
+  document.querySelectorAll('#steps div').forEach(d => d.className = 'done');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+$('dlPdf').addEventListener('click', () => window.print());
+</script>
+<script>
+(function(){
+  var cv = document.getElementById('stars'), cx = cv.getContext('2d'), stars = [], W, H;
+  function rs(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+  rs(); addEventListener('resize', rs);
+  for (var i = 0; i < 90; i++) stars.push({ x: Math.random(), y: Math.random(), z: Math.random() });
+  (function loop(){
+    cx.fillStyle = '#0a0a0a'; cx.fillRect(0, 0, W, H);
+    for (var s = 0; s < stars.length; s++) {
+      var st = stars[s]; st.y += st.z * 0.0006; if (st.y > 1) st.y = 0;
+      cx.fillStyle = 'rgba(255,255,255,' + (0.15 + st.z * 0.5).toFixed(2) + ')';
+      cx.fillRect(st.x * W, st.y * H, st.z * 1.8, st.z * 1.8);
+    }
+    requestAnimationFrame(loop);
+  })();
+  var a = document.getElementById('dx1'), b = document.getElementById('dx2'), t = 0;
+  setInterval(function(){
+    t++;
+    var blink = (t % 5 === 0);
+    a.style.transform = 'translateX(-.20em) scaleY(' + (blink ? '.02' : '.236') + ')';
+    b.style.transform = 'translateX(.20em) scaleY(' + (blink ? '.02' : '.236') + ')';
+  }, 900);
+})();
+</script>
+</body>
+</html>
