@@ -193,17 +193,19 @@ $("verifyOtp").addEventListener("click", async () => {
     } else {
       const { error } = await sb.auth.verifyOtp({ email: $("s_email").value.trim(), token: code, type: "email" });
       if (error) throw error;
-      /* create/update profile row */
+      /* create/update profile row — best-effort: the auth account is created regardless */
       const { data: { user } } = await sb.auth.getUser();
-      await sb.from("profiles").upsert({
-        id: user.id,
-        full_name: $("s_name").value.trim(),
-        mobile: $("s_mob").value.trim(),
-        exam: $("s_exam").value,
-        target_year: parseInt($("s_year").value, 10),
-        state: $("s_state").value,
-        category: $("s_cat").value
-      });
+      try {
+        await sb.from("profiles").upsert({
+          id: user.id,
+          full_name: $("s_name").value.trim(),
+          mobile: $("s_mob").value.trim(),
+          exam: $("s_exam").value,
+          target_year: parseInt($("s_year").value, 10),
+          state: $("s_state").value,
+          category: $("s_cat").value
+        });
+      } catch (e) { console.warn("profile save pending table setup:", e.message); }
       $("doneMsg").textContent = "Welcome aboard, " + $("s_name").value.trim().split(" ")[0] + ". Your account is live.";
     }
     $("otpOk").style.display = "block";
