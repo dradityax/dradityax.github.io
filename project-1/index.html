@@ -6,6 +6,13 @@
 <title>Project One — NEET Practice Tools | Aditya X</title>
 <meta name="description" content="Project One: free NEET-UG practice tools — simulated form practice, document converter, deadline alerts. Practice everything, fear nothing.">
 <link rel="canonical" href="https://dradityax.pages.dev/project-1/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Project One — NEET Practice Tools | Aditya X">
+<meta property="og:description" content="Project One: free NEET-UG practice tools — simulated form practice, document converter, deadline alerts. Practice everything, fear nothing.">
+<meta property="og:url" content="https://dradityax.pages.dev/project-1/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Project One — NEET Practice Tools | Aditya X">
+<meta name="twitter:description" content="Project One: free NEET-UG practice tools — simulated form practice, document converter, deadline alerts. Practice everything, fear nothing.">
 <style>
   @font-face { font-family: 'Quicksand'; src: url('/assets/quicksand.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
   :root { --acc: #f2f0ea; }
@@ -91,6 +98,11 @@
   body.neet .tool.soon { animation: none; opacity: .45; transform: none; }
   .fine { text-align: center; font-size: .72rem; color: rgba(255,255,255,.4); margin-top: 30px; line-height: 1.7; }
   .fine b { color: var(--acc); }
+  .acctbtn { display: inline-block; padding: 11px 28px; border: 1px solid var(--acc); border-radius: 26px;
+             color: var(--acc); font-size: .78rem; font-weight: 700; letter-spacing: 2px; text-decoration: none;
+             font-family: inherit; transition: transform .16s ease, background .2s; }
+  .acctbtn:active { transform: scale(.94); background: rgba(255,255,255,.08); }
+  .acctwrap { text-align: center; margin: 2px 0 6px; }
 </style>
 </head>
 <body>
@@ -105,6 +117,7 @@
   <h1>PROJECT <span class="xcol">ONE</span></h1>
   <p class="tag">practice everything &middot; fear nothing</p>
   <div class="sw"><div class="dots" id="dots"></div></div>
+  <div class="acctwrap"><a class="acctbtn" href="signup/">SIGN IN / CREATE ACCOUNT</a></div>
   <div class="sec">CHOOSE YOUR EXAM</div>
   <div class="tiles">
     <div class="tile live" id="tileNeet"><div class="t">NEET-UG</div><div class="s">Medical &middot; live now</div></div>
@@ -133,6 +146,8 @@
     <div class="td">Coming soon &mdash; personalized reminders for your NEET year.</div></div></div>
   <div class="tool soon"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h7v15H4z"/><path d="M13 5h7v15h-7z"/><path d="M6.5 9h2M6.5 13h2M15.5 9h2M15.5 13h2"/></svg></div><div><div class="tt">Sample Papers</div>
     <div class="td">Coming soon.</div></div></div>
+  <a class="tool" href="dashboard/"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.5-3.5 4-5 7-5s5.5 1.5 7 5"/></svg></div><div><div class="tt">My Account</div>
+    <div class="td">Sign in for deadline alerts &amp; your profile.</div></div><div class="go">&rarr;</div></a>
   <p class="fine">Everything here is <b>practice</b> &mdash; real registration happens only on the NTA site.<br>
   Your data never leaves your device.</p>
 </div></div>
