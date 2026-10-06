@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEET Document Converter — Project One | Aditya X</title>
+<meta name="description" content="Free NEET document converter: any photo to exact NTA format and size, 100% in your browser. Project One by Aditya X.">
+<link rel="canonical" href="https://dradityax.pages.dev/project-1/converter/">
+<style>
+  @font-face { font-family: 'Quicksand'; src: url('/assets/quicksand.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
+  #stars { position: fixed; inset: 0; z-index: 0; }
+  body { font-family: Quicksand, -apple-system, "Segoe UI", sans-serif; }
+  .wrap, .fine { position: relative; z-index: 1; }
+  .topbar { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; padding: 18px 16px 0; }
+  .backbtn { display: inline-flex; align-items: center; gap: 8px; color: #f2f0ea; background: rgba(255,255,255,.04);
+             border: 1px solid #f2f0ea; border-radius: 22px; padding: 9px 18px; font-size: .78rem; font-weight: 700;
+             letter-spacing: 2px; cursor: pointer; font-family: inherit; text-decoration: none;
+             transition: transform .16s ease; }
+  .backbtn:active { transform: scale(.94); }
+  .mini-x { text-align: center; position: relative; z-index: 1; margin-top: 2px; }
+  .mini-x .xslot { position: relative; display: inline-block; width: .78em; height: .72em; font-size: 56px; }
+  .mini-x .dx { position: absolute; inset: 0; }
+  .mini-x .dx .ln { position: absolute; top: 0; left: 50%; width: .17em; height: 100%; background: #fff;
+             border-radius: 50%; box-shadow: 0 0 6px #f2f0ea; transform-origin: center; }
+  .mini-x .dx .l1 { transform: translateX(-.20em) scaleY(.236); }
+  .mini-x .dx .l2 { transform: translateX(.20em) scaleY(.236); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; color: #f0ede6; font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+         min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 32px 16px; }
+  .wrap { width: 100%; max-width: 560px; }
+  h1 { font-size: 1.5rem; letter-spacing: 2px; text-align: center; margin-bottom: 6px; }
+  .sub { text-align: center; color: #9a958a; font-size: 0.85rem; margin-bottom: 24px; }
+  .card { background: #141414; border: 1px solid #2a2a2a; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  label { display: block; font-size: 0.8rem; letter-spacing: 1px; color: #b9b3a6; margin-bottom: 8px; text-transform: uppercase; }
+  select, input[type=number] { width: 100%; background: #0a0a0a; color: #f0ede6; border: 1px solid #3a3a3a;
+    border-radius: 10px; padding: 12px; font-size: 1rem; margin-bottom: 4px; }
+  .row { display: flex; gap: 10px; }
+  .row > div { flex: 1; }
+  .spec { font-size: 0.8rem; color: #9a958a; margin-top: 8px; line-height: 1.5; }
+  .spec b { color: #f2f0ea; }
+  .drop { border: 2px dashed #3a3a3a; border-radius: 14px; padding: 36px 16px; text-align: center;
+          cursor: pointer; color: #9a958a; transition: border-color .2s; }
+  .drop:hover, .drop.over { border-color: #f2f0ea; color: #f2f0ea; }
+  .drop input { display: none; }
+  .preview { display: none; text-align: center; }
+  .preview img { max-width: 100%; max-height: 260px; border-radius: 10px; border: 1px solid #2a2a2a; background: #fff; }
+  .meta { font-size: 0.85rem; color: #9a958a; margin: 12px 0; line-height: 1.7; }
+  .meta b { color: #f0ede6; }
+  .ok { color: #7fd08a !important; }
+  .bad { color: #e07a7a !important; }
+  button.go { width: 100%; background: #f2f0ea; color: #111; border: none; border-radius: 12px;
+    padding: 15px; font-size: 1.05rem; font-weight: 700; letter-spacing: 1px; cursor: pointer; margin-top: 8px; }
+  button.go:disabled { opacity: .35; cursor: default; }
+  a.dl { display: none; text-align: center; background: transparent; border: 1px solid #f2f0ea; color: #f2f0ea;
+    border-radius: 12px; padding: 14px; font-weight: 700; letter-spacing: 1px; text-decoration: none; margin-top: 10px; }
+  .fine { font-size: 0.75rem; color: #6f6a5e; text-align: center; margin-top: 20px; line-height: 1.6; max-width: 560px; }
+  .warn { background: #1c1607; border: 1px solid #5a4517; border-radius: 10px; padding: 12px 14px;
+          font-size: 0.8rem; color: #f2f0ea; margin-bottom: 16px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="topbar"><a class="backbtn" href="../">&larr; PROJECT ONE</a></div>
+<div class="mini-x"><span class="xslot"><span class="dx">
+  <span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span>
+</span></span></div>
+<div class="wrap">
+  <h1>NEET DOC CONVERTER</h1>
+  <p class="sub">Upload any image. Get it in exact NTA format. 100% in your browser — nothing is uploaded anywhere.</p>
+
+  <div class="warn">Specs below are compiled from 2026 bulletin reports. NTA changes these some years —
+    always match your year's official bulletin. You can edit the KB limits.</div>
+
+  <div class="card">
+    <label for="preset">Document type</label>
+    <select id="preset">
+      <option value="passport">Passport photograph</option>
+      <option value="postcard">Postcard photograph (4" × 6")</option>
+      <option value="signature">Signature</option>
+      <option value="thumb">Thumb impression</option>
+      <option value="custom">Custom…</option>
+    </select>
+    <div class="spec" id="specLine"></div>
+    <div class="row" style="margin-top:12px">
+      <div><label for="minKB">Min KB</label><input type="number" id="minKB" value="10"></div>
+      <div><label for="maxKB">Max KB</label><input type="number" id="maxKB" value="200"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Your image</label>
+    <div class="drop" id="drop">Tap to choose, or drop an image here
+      <input type="file" id="file" accept="image/*">
+    </div>
+    <div class="preview" id="previewBox">
+      <img id="previewImg" alt="preview">
+      <div class="meta" id="metaLine"></div>
+    </div>
+    <button class="go" id="goBtn" disabled>CONVERT</button>
+    <a class="dl" id="dlLink" download="neet-document.jpg">DOWNLOAD CONVERTED JPG</a>
+  </div>
+</div>
+<p class="fine">Demo build — Project One, Phase 1. Conversion happens fully on your device via canvas.
+No account, no server, no upload. Final page will carry the site's full styling.</p>
+
+<script>
+const PRESETS = {
+  passport:  { label: 'Passport photograph',        minKB: 10, maxKB: 200, maxW: 600,  maxH: 750,
+               note: 'JPG · white background · 80% face, ears visible' },
+  postcard:  { label: 'Postcard photograph (4"×6")', minKB: 10, maxKB: 200, maxW: 1200, maxH: 800,
+               note: 'JPG · white background · name + date preferred' },
+  signature: { label: 'Signature',                   minKB: 4,  maxKB: 30,  maxW: 600,  maxH: 220,
+               note: 'JPG · black pen on white paper · running hand, NOT capitals' },
+  thumb:     { label: 'Thumb impression',            minKB: 10, maxKB: 200, maxW: 600,  maxH: 600,
+               note: 'JPG · blue ink on white paper' },
+  custom:    { label: 'Custom',                      minKB: 10, maxKB: 200, maxW: 1000, maxH: 1000, note: 'Set your own limits' }
+};
+const presetEl = document.getElementById('preset'),
+      minEl = document.getElementById('minKB'), maxEl = document.getElementById('maxKB'),
+      specLine = document.getElementById('specLine'),
+      drop = document.getElementById('drop'), fileEl = document.getElementById('file'),
+      previewBox = document.getElementById('previewBox'), previewImg = document.getElementById('previewImg'),
+      metaLine = document.getElementById('metaLine'),
+      goBtn = document.getElementById('goBtn'), dlLink = document.getElementById('dlLink');
+let srcImg = null, srcName = '';
+
+function refreshSpec() {
+  const p = PRESETS[presetEl.value];
+  minEl.value = p.minKB; maxEl.value = p.maxKB;
+  specLine.innerHTML = 'Target: <b>' + p.minKB + '–' + p.maxKB + ' KB</b> · JPG · ' + p.note;
+}
+presetEl.addEventListener('change', refreshSpec); refreshSpec();
+
+drop.addEventListener('click', () => fileEl.click());
+['dragover','dragenter'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', ev => { if (ev.dataTransfer.files[0]) loadFile(ev.dataTransfer.files[0]); });
+fileEl.addEventListener('change', () => { if (fileEl.files[0]) loadFile(fileEl.files[0]); });
+
+function loadFile(f) {
+  srcName = f.name.replace(/\.[^.]+$/, '');
+  const url = URL.createObjectURL(f), img = new Image();
+  img.onload = () => {
+    srcImg = img;
+    previewImg.src = url; previewBox.style.display = 'block';
+    metaLine.innerHTML = 'Original: <b>' + img.naturalWidth + '×' + img.naturalHeight + 'px</b> · <b>' + (f.size/1024).toFixed(1) + ' KB</b>';
+    goBtn.disabled = false; dlLink.style.display = 'none';
+  };
+  img.src = url;
+}
+
+function render(img, w, h, q) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);   // flatten transparency for JPG
+  ctx.drawImage(img, 0, 0, w, h);
+  return new Promise(res => c.toBlob(res, 'image/jpeg', q));
+}
+
+goBtn.addEventListener('click', async () => {
+  if (!srcImg) return;
+  goBtn.disabled = true; goBtn.textContent = 'WORKING…';
+  const p = PRESETS[presetEl.value];
+  const minB = (+minEl.value || 1) * 1024, maxB = (+maxEl.value || 200) * 1024;
+  let baseScale = Math.min(1, p.maxW / srcImg.naturalWidth, p.maxH / srcImg.naturalHeight);
+  let up = 1, w = 0, h = 0, bestOverall = null;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    w = Math.min(Math.round(srcImg.naturalWidth * baseScale * up), p.maxW * 2);
+    h = Math.min(Math.round(srcImg.naturalHeight * baseScale * up), p.maxH * 2);
+    let lo = 0.05, hi = 0.95, best = null;
+    for (let i = 0; i < 8; i++) {
+      const q = (lo + hi) / 2, b = await render(srcImg, w, h, q);
+      if (b.size <= maxB) { best = b; lo = q; } else { hi = q; }
+    }
+    if (best && (!bestOverall || best.size > bestOverall.size)) bestOverall = best;
+    if (best && best.size >= minB) break;   // in range — done
+    if (!best) { baseScale *= 0.8; up = 1; } // too big even at min quality — shrink
+    else { up *= 1.6; }                      // too small — upscale and retry
+    if (baseScale < 0.05) break;
+  }
+  const blob = bestOverall || await render(srcImg, w, h, 0.05);
+  const kb = blob.size / 1024;
+  const url = URL.createObjectURL(blob);
+  previewImg.src = url;
+  const inRange = blob.size >= minB && blob.size <= maxB;
+  metaLine.innerHTML =
+    'Converted: <b>' + w + '×' + h + 'px</b> · <b class="' + (inRange ? 'ok' : 'bad') + '">' + kb.toFixed(1) + ' KB</b>' +
+    ' (target ' + (minB/1024) + '–' + (maxB/1024) + ' KB)' +
+    (inRange ? '<br><span class="ok">✓ Within NTA range — ready to upload.</span>'
+             : '<br><span class="bad">Outside range — try the Custom preset with adjusted limits.</span>');
+  dlLink.href = url;
+  dlLink.download = srcName + '-' + presetEl.value + '.jpg';
+  dlLink.style.display = 'block';
+  goBtn.disabled = false; goBtn.textContent = 'CONVERT';
+});
+</script>
+<script>
+(function(){
+  var cv = document.getElementById('stars'), cx = cv.getContext('2d'), stars = [], W, H;
+  function rs(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+  rs(); addEventListener('resize', rs);
+  for (var i = 0; i < 90; i++) stars.push({ x: Math.random(), y: Math.random(), z: Math.random() });
+  (function loop(){
+    cx.fillStyle = '#0a0a0a'; cx.fillRect(0, 0, W, H);
+    for (var s = 0; s < stars.length; s++) {
+      var st = stars[s]; st.y += st.z * 0.0006; if (st.y > 1) st.y = 0;
+      cx.fillStyle = 'rgba(255,255,255,' + (0.15 + st.z * 0.5).toFixed(2) + ')';
+      cx.fillRect(st.x * W, st.y * H, st.z * 1.8, st.z * 1.8);
+    }
+    requestAnimationFrame(loop);
+  })();
+  var a = document.getElementById('dx1'), b = document.getElementById('dx2'), t = 0;
+  setInterval(function(){
+    t++;
+    var blink = (t % 5 === 0);
+    a.style.transform = 'translateX(-.20em) scaleY(' + (blink ? '.02' : '.236') + ')';
+    b.style.transform = 'translateX(.20em) scaleY(' + (blink ? '.02' : '.236') + ')';
+  }, 900);
+})();
+</script>
+</body>
+</html>
