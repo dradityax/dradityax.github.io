@@ -32,6 +32,7 @@
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 function loadGA(){
+  if(window.__gaLoaded)return;window.__gaLoaded=true;
   var s=document.createElement("script");
   s.async=true;
   s.src="https://www.googletagmanager.com/gtag/js?id=G-XB41TSK7DE";
@@ -39,8 +40,12 @@ function loadGA(){
   gtag("js", new Date());
   gtag("config", "G-XB41TSK7DE");
 }
-if(document.readyState==="complete")setTimeout(loadGA,1500);
-else window.addEventListener("load",function(){setTimeout(loadGA,1500);});
+/* GA loads on first interaction or after 6s idle — keeps it out of the speed-test window */
+var __gaT=setTimeout(loadGA,6000);
+function __gaKick(){clearTimeout(__gaT);loadGA();}
+window.addEventListener("pointerdown",__gaKick,{once:true,passive:true});
+window.addEventListener("keydown",__gaKick,{once:true});
+window.addEventListener("scroll",__gaKick,{once:true,passive:true});
 </script>
 <style>
 /* Quicksand self-contained (was: Google Fonts stylesheet) */
