@@ -116,6 +116,20 @@ let students = [];
 function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function fmtDate(iso){ try { return new Date(iso).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" }); } catch(e){ return ""; } }
 
+// ensure the admin's own profile row exists (he signed up before the table/trigger existed)
+async function ensureOwnProfile(user){
+  const md = user.user_metadata || {};
+  if (!md.full_name) return;
+  try {
+    await sb.from("profiles").upsert({
+      id: user.id, email: user.email,
+      full_name: md.full_name, mobile: md.mobile || null,
+      exam: md.exam || "NEET-UG", target_year: parseInt(md.target_year, 10) || 2027,
+      state: md.state || null, category: md.category || null
+    }, { onConflict: "id" });
+  } catch(e){ console.warn("own profile:", e.message); }
+}
+
 async function loadAdmin(){
   $("viewLoading").style.display = "none";
   $("viewAdmin").style.display = "block";
@@ -198,7 +212,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
   $("viewAdmin").style.display = "none";
   if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session && session.user){
     try { history.replaceState(null, "", location.pathname); } catch(e){}
-    if (session.user.id === ADMIN_UID) loadAdmin();
+    if (session.user.id === ADMIN_UID){ await ensureOwnProfile(session.user); loadAdmin(); }
     else { $("viewNope").style.display = "block"; }
   } else if (event === "SIGNED_OUT" || !session){
     $("viewSignin").style.display = "block";
@@ -208,7 +222,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
   const { data } = await sb.auth.getSession();
   $("viewLoading").style.display = "none";
   if (data && data.session && data.session.user){
-    if (data.session.user.id === ADMIN_UID) loadAdmin();
+    if (data.session.user.id === ADMIN_UID){ await ensureOwnProfile(data.session.user); loadAdmin(); }
     else $("viewNope").style.display = "block";
   } else $("viewSignin").style.display = "block";
 })();
