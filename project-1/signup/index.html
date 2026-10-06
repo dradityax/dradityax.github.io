@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign Up — Project One</title>
+<meta name="description" content="Create your Project One account — one profile for deadlines, forms and counselling help." />
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Quicksand', system-ui, sans-serif; background: #0a0a0c; color: #f2f0ea; min-height: 100vh; }
+  #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .topbar { position: relative; z-index: 2; padding: 16px; }
+  .backbtn { display: inline-flex; align-items: center; gap: 8px; color: #f2f0ea; background: rgba(255,255,255,.04);
+             border: 1px solid #f2f0ea; border-radius: 22px; padding: 9px 18px; font-size: .78rem; font-weight: 700;
+             text-decoration: none; letter-spacing: 1px; }
+  .mini-x { position: relative; z-index: 2; text-align: center; margin: 6px 0 2px; }
+  .xslot { display: inline-block; width: 74px; height: 46px; position: relative; }
+  .dx { position: absolute; inset: 0; animation: blink 5s infinite; }
+  .dx .ln { position: absolute; left: 50%; top: 50%; width: 52px; height: 3px; background: #f2f0ea; border-radius: 3px;
+            box-shadow: 0 0 6px #f2f0ea; transform-origin: center; }
+  .dx .l1 { transform: translate(-50%,-50%) rotate(38deg); }
+  .dx .l2 { transform: translate(-50%,-50%) rotate(-38deg); }
+  @keyframes blink { 0%, 92%, 100% { opacity: 1; } 95% { opacity: .15; } }
+  .wrap { position: relative; z-index: 2; max-width: 560px; margin: 0 auto; padding: 8px 18px 60px; }
+  h1 { font-size: 1.5rem; letter-spacing: 3px; text-align: center; margin: 10px 0 4px; }
+  .sub { text-align: center; color: rgba(255,255,255,.55); font-size: .92rem; margin-bottom: 18px; }
+  .prev { background: rgba(242,240,234,.06); border: 1px dashed rgba(242,240,234,.5); border-radius: 12px;
+          padding: 12px 16px; font-size: .85rem; color: #f2f0ea; margin-bottom: 18px; text-align: center; }
+  .card { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.1); border-radius: 16px;
+          padding: 22px; margin-bottom: 16px; display: none; }
+  .card.on { display: block; }
+  label { display: block; font-size: .78rem; letter-spacing: 1.5px; color: rgba(255,255,255,.6); margin: 14px 0 6px; }
+  input, select { width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16);
+                  border-radius: 10px; color: #f2f0ea; padding: 12px; font-size: 1rem; font-family: inherit; }
+  input:focus, select:focus { outline: none; border-color: #f2f0ea; }
+  input.err, select.err { border-color: #f0506e; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  button.go { width: 100%; margin-top: 20px; background: #f2f0ea; color: #111; border: none; border-radius: 12px;
+              padding: 15px; font-size: 1rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; font-family: inherit; }
+  button.go:disabled { opacity: .5; }
+  .note { font-size: .82rem; color: rgba(255,255,255,.5); margin-top: 12px; line-height: 1.5; }
+  .okmsg { color: #7fc97f; font-size: .9rem; margin-top: 10px; }
+  .warnline { color: #e8a13c; font-size: .82rem; margin: 4px 0 0; }
+  #sms { position: fixed; top: 12px; left: 50%; transform: translate(-50%,-140%); z-index: 50; width: min(92vw, 420px);
+         background: #16181d; border: 1px solid rgba(255,255,255,.2); border-radius: 14px; padding: 12px 16px;
+         transition: transform .45s cubic-bezier(.2,.9,.25,1.2); box-shadow: 0 12px 40px rgba(0,0,0,.6); }
+  #sms.show { transform: translate(-50%,0); }
+  #sms .from { font-size: .72rem; letter-spacing: 2px; color: rgba(255,255,255,.5); margin-bottom: 4px; }
+  #sms .body { font-size: 1rem; }
+  .done { text-align: center; padding: 30px 10px; }
+  .done .tick { font-size: 3rem; color: #7fc97f; }
+  .done h2 { letter-spacing: 2px; margin: 12px 0 8px; }
+  .fine { text-align: center; font-size: .75rem; color: rgba(255,255,255,.35); margin-top: 26px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div id="sms"><div class="from">SMS · SIMULATED — no real message was sent</div><div class="body" id="smsBody"></div></div>
+<div class="topbar"><a class="backbtn" href="../">&larr; PROJECT ONE</a></div>
+<div class="mini-x"><span class="xslot"><span class="dx"><span class="ln l1"></span><span class="ln l2"></span></span></span></div>
+<div class="wrap">
+  <h1>CREATE ACCOUNT</h1>
+  <p class="sub">One profile. Deadlines, forms, counselling — handled.</p>
+  <div class="prev" id="prevBanner">EARLY PREVIEW — real accounts are activating soon. This demo creates nothing yet.</div>
+
+  <div class="card on" id="step1">
+    <label>Full name</label><input type="text" id="s_name" placeholder="As on your Class 10 certificate" autocomplete="name">
+    <label>Email address</label><input type="email" id="s_email" placeholder="you@example.com" autocomplete="email">
+    <div class="warnline" id="emailWarn" style="display:none">⚠ Unusual email domain — double-check this is your real email. OTP comes here.</div>
+    <label>Mobile number</label><input type="tel" id="s_mob" placeholder="10-digit mobile" maxlength="10" inputmode="numeric" autocomplete="tel">
+    <div class="row">
+      <div><label>Exam</label><select id="s_exam"><option value="">Select</option><option>NEET-UG</option><option>JEE</option><option>CUET</option></select></div>
+      <div><label>Target year</label><select id="s_year"><option value="">Select</option><option>2027</option><option>2028</option><option>2029</option></select></div>
+    </div>
+    <div class="row">
+      <div><label>State</label><select id="s_state"><option value="">Select</option></select></div>
+      <div><label>Category</label><select id="s_cat"><option value="">Select</option><option>UR</option><option>EWS</option><option>OBC-NCL</option><option>SC</option><option>ST</option></select></div>
+    </div>
+    <button class="go" id="sendOtp">SEND OTP →</button>
+    <p class="note">We never ask for passwords — login is OTP-only. Your NTA password is yours alone; we will never ask for it.</p>
+  </div>
+
+  <div class="card" id="step2">
+    <label>Enter the 6-digit OTP sent to <b id="otpEcho"></b></label>
+    <input type="tel" id="s_otp" placeholder="••••••" maxlength="6" inputmode="numeric" style="text-align:center;letter-spacing:6px;font-size:1.3rem">
+    <button class="go" id="verifyOtp">VERIFY &amp; CREATE ACCOUNT</button>
+    <p class="note" id="mockNote" style="display:none">Preview mode: the OTP pops up on your screen, like the practice form.</p>
+    <div class="okmsg" id="otpOk" style="display:none">✓ Verified</div>
+  </div>
+
+  <div class="card" id="step3">
+    <div class="done">
+      <div class="tick">✓</div>
+      <h2>ACCOUNT CREATED</h2>
+      <p class="sub" id="doneMsg">Welcome aboard. This is a preview — real accounts activate soon.</p>
+      <a class="backbtn" href="../" style="margin-top:10px">← BACK TO PROJECT ONE</a>
+    </div>
+  </div>
+</div>
+<p class="fine">Project One · Phase 2 preview. Your details never leave this device in preview mode.<br>No account, no server, no tracking.</p>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============ SUPABASE CONFIG — paste keys here when Phase 2 goes live ============ */
+const SUPABASE_URL = "";
+const SUPABASE_ANON_KEY = "";
+const MOCK_MODE = !(SUPABASE_URL && SUPABASE_ANON_KEY);
+/* ================================================================================== */
+const $ = id => document.getElementById(id);
+const STATES = ["Andaman & Nicobar (UT)","Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh (UT)","Chhattisgarh","Dadra & Nagar Haveli","Daman & Diu (UT)","Delhi","Goa","Gujarat","Haryana","Himachal Pradesh","Jammu & Kashmir","Jharkhand","Karnataka","Kerala","Ladakh (UT)","Lakshadweep (UT)","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Outside India","Puducherry (UT)","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal"];
+$("s_state").innerHTML = '<option value="">Select</option>' + STATES.map(s => `<option>${s}</option>`).join("");
+if (MOCK_MODE) { $("prevBanner").style.display = "block"; $("mockNote").style.display = "block"; }
+else { $("prevBanner").style.display = "none"; }
+
+let sb = null;
+if (!MOCK_MODE) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ---- validators (same strictness as the practice form) ---- */
+function normName(v){ return v.trim().toLowerCase().replace(/\s+/g," "); }
+function nameProblem(v){
+  const t = normName(v), bare = t.replace(/ /g,"");
+  if (t.length < 3) return "too short";
+  if (/^(.)\1+$/.test(bare)) return "looks fake (repeated character)";
+  if (/^(xyz|abc|qwerty|asdf|test|demo|name)+$/.test(bare)) return "looks fake (keyboard gibberish)";
+  return null;
+}
+function mobileProblem(v){
+  if (!/^[6-9]\d{9}$/.test(v)) return "must be 10 digits starting with 6–9";
+  if (/^(\d)\1{9}$/.test(v)) return "looks fake (same digit repeated)";
+  let up = true, down = true;
+  for (let i = 1; i < 10; i++){ const d = +v[i] - +v[i-1]; if (d !== 1 && d !== -9) up = false; if (d !== -1 && d !== 9) down = false; }
+  if (up || down) return "looks fake (sequential digits)";
+  return null;
+}
+const COMMON_DOMAINS = ["gmail.com","yahoo.com","yahoo.in","outlook.com","hotmail.com","rediffmail.com","icloud.com","proton.me","protonmail.com","zoho.com"];
+function emailProblem(v){
+  if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/.test(v) || /\.\./.test(v)) return "invalid format";
+  return null;
+}
+function need(id){ const el = $(id); const bad = !el.value; el.classList.toggle("err", bad); if (bad) el.focus(); return !bad; }
+
+let mockOtp = null;
+$("sendOtp").addEventListener("click", async () => {
+  let msg = "Please fix the highlighted fields.";
+  let ok = true;
+  const np = nameProblem($("s_name").value);
+  if (!$("s_name").value.trim() || np){ $("s_name").classList.add("err"); ok = false; if (np) msg = "Name " + np + " — enter your real name."; }
+  else $("s_name").classList.remove("err");
+  const ep = emailProblem($("s_email").value);
+  if (ep){ $("s_email").classList.add("err"); ok = false; msg = "Email address: " + ep + "."; }
+  else {
+    $("s_email").classList.remove("err");
+    $("emailWarn").style.display = COMMON_DOMAINS.indexOf($("s_email").value.split("@")[1].toLowerCase()) === -1 ? "block" : "none";
+  }
+  const mp = mobileProblem($("s_mob").value);
+  if (mp){ $("s_mob").classList.add("err"); ok = false; msg = "Mobile number " + mp + "."; }
+  else $("s_mob").classList.remove("err");
+  ["s_exam","s_year","s_state","s_cat"].forEach(id => { if (!need(id)) ok = false; });
+  if (!ok){ alert(msg); return; }
+
+  $("sendOtp").disabled = true; $("sendOtp").textContent = "SENDING…";
+  try {
+    if (MOCK_MODE){
+      mockOtp = String(Math.floor(100000 + Math.random()*900000));
+      $("smsBody").innerHTML = `Your Project One OTP is <b>${mockOtp}</b>. <span style="color:#9a958a;font-size:.8rem">(PREVIEW — shown on screen, not by email)</span>`;
+      $("sms").classList.add("show");
+      setTimeout(() => $("sms").classList.remove("show"), 9000);
+    } else {
+      const { error } = await sb.auth.signInWithOtp({
+        email: $("s_email").value.trim(),
+        options: { data: { full_name: $("s_name").value.trim() } }
+      });
+      if (error) throw error;
+    }
+    $("otpEcho").textContent = $("s_email").value.trim();
+    $("step1").classList.remove("on"); $("step2").classList.add("on");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch(e){ alert("Could not send OTP: " + (e.message || e)); }
+  $("sendOtp").disabled = false; $("sendOtp").textContent = "SEND OTP →";
+});
+
+$("verifyOtp").addEventListener("click", async () => {
+  const code = $("s_otp").value.trim();
+  if (!/^\d{6}$/.test(code)){ $("s_otp").classList.add("err"); alert("Enter the 6-digit OTP."); return; }
+  $("verifyOtp").disabled = true; $("verifyOtp").textContent = "VERIFYING…";
+  try {
+    if (MOCK_MODE){
+      if (code !== mockOtp) throw new Error("Wrong OTP. Hint: it is shown in the on-screen message above.");
+    } else {
+      const { error } = await sb.auth.verifyOtp({ email: $("s_email").value.trim(), token: code, type: "email" });
+      if (error) throw error;
+      /* create/update profile row */
+      const { data: { user } } = await sb.auth.getUser();
+      await sb.from("profiles").upsert({
+        id: user.id,
+        full_name: $("s_name").value.trim(),
+        mobile: $("s_mob").value.trim(),
+        exam: $("s_exam").value,
+        target_year: parseInt($("s_year").value, 10),
+        state: $("s_state").value,
+        category: $("s_cat").value
+      });
+      $("doneMsg").textContent = "Welcome aboard, " + $("s_name").value.trim().split(" ")[0] + ". Your account is live.";
+    }
+    $("otpOk").style.display = "block";
+    setTimeout(() => { $("step2").classList.remove("on"); $("step3").classList.add("on"); window.scrollTo({ top: 0, behavior: "smooth" }); }, 600);
+  } catch(e){ $("s_otp").classList.add("err"); alert(e.message || e); }
+  $("verifyOtp").disabled = false; $("verifyOtp").textContent = "VERIFY & CREATE ACCOUNT";
+});
+</script>
+<script>
+(function(){
+  var cv = document.getElementById("stars"), cx = cv.getContext("2d"), stars = [], W, H;
+  function rs(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+  addEventListener("resize", rs); rs();
+  for (var i = 0; i < 90; i++) stars.push({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.3+.3, p: Math.random()*6.28, s: .4+Math.random()*.8 });
+  (function loop(t){
+    cx.clearRect(0,0,W,H);
+    for (var i = 0; i < stars.length; i++){ var st = stars[i];
+      cx.globalAlpha = .25 + .35*Math.abs(Math.sin(t/1600*st.s + st.p));
+      cx.fillStyle = "#fff"; cx.beginPath(); cx.arc(st.x, st.y, st.r, 0, 6.29); cx.fill(); }
+    cx.globalAlpha = 1; requestAnimationFrame(loop);
+  })(0);
+})();
+</script>
+</body>
+</html>
