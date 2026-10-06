@@ -40,11 +40,13 @@ gtag('config', 'G-XB41TSK7DE');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-#bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;opacity:0;transition:opacity 1.2s ease;
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:0;transition:opacity 1.2s ease;display:block;touch-action:none;
  -webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 #bg.show{opacity:1}
-#bg{animation:bgzoom 26s ease-in-out infinite alternate}
-@keyframes bgzoom{from{transform:scale(1)}to{transform:scale(1.07)}}
+#hud{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2;pointer-events:none;
+ font-family:Quicksand,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.28em;
+ color:rgba(255,255,255,.42);text-shadow:0 0 8px rgba(255,255,255,.2);opacity:0;transition:opacity 1.2s ease;white-space:nowrap}
+#hud.show{opacity:1}
 #shade{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 1.2s ease;
  background:linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.15) 35%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.45) 100%)}
 #shade.show{opacity:1}
@@ -178,7 +180,7 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 </style>
 </head>
 <body>
-<video id="bg" src="assets/bg.mp4" poster="assets/poster.jpg" autoplay muted loop playsinline preload="auto" controlslist="nodownload" disablepictureinpicture oncontextmenu="return false"></video>
+<canvas id="bg" aria-hidden="true"></canvas>
 <div id="shade"></div>
 <header class="brand">
   <h1 id="name" aria-label="ADITYA X">ADITYA <span class="xslot" aria-hidden="true"><span class="dx"><span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span><span class="glasses" id="dxg" aria-hidden="true"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span><span class="book" id="dxb" aria-hidden="true"><span class="page p1"></span><span class="page p2"></span></span></span></span></h1>
@@ -351,6 +353,148 @@ async function dxLoop(){
 setTimeout(function(){ if(!reduce) dxLoop(); }, 1500);
 
 setTimeout(revealAll, reduce?0:600);
+})();
+</script>
+<script>
+/* Starfall — playable spaceship background (approved demo) */
+(function(){
+"use strict";
+var cv=document.getElementById("bg");
+if(!cv||!cv.getContext)return;
+var ctx=cv.getContext("2d");
+var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var W=0,H=0,DPR=1,stars=[],mets=[],parts=[];
+var ship={x:0,y:0,tx:0,ty:0,inv:0,flash:0};
+var keys={},dist=0,stage=1,t0=0,last=0,spawnT=0,hudT=0,running=true;
+var hud=document.createElement("div");hud.id="hud";hud.setAttribute("aria-hidden","true");document.body.appendChild(hud);
+function rnd(a,b){return a+Math.random()*(b-a);}
+function initStars(){
+  stars.length=0;
+  var n=Math.max(60,Math.min(200,Math.round(W*H/11000)));
+  for(var i=0;i<n;i++)stars.push({x:rnd(0,W),y:rnd(0,H),z:rnd(.15,1)});
+}
+function resize(){
+  DPR=Math.min(window.devicePixelRatio||1,1.75);
+  W=window.innerWidth;H=window.innerHeight;
+  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  initStars();
+  if(!t0){ship.x=ship.tx=W/2;ship.y=ship.ty=H*0.74;}
+}
+window.addEventListener("resize",resize);
+function spawnMet(){
+  var r=rnd(9,26),v=[],n=8;
+  for(var i=0;i<n;i++){var a=i/n*Math.PI*2,rr=rnd(.72,1.08);v.push([Math.cos(a)*rr,Math.sin(a)*rr]);}
+  mets.push({x:rnd(-20,W+20),y:-40,vx:rnd(-30,30),vy:(70+stage*42)*rnd(.7,1.25),r:r,rot:rnd(0,6.28),vr:rnd(-1.5,1.5),v:v});
+}
+function burst(x,y){
+  for(var i=0;i<14;i++)parts.push({x:x,y:y,vx:rnd(-160,160),vy:rnd(-160,160),l:rnd(.3,.7),t:0});
+}
+function drawShip(){
+  var s=ship;
+  ctx.save();ctx.translate(s.x,s.y);
+  if(s.flash>0)ctx.globalAlpha=Math.max(.25,1-s.flash*2);
+  else if(s.inv>0&&Math.floor(s.inv*10)%2===0)ctx.globalAlpha=.3;
+  var fl=5+Math.random()*7+stage;
+  ctx.fillStyle="rgba(150,190,255,.5)";
+  ctx.beginPath();ctx.moveTo(-3.5,7);ctx.lineTo(0,7+fl);ctx.lineTo(3.5,7);ctx.closePath();ctx.fill();
+  ctx.fillStyle="#ffffff";
+  ctx.beginPath();ctx.moveTo(0,-11);ctx.lineTo(6.5,8);ctx.lineTo(0,3.5);ctx.lineTo(-6.5,8);ctx.closePath();ctx.fill();
+  ctx.restore();
+}
+function frame(now){
+  if(!running){requestAnimationFrame(frame);return;}
+  if(!last)last=now;
+  var dt=Math.min(.05,(now-last)/1000);last=now;
+  if(!t0)t0=now;
+  var el=(now-t0)/1000;
+  stage=Math.min(8,1+Math.floor(el/18));
+  dist+=dt*(46+stage*24);
+  var kx=((keys.ArrowRight||keys.KeyD)?1:0)-((keys.ArrowLeft||keys.KeyA)?1:0);
+  var ky=((keys.ArrowDown||keys.KeyS)?1:0)-((keys.ArrowUp||keys.KeyW)?1:0);
+  if(kx||ky){
+    ship.x=Math.max(14,Math.min(W-14,ship.x+kx*430*dt));
+    ship.y=Math.max(14,Math.min(H-14,ship.y+ky*430*dt));
+    ship.tx=ship.x;ship.ty=ship.y;
+  }else{
+    var e=Math.min(1,dt*7);
+    ship.x+=(ship.tx-ship.x)*e;ship.y+=(ship.ty-ship.y)*e;
+  }
+  if(ship.inv>0)ship.inv-=dt;
+  if(ship.flash>0)ship.flash-=dt;
+  spawnT-=dt;
+  var maxM=Math.min(44,10+stage*5);
+  if(spawnT<=0&&mets.length<maxM&&el>1.2){spawnMet();spawnT=Math.max(.16,.85-stage*.08);}
+  var i,m,dx,dy;
+  for(i=mets.length-1;i>=0;i--){
+    m=mets[i];
+    m.x+=m.vx*dt;m.y+=m.vy*dt;m.rot+=m.vr*dt;
+    if(m.y>H+60||m.x<-70||m.x>W+70){mets.splice(i,1);continue;}
+    dx=m.x-ship.x;dy=m.y-ship.y;
+    if(ship.inv<=0&&dx*dx+dy*dy<Math.pow(m.r*.78+8,2)){
+      ship.inv=2;ship.flash=.5;burst(ship.x,ship.y);
+      for(var j=mets.length-1;j>=0;j--){var o=mets[j],ox=o.x-ship.x,oy=o.y-ship.y;if(ox*ox+oy*oy<16900)mets.splice(j,1);}
+      break;
+    }
+  }
+  for(var p=parts.length-1;p>=0;p--){
+    var q=parts[p];q.t+=dt;
+    if(q.t>q.l){parts.splice(p,1);continue;}
+    q.x+=q.vx*dt;q.y+=q.vy*dt;
+  }
+  ctx.fillStyle="rgba(0,0,0,.55)";ctx.fillRect(0,0,W,H);
+  var spd=1+stage*.32,s,st;
+  for(s=0;s<stars.length;s++){
+    st=stars[s];
+    st.y+=st.z*46*spd*dt;
+    if(st.y>H+8){st.y=-8;st.x=rnd(0,W);}
+    var len=st.z*stage*9*spd;
+    ctx.strokeStyle="rgba(255,255,255,"+(0.25+st.z*0.5).toFixed(2)+")";
+    ctx.lineWidth=st.z*1.6;
+    ctx.beginPath();ctx.moveTo(st.x,st.y);ctx.lineTo(st.x,st.y-len);ctx.stroke();
+  }
+  for(var k=0;k<mets.length;k++){
+    var mm=mets[k];
+    ctx.save();ctx.translate(mm.x,mm.y);ctx.rotate(mm.rot);
+    ctx.fillStyle="rgba(158,158,170,.9)";
+    ctx.beginPath();
+    for(var vi=0;vi<mm.v.length;vi++){var pv=mm.v[vi];if(vi)ctx.lineTo(pv[0]*mm.r,pv[1]*mm.r);else ctx.moveTo(pv[0]*mm.r,pv[1]*mm.r);}
+    ctx.closePath();ctx.fill();
+    ctx.fillStyle="rgba(255,255,255,.28)";
+    ctx.beginPath();ctx.arc(-mm.r*.28,-mm.r*.28,mm.r*.3,0,6.29);ctx.fill();
+    ctx.restore();
+  }
+  for(var b=0;b<parts.length;b++){
+    var bp=parts[b],al=1-bp.t/bp.l;
+    ctx.fillStyle="rgba(255,255,255,"+(al*.9).toFixed(2)+")";
+    ctx.fillRect(bp.x,bp.y,2.4,2.4);
+  }
+  drawShip();
+  hudT-=dt;
+  if(hudT<=0){hud.textContent=Math.floor(dist).toLocaleString("en-US")+" m";hudT=.25;}
+  requestAnimationFrame(frame);
+}
+window.addEventListener("pointermove",function(e){
+  ship.tx=e.clientX;ship.ty=e.clientY-(e.pointerType==="touch"?46:0);
+},{passive:true});
+window.addEventListener("pointerdown",function(e){
+  ship.tx=e.clientX;ship.ty=e.clientY-(e.pointerType==="touch"?46:0);
+},{passive:true});
+window.addEventListener("keydown",function(e){
+  if((e.code.indexOf("Arrow")===0||e.code==="Space")&&e.target===document.body)e.preventDefault();
+  keys[e.code]=true;
+});
+window.addEventListener("keyup",function(e){keys[e.code]=false;});
+document.addEventListener("visibilitychange",function(){running=!document.hidden;last=0;});
+resize();
+if(reduced){
+  ctx.fillStyle="#000";ctx.fillRect(0,0,W,H);
+  for(var i=0;i<stars.length;i++){var st2=stars[i];ctx.fillStyle="rgba(255,255,255,"+(0.25+st2.z*0.5).toFixed(2)+")";ctx.fillRect(st2.x,st2.y,st2.z*1.8,st2.z*1.8);}
+  drawShip();
+}else{
+  requestAnimationFrame(frame);
+}
+setTimeout(function(){hud.classList.add("show");},1200);
 })();
 </script>
 </body>
