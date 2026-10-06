@@ -17,7 +17,7 @@
   @font-face { font-family: 'Quicksand'; src: url('/assets/quicksand.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
   #stars { position: fixed; inset: 0; z-index: 0; }
   body { font-family: Quicksand, -apple-system, "Segoe UI", sans-serif; }
-  .wrap, .prac { position: relative; z-index: 1; }
+  .wrap { position: relative; z-index: 1; }
   .topbar { position: relative; z-index: 1; max-width: 620px; margin: 0 auto; padding: 18px 16px 0; }
   .backbtn { display: inline-flex; align-items: center; gap: 8px; color: #f2f0ea; background: rgba(255,255,255,.04);
              border: 1px solid #f2f0ea; border-radius: 22px; padding: 9px 18px; font-size: .78rem; font-weight: 700;
@@ -33,8 +33,6 @@
   .mini-x .dx .l2 { transform: translateX(.20em) scaleY(.236); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0a0a0a; color: #f0ede6; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; padding: 0 0 40px; }
-  .prac { background: #f2f0ea; color: #111; text-align: center; font-weight: 800; letter-spacing: 1px;
-          padding: 10px 12px; font-size: 0.85rem; position: sticky; top: 0; z-index: 50; }
   .wrap { max-width: 620px; margin: 0 auto; padding: 24px 16px; }
   h1 { font-size: 1.4rem; letter-spacing: 2px; text-align: center; margin-bottom: 4px; }
   .sub { text-align: center; color: #9a958a; font-size: 0.85rem; margin-bottom: 20px; }
@@ -92,13 +90,12 @@
   #dlPdf.on { display: block; }
   @media print {
     body { background: #fff; padding: 0; }
-    .prac, #sms, canvas, .topbar, .mini-x, .wrap .card, #dlPdf { display: none !important; }
+    #sms, canvas, .topbar, .mini-x, .wrap .card, #dlPdf { display: none !important; }
     #sheet { display: block !important; border-radius: 0; margin: 0; }
   }
 </style>
 </head>
 <body>
-<div class="prac">⚠ PRACTICE FORM — this is NOT the real NTA form. Nothing here registers you.</div>
 <div id="sms"><div class="body" id="smsBody"></div></div>
 
 <canvas id="stars"></canvas>
