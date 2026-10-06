@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Account — Project One</title>
+<meta name="description" content="Your Project One account — profile, deadlines and personal notifications." />
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Quicksand', system-ui, sans-serif; background: #0a0a0c; color: #f2f0ea; min-height: 100vh; }
+  #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .topbar { position: relative; z-index: 2; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .backbtn { display: inline-flex; align-items: center; gap: 8px; color: #f2f0ea; background: rgba(255,255,255,.04);
+             border: 1px solid #f2f0ea; border-radius: 22px; padding: 9px 18px; font-size: .78rem; font-weight: 700;
+             text-decoration: none; letter-spacing: 1px; }
+  .mini-x { position: relative; z-index: 2; text-align: center; margin: 6px 0 2px; }
+  .xslot { display: inline-block; width: 74px; height: 46px; position: relative; }
+  .dx { position: absolute; inset: 0; animation: blink 5s infinite; }
+  .dx .ln { position: absolute; left: 50%; top: 50%; width: 52px; height: 3px; background: #f2f0ea; border-radius: 3px;
+            box-shadow: 0 0 6px #f2f0ea; transform-origin: center; }
+  .dx .l1 { transform: translate(-50%,-50%) rotate(38deg); }
+  .dx .l2 { transform: translate(-50%,-50%) rotate(-38deg); }
+  @keyframes blink { 0%, 92%, 100% { opacity: 1; } 95% { opacity: .15; } }
+  .wrap { position: relative; z-index: 2; max-width: 560px; margin: 0 auto; padding: 8px 18px 60px; }
+  h1 { font-size: 1.5rem; letter-spacing: 3px; text-align: center; margin: 10px 0 4px; }
+  .sub { text-align: center; color: rgba(255,255,255,.55); font-size: .92rem; margin-bottom: 18px; }
+  .card { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.1); border-radius: 16px;
+          padding: 22px; margin-bottom: 16px; display: none; }
+  .card.on { display: block; }
+  label { display: block; font-size: .78rem; letter-spacing: 1.5px; color: rgba(255,255,255,.6); margin: 14px 0 6px; }
+  input, select, textarea { width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16);
+                  border-radius: 10px; color: #f2f0ea; padding: 12px; font-size: 1rem; font-family: inherit; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: #f2f0ea; }
+  button.go { width: 100%; margin-top: 20px; background: #f2f0ea; color: #111; border: none; border-radius: 12px;
+              padding: 15px; font-size: 1rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; font-family: inherit; }
+  button.go:disabled { opacity: .5; }
+  button.ghost { width: 100%; margin-top: 12px; background: transparent; color: #f2f0ea; border: 1px solid rgba(255,255,255,.25);
+              border-radius: 12px; padding: 13px; font-size: .9rem; font-weight: 700; letter-spacing: 2px; cursor: pointer; font-family: inherit; }
+  .note { font-size: .82rem; color: rgba(255,255,255,.5); margin-top: 12px; line-height: 1.5; }
+  .prow { display: flex; justify-content: space-between; gap: 12px; padding: 10px 2px; border-bottom: 1px solid rgba(255,255,255,.07); font-size: .92rem; }
+  .prow:last-child { border-bottom: none; }
+  .prow .k { color: rgba(255,255,255,.5); letter-spacing: 1px; font-size: .78rem; padding-top: 2px; }
+  .prow .v { text-align: right; font-weight: 600; }
+  .sechd { font-size: .85rem; letter-spacing: 3px; color: rgba(255,255,255,.6); margin: 22px 0 10px; text-align: center; }
+  .notif { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; }
+  .notif.unread { border-color: #f2f0ea; background: rgba(242,240,234,.08); }
+  .notif .t { font-weight: 700; font-size: .95rem; margin-bottom: 4px; }
+  .notif .m { font-size: .88rem; color: rgba(255,255,255,.75); line-height: 1.55; white-space: pre-wrap; }
+  .notif .d { font-size: .72rem; color: rgba(255,255,255,.4); margin-top: 8px; letter-spacing: 1px; }
+  .notif .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #f2f0ea; margin-right: 8px; }
+  .empty { text-align: center; color: rgba(255,255,255,.4); font-size: .88rem; padding: 18px 0; }
+  .fine { text-align: center; font-size: .75rem; color: rgba(255,255,255,.35); margin-top: 26px; line-height: 1.6; }
+  .loading { text-align: center; padding: 40px 0; color: rgba(255,255,255,.5); }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="topbar">
+  <a class="backbtn" href="../">&larr; PROJECT ONE</a>
+  <a class="backbtn" href="../signup/" id="acctBtn" style="display:none">SIGN IN</a>
+</div>
+<div class="mini-x"><span class="xslot"><span class="dx"><span class="ln l1"></span><span class="ln l2"></span></span></span></div>
+<div class="wrap">
+  <div class="loading" id="viewLoading">Checking your session…</div>
+
+  <div class="card" id="viewSignin">
+    <h1>SIGN IN</h1>
+    <p class="sub">One tap on the email link signs you in.</p>
+    <label>Email address</label>
+    <input type="email" id="d_email" placeholder="you@example.com" autocomplete="email">
+    <button class="go" id="d_send">SEND LINK →</button>
+    <p class="note">New here? <a href="../signup/" style="color:#f2f0ea">Create your account first</a> — then come back and sign in.</p>
+  </div>
+
+  <div id="viewDash" style="display:none">
+    <h1 id="d_hi">MY ACCOUNT</h1>
+    <p class="sub" id="d_sub">Your profile &amp; personal updates.</p>
+    <div class="card on" style="display:block">
+      <div id="profRows"></div>
+    </div>
+    <div class="sechd">NOTIFICATIONS</div>
+    <div id="notifList"></div>
+    <button class="ghost" id="d_out">SIGN OUT</button>
+  </div>
+</div>
+<p class="fine">Project One · Secure accounts via Supabase (free tier).<br>Passwordless login — we never see or store passwords.</p>
+
+<script src="../signup/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://vpduxwujkzahjhkaehyz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GnnsBs6fTl_z-I7JkOcyRA_qoObJFhU";
+const DASH_URL = "https://dradityax.pages.dev/project-1/dashboard/";
+const $ = id => document.getElementById(id);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let me = null;
+
+function show(which){
+  ["viewLoading","viewSignin"].forEach(v => $(v).style.display = "none");
+  $("viewDash").style.display = "none"; $("acctBtn").style.display = "none";
+  if (which === "signin"){ $("viewSignin").classList.add("on"); $("viewSignin").style.display = "block"; }
+  if (which === "dash"){ $("viewDash").style.display = "block"; }
+  if (which === "loading"){ $("viewLoading").style.display = "block"; }
+}
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function fmtDate(iso){ try { return new Date(iso).toLocaleString("en-IN", { day:"numeric", month:"short", hour:"numeric", minute:"2-digit" }); } catch(e){ return ""; } }
+
+async function loadDash(){
+  show("dash");
+  const md = (me.user_metadata) || {};
+  // ensure profile row exists (upsert from metadata, same as signup page)
+  const prof = {
+    id: me.id, email: me.email,
+    full_name: md.full_name || null, mobile: md.mobile || null,
+    exam: md.exam || "NEET-UG", target_year: parseInt(md.target_year, 10) || 2027,
+    state: md.state || null, category: md.category || null
+  };
+  try { await sb.from("profiles").upsert(prof, { onConflict: "id" }); } catch(e){ console.warn("profile upsert:", e.message); }
+  let row = null;
+  try {
+    const r = await sb.from("profiles").select("*").eq("id", me.id).single();
+    if (!r.error) row = r.data;
+  } catch(e){}
+  row = row || prof;
+  const first = String(row.full_name || "friend").split(" ")[0];
+  $("d_hi").textContent = "HEY, " + first.toUpperCase();
+  const rows = [
+    ["Name", row.full_name], ["Email", row.email || me.email], ["Exam", row.exam],
+    ["Target year", row.target_year], ["State", row.state], ["Category", row.category]
+  ];
+  $("profRows").innerHTML = rows.map(([k,v]) =>
+    `<div class="prow"><span class="k">${k.toUpperCase()}</span><span class="v">${esc(v || "—")}</span></div>`).join("");
+  // notifications
+  let notifs = [];
+  try {
+    const r = await sb.from("notifications").select("*").eq("user_id", me.id).order("created_at", { ascending: false }).limit(50);
+    if (!r.error) notifs = r.data || [];
+  } catch(e){ console.warn("notifs:", e.message); }
+  if (!notifs.length){
+    $("notifList").innerHTML = `<div class="empty">No notifications yet.<br>Important updates from Aditya X will appear here.</div>`;
+  } else {
+    $("notifList").innerHTML = notifs.map(n =>
+      `<div class="notif${n.read ? "" : " unread"}" data-id="${n.id}">
+         <div class="t">${n.read ? "" : '<span class="dot"></span>'}${esc(n.title)}</div>
+         <div class="m">${esc(n.message)}</div>
+         <div class="d">${fmtDate(n.created_at).toUpperCase()}</div>
+       </div>`).join("");
+    $("notifList").querySelectorAll(".notif.unread").forEach(el => {
+      el.addEventListener("click", async () => {
+        el.classList.remove("unread");
+        const dot = el.querySelector(".dot"); if (dot) dot.remove();
+        try { await sb.from("notifications").update({ read: true }).eq("id", el.dataset.id); } catch(e){}
+      });
+    });
+  }
+}
+
+$("d_send").addEventListener("click", async () => {
+  const em = $("d_email").value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){ alert("Please enter a valid email address."); return; }
+  $("d_send").disabled = true; $("d_send").textContent = "SENDING…";
+  try {
+    const { error } = await sb.auth.signInWithOtp({ email: em, options: { emailRedirectTo: DASH_URL } });
+    if (error) throw error;
+    alert("Link sent! Tap the button in the email — you'll land right back here.");
+  } catch(e){ alert("Could not send the link: " + (e.message || e)); }
+  $("d_send").disabled = false; $("d_send").textContent = "SEND LINK →";
+});
+$("d_out").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session && session.user){
+    me = session.user; await loadDash();
+    try { history.replaceState(null, "", location.pathname); } catch(e){}
+  } else if (event === "SIGNED_OUT"){
+    me = null; show("signin"); $("acctBtn").style.display = "none";
+  }
+});
+(async () => {
+  show("loading");
+  const { data } = await sb.auth.getSession();
+  if (data && data.session && data.session.user){ me = data.session.user; await loadDash(); }
+  else { show("signin"); }
+})();
+</script>
+<script>
+(function(){
+  var cv = document.getElementById("stars"), cx = cv.getContext("2d"), stars = [], W, H;
+  function rs(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+  addEventListener("resize", rs); rs();
+  for (var i = 0; i < 90; i++) stars.push({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.3+.3, p: Math.random()*6.28, s: .4+Math.random()*.8 });
+  (function loop(t){
+    cx.clearRect(0,0,W,H);
+    for (var i = 0; i < stars.length; i++){ var st = stars[i];
+      cx.globalAlpha = .25 + .35*Math.abs(Math.sin(t/1600*st.s + st.p));
+      cx.fillStyle = "#fff"; cx.beginPath(); cx.arc(st.x, st.y, st.r, 0, 6.29); cx.fill(); }
+    cx.globalAlpha = 1; requestAnimationFrame(loop);
+  })(0);
+})();
+</script>
+</body>
+</html>
