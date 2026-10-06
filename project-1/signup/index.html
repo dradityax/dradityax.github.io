@@ -203,6 +203,7 @@ async function completeSignup(user){
   const md = user.user_metadata || {};
   const prof = {
     id: user.id,
+    email: user.email,
     full_name: md.full_name || $("s_name").value.trim() || null,
     mobile: md.mobile || $("s_mob").value.trim() || null,
     exam: md.exam || $("s_exam").value || null,
