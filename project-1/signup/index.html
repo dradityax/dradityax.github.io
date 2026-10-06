@@ -98,20 +98,23 @@
     </div>
   </div>
 </div>
-<p class="fine">Project One · Phase 2 preview. Your details never leave this device in preview mode.<br>No account, no server, no tracking.</p>
+<p class="fine" id="fineLine">Project One · Phase 2 preview. Your details never leave this device in preview mode.<br>No account, no server, no tracking.</p>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase.min.js"></script>
 <script>
-/* ============ SUPABASE CONFIG — paste keys here when Phase 2 goes live ============ */
-const SUPABASE_URL = "";
-const SUPABASE_ANON_KEY = "";
+/* ============ SUPABASE CONFIG — Phase 2 live ============ */
+const SUPABASE_URL = "https://fpduxwujkzahjhkaehyz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GnnsBs6fTl_z-I7JkOcyRA_qoObJFhU";
 const MOCK_MODE = !(SUPABASE_URL && SUPABASE_ANON_KEY);
-/* ================================================================================== */
+/* ========================================================== */
 const $ = id => document.getElementById(id);
 const STATES = ["Andaman & Nicobar (UT)","Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh (UT)","Chhattisgarh","Dadra & Nagar Haveli","Daman & Diu (UT)","Delhi","Goa","Gujarat","Haryana","Himachal Pradesh","Jammu & Kashmir","Jharkhand","Karnataka","Kerala","Ladakh (UT)","Lakshadweep (UT)","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Outside India","Puducherry (UT)","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal"];
 $("s_state").innerHTML = '<option value="">Select</option>' + STATES.map(s => `<option>${s}</option>`).join("");
 if (MOCK_MODE) { $("prevBanner").style.display = "block"; $("mockNote").style.display = "block"; }
-else { $("prevBanner").style.display = "none"; }
+else {
+  $("prevBanner").style.display = "none";
+  $("fineLine").innerHTML = "Project One · Secure accounts via Supabase (free tier).<br>OTP login only — we never see or store passwords.";
+}
 
 let sb = null;
 if (!MOCK_MODE) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
