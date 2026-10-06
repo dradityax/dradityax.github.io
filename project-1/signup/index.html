@@ -178,7 +178,8 @@ $("sendOtp").addEventListener("click", async () => {
          https://dradityax.pages.dev/project-1/signup/ for the link to land back here. */
       const { error } = await sb.auth.signInWithOtp({
         email: $("s_email").value.trim(),
-        options: { data: {
+        options: { emailRedirectTo: "https://dradityax.pages.dev/project-1/signup/",
+          data: {
           full_name: $("s_name").value.trim(),
           mobile: $("s_mob").value.trim() || null,
           exam: $("s_exam").value,
