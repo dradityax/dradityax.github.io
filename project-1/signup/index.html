@@ -68,7 +68,7 @@
     <label>Full name</label><input type="text" id="s_name" placeholder="As on your Class 10 certificate" autocomplete="name">
     <label>Email address</label><input type="email" id="s_email" placeholder="you@example.com" autocomplete="email">
     <div class="warnline" id="emailWarn" style="display:none">⚠ Unusual email domain — double-check this is your real email. OTP comes here.</div>
-    <label>Mobile number</label><input type="tel" id="s_mob" placeholder="10-digit mobile" maxlength="10" inputmode="numeric" autocomplete="tel">
+    <label>Mobile number (optional)</label><input type="tel" id="s_mob" placeholder="10-digit mobile — only if you want SMS alerts later" maxlength="10" inputmode="numeric" autocomplete="tel">
     <div class="row">
       <div><label>Exam</label><select id="s_exam"><option value="">Select</option><option>NEET-UG</option><option>JEE</option><option>CUET</option></select></div>
       <div><label>Target year</label><select id="s_year"><option value="">Select</option><option>2027</option><option>2028</option><option>2029</option></select></div>
@@ -156,9 +156,12 @@ $("sendOtp").addEventListener("click", async () => {
     $("s_email").classList.remove("err");
     $("emailWarn").style.display = COMMON_DOMAINS.indexOf($("s_email").value.split("@")[1].toLowerCase()) === -1 ? "block" : "none";
   }
-  const mp = mobileProblem($("s_mob").value);
-  if (mp){ $("s_mob").classList.add("err"); ok = false; msg = "Mobile number " + mp + "."; }
-  else $("s_mob").classList.remove("err");
+  const mobVal = $("s_mob").value.trim();
+  if (mobVal) {
+    const mp = mobileProblem(mobVal);
+    if (mp){ $("s_mob").classList.add("err"); ok = false; msg = "Mobile number " + mp + "."; }
+    else $("s_mob").classList.remove("err");
+  } else $("s_mob").classList.remove("err");
   ["s_exam","s_year","s_state","s_cat"].forEach(id => { if (!need(id)) ok = false; });
   if (!ok){ alert(msg); return; }
 
@@ -199,7 +202,7 @@ $("verifyOtp").addEventListener("click", async () => {
         await sb.from("profiles").upsert({
           id: user.id,
           full_name: $("s_name").value.trim(),
-          mobile: $("s_mob").value.trim(),
+          mobile: $("s_mob").value.trim() || null,
           exam: $("s_exam").value,
           target_year: parseInt($("s_year").value, 10),
           state: $("s_state").value,
