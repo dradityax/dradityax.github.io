@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project One — NEET Practice Tools | Aditya X</title>
+<meta name="description" content="Project One: free NEET-UG practice tools — simulated form practice, document converter, deadline alerts. Practice everything, fear nothing.">
+<link rel="canonical" href="https://dradityax.pages.dev/project-1/">
+<style>
+  @font-face { font-family: 'Quicksand'; src: url('/assets/quicksand.woff2') format('woff2'); font-weight: 400 700; font-display: swap; }
+  :root { --acc: #f2f0ea; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #050505; color: #f0ede6; font-family: Quicksand, -apple-system, "Segoe UI", sans-serif;
+         min-height: 100vh; overflow-x: hidden; }
+  #stars { position: fixed; inset: 0; z-index: 0; }
+  .wrap { position: relative; z-index: 1; max-width: 620px; margin: 0 auto; padding: 20px 18px 60px; }
+  /* ---------- X mascot (from homepage) ---------- */
+  .mascot { text-align: center; margin: 6px 0 0; }
+  .xslot { position: relative; display: inline-block; width: .78em; height: .72em; font-size: 118px; }
+  .dx { position: absolute; inset: 0; }
+  .dx .ln { position: absolute; top: 0; left: 50%; width: .17em; height: 100%; background: #fff;
+            border-radius: 50%; box-shadow: 0 0 6px var(--acc); transform-origin: center; }
+  .dx .l1 { transform: translateX(-.20em) scaleY(.236); }
+  .dx .l2 { transform: translateX(.20em) scaleY(.236); }
+  .dx .glasses { position: absolute; inset: 0; opacity: 0; transform: scale(.6); transform-origin: center;
+                 transition: opacity .35s ease, transform .45s cubic-bezier(.2,1.6,.4,1); pointer-events: none; }
+  .dx .glasses.show { opacity: 1; transform: scale(1); }
+  .dx .rim { position: absolute; top: 50%; left: 50%; width: .26em; height: .26em; border: .04em solid #fff;
+             border-radius: 50%; box-shadow: 0 0 5px var(--acc); }
+  .dx .r1 { transform: translate(-50%,-50%) translateX(-.20em); }
+  .dx .r2 { transform: translate(-50%,-50%) translateX(.20em); }
+  .dx .bridge { position: absolute; top: 50%; left: 50%; width: .18em; height: .04em; background: #fff;
+                border-radius: .02em; transform: translate(-50%,-50%); }
+  .dx .book { position: absolute; left: 50%; bottom: -4%; width: .48em; height: .26em;
+              transform: translateX(-50%) scale(0); transform-origin: center bottom;
+              transition: transform .45s cubic-bezier(.2,1.5,.4,1); pointer-events: none; }
+  .dx .book.open { transform: translateX(-50%) scale(1); }
+  .dx .page { position: absolute; top: 0; width: 50%; height: 100%;
+              background: repeating-linear-gradient(to bottom, #f7f2e7 0 .045em, #d9d4c4 .045em .06em); }
+  .dx .p1 { left: 0; transform: skewY(-7deg); transform-origin: right center; }
+  .dx .p2 { right: 0; transform: skewY(7deg); transform-origin: left center; }
+  h1 { text-align: center; font-size: 1.5rem; letter-spacing: 6px; margin-top: 10px; font-weight: 700; }
+  h1 .xcol { color: var(--acc); }
+  .tag { text-align: center; color: rgba(255,255,255,.6); font-size: .85rem; margin: 8px 0 24px; letter-spacing: 1px; }
+  .sec { font-size: .75rem; letter-spacing: 3px; color: rgba(255,255,255,.5); margin: 24px 0 12px; }
+  /* ---------- screens: app-like slide ---------- */
+  .screen { transition: transform .45s cubic-bezier(.22,.9,.24,1), opacity .35s ease; }
+  #screenNeet { position: fixed; inset: 0; z-index: 5; overflow-y: auto; -webkit-overflow-scrolling: touch;
+                transform: translateX(103%);
+                background: radial-gradient(120% 90% at 50% 0%, #0b0b10 0%, #050505 62%); }
+  body.neet #screenNeet { transform: translateX(0); }
+  body.neet #screenHub { transform: translateX(-16%) scale(.985); opacity: .3; pointer-events: none; }
+  .backbtn { display: inline-flex; align-items: center; gap: 8px; color: var(--acc); background: rgba(255,255,255,.04);
+             border: 1px solid var(--acc); border-radius: 22px; padding: 9px 18px; font-size: .78rem; font-weight: 700;
+             letter-spacing: 2px; cursor: pointer; font-family: inherit; margin-bottom: 4px;
+             transition: transform .18s ease, background .2s ease; }
+  .backbtn:active { transform: scale(.94); background: rgba(255,255,255,.09); }
+  .mini-x .xslot { font-size: 62px; }
+  .mini-x { margin-top: 2px; }
+  /* ---------- tiles ---------- */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tile { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.12); border-radius: 16px;
+          padding: 26px 12px; text-align: center; cursor: pointer;
+          transition: transform .16s cubic-bezier(.3,1.4,.4,1), border-color .25s, box-shadow .25s; }
+  .tile:active { transform: scale(.94); }
+  .tile.live { border-color: var(--acc); box-shadow: 0 0 24px -6px var(--acc); }
+  .tile .t { font-size: 1.15rem; font-weight: 700; letter-spacing: 2px; }
+  .tile .s { font-size: .72rem; color: rgba(255,255,255,.55); margin-top: 6px; }
+  .tile .wip { display: inline-block; margin-top: 8px; font-size: .65rem; letter-spacing: 1px; color: var(--acc);
+               border: 1px solid var(--acc); border-radius: 20px; padding: 3px 10px; }
+  /* ---------- tool cards ---------- */
+  .tool { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.04);
+          border: 1px solid rgba(255,255,255,.12); border-radius: 16px; padding: 18px 16px; margin-bottom: 12px;
+          color: inherit; text-decoration: none; opacity: 0; transform: translateY(14px);
+          animation: cardin .5s cubic-bezier(.22,.9,.24,1) forwards; transition: transform .16s ease, border-color .2s; }
+  .tool:active { transform: scale(.97); }
+  body.neet .tool:nth-child(1) { animation-delay: .12s; } body.neet .tool:nth-child(2) { animation-delay: .2s; }
+  body.neet .tool:nth-child(3) { animation-delay: .28s; } body.neet .tool:nth-child(4) { animation-delay: .36s; }
+  @keyframes cardin { to { opacity: 1; transform: none; } }
+  .tool .ic { font-size: 1.7rem; }
+  .tool .tt { font-weight: 700; letter-spacing: 1px; }
+  .tool .td { font-size: .78rem; color: rgba(255,255,255,.55); margin-top: 3px; line-height: 1.5; }
+  .tool .go { margin-left: auto; color: var(--acc); font-size: 1.4rem; }
+  .tool.soon { opacity: .45; }
+  body.neet .tool.soon { animation: none; opacity: .45; transform: none; }
+  .fine { text-align: center; font-size: .72rem; color: rgba(255,255,255,.4); margin-top: 30px; line-height: 1.7; }
+  .fine b { color: var(--acc); }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<div class="wrap screen" id="screenHub">
+  <div class="mascot"><span class="xslot"><span class="dx">
+    <span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span>
+    <span class="glasses" id="dxg"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span>
+    <span class="book" id="dxb"><span class="page p1"></span><span class="page p2"></span></span>
+  </span></span></div>
+  <h1>PROJECT <span class="xcol">ONE</span></h1>
+  <p class="tag">practice everything &middot; fear nothing</p>
+  <div class="sec">CHOOSE YOUR EXAM</div>
+  <div class="tiles">
+    <div class="tile live" id="tileNeet"><div class="t">NEET-UG</div><div class="s">Medical &middot; live now</div></div>
+    <div class="tile"><div class="t">JEE</div><div class="s">Engineering</div><br><span class="wip">WORK IN PROGRESS</span></div>
+    <div class="tile"><div class="t">CUET</div><div class="s">Universities</div><br><span class="wip">WORK IN PROGRESS</span></div>
+    <div class="tile"><div class="t">UGMAC</div><div class="s">Bihar counselling</div><br><span class="wip">WORK IN PROGRESS</span></div>
+  </div>
+  <p class="fine" style="margin-top:26px">Tap <b>NEET-UG</b> to enter its practice room.</p>
+</div>
+
+<div id="screenNeet" class="screen"><div class="wrap">
+  <button class="backbtn" id="backBtn">&larr; ALL EXAMS</button>
+  <div class="mascot mini-x"><span class="xslot"><span class="dx">
+    <span class="ln l1" id="dxn1"></span><span class="ln l2" id="dxn2"></span>
+    <span class="glasses" id="dxng"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span>
+    <span class="book" id="dxnb"><span class="page p1"></span><span class="page p2"></span></span>
+  </span></span></div>
+  <h1>NEET-<span class="xcol">UG</span></h1>
+  <p class="tag">what do you want to practice today?</p>
+  <div class="sec">TOOLS</div>
+  <a class="tool" href="form-practice/"><div class="ic">&#x1F4DD;</div><div><div class="tt">Form Practice</div>
+    <div class="td">Fill the exact NEET form pattern &mdash; OTP, payment, captcha &mdash; all simulated. Make mistakes here, not there.</div></div><div class="go">&rarr;</div></a>
+  <a class="tool" href="converter/"><div class="ic">&#x1F5BC;&#xFE0F;</div><div><div class="tt">Doc Converter</div>
+    <div class="td">Any photo &rarr; exact NTA format &amp; size. In your browser, nothing uploaded.</div></div><div class="go">&rarr;</div></a>
+  <div class="tool soon"><div class="ic">&#x1F514;</div><div><div class="tt">Deadline Alerts</div>
+    <div class="td">Coming soon &mdash; personalized reminders for your NEET year.</div></div></div>
+  <div class="tool soon"><div class="ic">&#x1F4DA;</div><div><div class="tt">Sample Papers</div>
+    <div class="td">Coming soon.</div></div></div>
+  <p class="fine">Everything here is <b>practice</b> &mdash; real registration happens only on the NTA site.<br>
+  Your data never leaves your device.</p>
+</div></div>
+
+<script>
+var cv = document.getElementById('stars'), cx = cv.getContext('2d'), stars = [], W, H;
+function rs() { W = cv.width = innerWidth; H = cv.height = innerHeight; }
+rs(); addEventListener('resize', rs);
+for (var i = 0; i < 110; i++) stars.push({ x: Math.random(), y: Math.random(), z: Math.random() });
+(function loop() {
+  cx.fillStyle = '#050505'; cx.fillRect(0, 0, W, H);
+  for (var s = 0; s < stars.length; s++) {
+    var st = stars[s]; st.y += st.z * 0.0006; if (st.y > 1) st.y = 0;
+    cx.fillStyle = 'rgba(255,255,255,' + (0.2 + st.z * 0.6).toFixed(2) + ')';
+    cx.fillRect(st.x * W, st.y * H, st.z * 1.8, st.z * 1.8);
+  }
+  requestAnimationFrame(loop);
+})();
+/* ---- X mascot, from the homepage ---- */
+function $(id){ return document.getElementById(id); }
+function mountX(p){
+  var dx1 = $(p+"1"), dx2 = $(p+"2"), dxg = $(p+"g"), dxb = $(p+"b");
+  function dxSet(el, tf, ms, ease){
+    el.style.transition = "transform " + ms + "ms " + (ease || "ease-in-out");
+    el.style.transform = tf;
+    return new Promise(function(r){ setTimeout(r, ms); });
+  }
+  var DX_DOT1 = "translateX(-.20em) scaleY(.236)", DX_DOT2 = "translateX(.20em) scaleY(.236)";
+  var DX_BLINK1 = "translateX(-.20em) scaleY(.02)", DX_BLINK2 = "translateX(.20em) scaleY(.02)";
+  var DX_LINE1 = "translateX(-.20em) scaleY(1)", DX_LINE2 = "translateX(.20em) scaleY(1)";
+  var DX_X1 = "translateX(-50%) rotate(40deg) scaleY(1)", DX_X2 = "translateX(-50%) rotate(-40deg) scaleY(1)";
+  function dxBlink(){
+    return Promise.all([ dxSet(dx1, DX_BLINK1, 150, "ease-in"), dxSet(dx2, DX_BLINK2, 150, "ease-in") ])
+      .then(function(){ return Promise.all([ dxSet(dx1, DX_DOT1, 200, "ease-out"), dxSet(dx2, DX_DOT2, 200, "ease-out") ]); });
+  }
+  function dxGlasses(){
+    dxg.classList.add("show");
+    return new Promise(function(r){ setTimeout(r, 700); }).then(dxBlink)
+      .then(function(){ return new Promise(function(r){ setTimeout(r, 2200); }); })
+      .then(function(){ dxg.classList.remove("show"); return new Promise(function(r){ setTimeout(r, 450); }); });
+  }
+  async function dxRead(){
+    dxb.classList.add("open");
+    await new Promise(function(r){ setTimeout(r, 550); });
+    for (var i = 0; i < 3; i++) {
+      await Promise.all([ dxSet(dx1, "translateX(-.14em) scaleY(.236)", 380), dxSet(dx2, "translateX(.26em) scaleY(.236)", 380) ]);
+      await Promise.all([ dxSet(dx1, "translateX(-.26em) scaleY(.236)", 380), dxSet(dx2, "translateX(.14em) scaleY(.236)", 380) ]);
+    }
+    await Promise.all([ dxSet(dx1, DX_DOT1, 320), dxSet(dx2, DX_DOT2, 320) ]);
+    await new Promise(function(r){ setTimeout(r, 350); });
+    dxb.classList.remove("open");
+    await new Promise(function(r){ setTimeout(r, 500); });
+  }
+  var dxN = 0;
+  async function dxLoop(){
+    while (true) {
+      dxN++;
+      await new Promise(function(r){ setTimeout(r, 2800); });
+      for (var i = 0; i < 2; i++) { await dxBlink(); await new Promise(function(r){ setTimeout(r, i < 1 ? 1200 : 2200); }); }
+      if (dxN % 4 === 2) { await dxGlasses(); }
+      else if (dxN % 4 === 0) { await dxRead(); }
+      await new Promise(function(r){ setTimeout(r, 1500); });
+      await Promise.all([ dxSet(dx1, DX_LINE1, 1100), dxSet(dx2, DX_LINE2, 1100) ]);
+      await new Promise(function(r){ setTimeout(r, 900); });
+      await Promise.all([ dxSet(dx1, DX_X1, 1500, "cubic-bezier(.3,1.2,.4,1)"), dxSet(dx2, DX_X2, 1500, "cubic-bezier(.3,1.2,.4,1)") ]);
+      await new Promise(function(r){ setTimeout(r, 8000); });
+      await Promise.all([ dxSet(dx1, DX_LINE1, 1300), dxSet(dx2, DX_LINE2, 1300) ]);
+      await new Promise(function(r){ setTimeout(r, 700); });
+      await Promise.all([ dxSet(dx1, DX_DOT1, 1100), dxSet(dx2, DX_DOT2, 1100) ]);
+    }
+  }
+  setTimeout(dxLoop, 1500);
+}
+mountX("dx");
+mountX("dxn");
+document.getElementById("tileNeet").onclick = function() { document.body.classList.add("neet"); };
+document.getElementById("backBtn").onclick = function() { document.body.classList.remove("neet"); };
+</script>
+</body>
+</html>
