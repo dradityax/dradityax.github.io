@@ -57,6 +57,35 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
  font-family:Quicksand,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.28em;
  color:rgba(255,255,255,.42);text-shadow:0 0 8px rgba(255,255,255,.2);opacity:0;transition:opacity 1.2s ease;white-space:nowrap}
 #hud.show{opacity:1}
+/* ---- Starfall play mode ---- */
+#playbtn{position:fixed;left:50%;bottom:calc(66px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;width:58px;height:58px;border-radius:50%;cursor:pointer;border:1px solid rgba(255,255,255,.24);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.20),rgba(255,255,255,.06));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(255,255,255,.12),0 10px 26px rgba(0,0,0,.45);transition:opacity .45s ease,transform .45s cubic-bezier(.2,1.4,.4,1)}
+#playbtn svg{width:22px;height:22px;fill:#fff;margin-left:2px;filter:drop-shadow(0 0 4px rgba(255,255,255,.3))}
+#playbtn:active{transform:translateX(-50%) scale(.86)}
+body.playing #playbtn{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(16px) scale(.6)}
+#exitbtn{position:fixed;top:max(3.5vh,18px);right:max(3vw,14px);z-index:30;width:46px;height:46px;border-radius:50%;cursor:pointer;border:1px solid rgba(255,255,255,.24);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.20),rgba(255,255,255,.06));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(255,255,255,.12),0 10px 26px rgba(0,0,0,.45);opacity:0;pointer-events:none;transform:translateY(-18px) scale(.6);transition:opacity .45s ease .25s,transform .45s cubic-bezier(.2,1.4,.4,1) .25s}
+#exitbtn svg{width:20px;height:20px}
+body.playing #exitbtn{opacity:1;pointer-events:auto;transform:none}
+#hearts{position:fixed;top:max(4vh,22px);left:50%;transform:translateX(-50%);z-index:30;display:flex;gap:.55rem;opacity:0;pointer-events:none;transition:opacity .5s ease .3s}
+body.playing #hearts{opacity:1}
+#hearts svg{width:20px;height:20px;fill:#ff5b6e;filter:drop-shadow(0 0 6px rgba(255,91,110,.55));transition:opacity .3s ease,transform .3s ease,filter .3s ease}
+#hearts svg.lost{opacity:.2;transform:scale(.75);filter:none}
+#gameover{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(2,2,6,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .5s ease}
+#gameover.show{opacity:1;pointer-events:auto}
+#gameover .panel{text-align:center;transform:scale(.8) translateY(20px);transition:transform .55s cubic-bezier(.2,1.4,.4,1)}
+#gameover.show .panel{transform:none}
+#gameover h2{font-family:Quicksand,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;font-size:clamp(1.8rem,6vw,2.6rem);font-weight:700;letter-spacing:.12em;color:#fff;text-shadow:0 0 30px rgba(255,91,110,.5)}
+#gameover .dist{margin-top:.6rem;font-size:clamp(1.1rem,3.4vw,1.5rem);font-weight:600;letter-spacing:.2em;color:rgba(255,255,255,.9)}
+#gameover .best{margin-top:.35rem;font-size:.78rem;font-weight:600;letter-spacing:.24em;color:rgba(255,255,255,.5)}
+#again{margin-top:1.4rem;padding:.8rem 2.2rem;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-family:Quicksand,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;font-weight:700;letter-spacing:.18em;font-size:.85rem;cursor:pointer;transition:transform .2s ease,background .3s ease}
+#again:hover{background:rgba(255,255,255,.2)}
+#again:active{transform:scale(.94)}
+/* beautiful staggered hide for play mode */
+.plinks,.fabwrap,.tagline,.bio{transition:opacity .55s ease,transform .55s ease,filter .55s ease}
+body.playing .plinks{opacity:0;transform:translateX(-34px);filter:blur(8px);pointer-events:none;transition-delay:.02s}
+body.playing .fabwrap{opacity:0;transform:translateY(34px) scale(.7);filter:blur(8px);pointer-events:none;transition-delay:.08s}
+body.playing .tagline{opacity:0;transform:translateY(-16px);filter:blur(8px);transition-delay:.14s}
+body.playing .bio{opacity:0;transform:translate(-50%,-50%) scale(.9);filter:blur(12px);transition-delay:.2s}
+body.playing #hud{color:rgba(255,255,255,.8);font-size:.8rem}
 #shade{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 1.2s ease;
  background:linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.15) 35%,rgba(0,0,0,.12) 60%,rgba(0,0,0,.45) 100%)}
 #shade.show{opacity:1}
@@ -182,6 +211,7 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
 @media (prefers-reduced-motion:reduce){
  .brand,.brand h1,#bg,.tagline{animation:none!important}
  .opt,.tag,.fab{transition:none!important;animation:none!important}
+ #playbtn,#exitbtn,#hearts,#gameover,#gameover .panel{transition:none!important}
  .dx .l1{transform:translateX(-50%) rotate(40deg) scaleY(1)}
  .dx .l2{transform:translateX(-50%) rotate(-40deg) scaleY(1)}
  .brand{opacity:1}
@@ -230,6 +260,17 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
   </div>
 </nav>
 <div class="scrim" id="scrim"></div>
+<button id="playbtn" aria-label="Play Starfall game"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+<button id="exitbtn" aria-label="Exit game"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+<div id="hearts" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+<div id="gameover" role="dialog" aria-modal="true" aria-label="Game over">
+  <div class="panel">
+    <h2>GAME OVER</h2>
+    <p class="dist" id="overdist">0 m</p>
+    <p class="best" id="overbest">BEST 0 m</p>
+    <button id="again">PLAY AGAIN</button>
+  </div>
+</div>
 <script>
 (function(){
 "use strict";
@@ -366,7 +407,7 @@ revealAll();
 })();
 </script>
 <script>
-/* Starfall — playable spaceship background (approved demo) */
+/* Starfall — ambient + play mode, 3 lives */
 (function(){
 "use strict";
 var cv=document.getElementById("bg");
@@ -374,22 +415,30 @@ if(!cv||!cv.getContext)return;
 var ctx=cv.getContext("2d");
 var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var W=0,H=0,DPR=1,stars=[],mets=[],parts=[];
-var ship={x:0,y:0,tx:0,ty:0,inv:0,flash:0};
+var ship={x:0,y:0,tx:0,ty:0,inv:0,flash:0,alive:true,resp:0,bob:0};
 var keys={},dist=0,stage=1,t0=0,last=0,spawnT=0,hudT=0,running=true;
+var mode="ambient",lives=3,best=0;
+try{best=parseInt(localStorage.getItem("starfall_best")||"0",10)||0;}catch(e){best=0;}
 var hud=document.createElement("div");hud.id="hud";hud.setAttribute("aria-hidden","true");document.body.appendChild(hud);
+var playbtn=document.getElementById("playbtn"),exitbtn=document.getElementById("exitbtn"),
+    heartsEl=document.getElementById("hearts"),over=document.getElementById("gameover"),
+    overDist=document.getElementById("overdist"),overBest=document.getElementById("overbest"),
+    againBtn=document.getElementById("again");
+var heartSvgs=heartsEl?heartsEl.querySelectorAll("svg"):[];
 function rnd(a,b){return a+Math.random()*(b-a);}
 function initStars(){
   stars.length=0;
   var n=Math.max(60,Math.min(200,Math.round(W*H/11000)));
   for(var i=0;i<n;i++)stars.push({x:rnd(0,W),y:rnd(0,H),z:rnd(.15,1)});
 }
+function parkShip(){ship.x=W/2;ship.y=H*0.68;ship.tx=ship.x;ship.ty=ship.y;}
 function resize(){
   DPR=Math.min(window.devicePixelRatio||1,1.75);
   W=window.innerWidth;H=window.innerHeight;
   cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
   ctx.setTransform(DPR,0,0,DPR,0,0);
   initStars();
-  if(!t0){ship.x=ship.tx=W/2;ship.y=ship.ty=H*0.74;}
+  if(mode==="ambient")parkShip();
 }
 window.addEventListener("resize",resize);
 function spawnMet(){
@@ -397,12 +446,17 @@ function spawnMet(){
   for(var i=0;i<n;i++){var a=i/n*Math.PI*2,rr=rnd(.72,1.08);v.push([Math.cos(a)*rr,Math.sin(a)*rr]);}
   mets.push({x:rnd(-20,W+20),y:-40,vx:rnd(-30,30),vy:(70+stage*42)*rnd(.7,1.25),r:r,rot:rnd(0,6.28),vr:rnd(-1.5,1.5),v:v});
 }
-function burst(x,y){
-  for(var i=0;i<14;i++)parts.push({x:x,y:y,vx:rnd(-160,160),vy:rnd(-160,160),l:rnd(.3,.7),t:0});
+function burst(x,y,big){
+  var n=big?26:14;
+  for(var i=0;i<n;i++)parts.push({x:x,y:y,vx:rnd(-190,190),vy:rnd(-190,190),l:rnd(.35,big?.9:.7),t:0});
+}
+function updateHearts(){
+  for(var i=0;i<heartSvgs.length;i++)heartSvgs[i].classList.toggle("lost",i>=lives);
 }
 function drawShip(){
+  if(!ship.alive)return;
   var s=ship;
-  ctx.save();ctx.translate(s.x,s.y);
+  ctx.save();ctx.translate(s.x,s.y+(mode==="ambient"?Math.sin(s.bob)*4:0));
   if(s.flash>0)ctx.globalAlpha=Math.max(.25,1-s.flash*2);
   else if(s.inv>0&&Math.floor(s.inv*10)%2===0)ctx.globalAlpha=.3;
   var fl=5+Math.random()*7+stage;
@@ -412,6 +466,43 @@ function drawShip(){
   ctx.beginPath();ctx.moveTo(0,-11);ctx.lineTo(6.5,8);ctx.lineTo(0,3.5);ctx.lineTo(-6.5,8);ctx.closePath();ctx.fill();
   ctx.restore();
 }
+function die(){
+  burst(ship.x,ship.y,true);
+  ship.alive=false;ship.flash=0;
+  if(mode==="playing"){
+    lives--;updateHearts();
+    if(lives<=0){gameOver();return;}
+    ship.inv=2;ship.resp=0.9;
+  }else{
+    ship.resp=1.6;
+  }
+  for(var j=mets.length-1;j>=0;j--){var o=mets[j],ox=o.x-ship.x,oy=o.y-ship.y;if(ox*ox+oy*oy<16900)mets.splice(j,1);}
+}
+function gameOver(){
+  mode="over";
+  var d=Math.floor(dist);
+  if(d>best){best=d;try{localStorage.setItem("starfall_best",String(best));}catch(e){}}
+  overDist.textContent=d.toLocaleString("en-US")+" m";
+  overBest.textContent="BEST "+best.toLocaleString("en-US")+" m";
+  setTimeout(function(){if(mode==="over")over.classList.add("show");},600);
+}
+function startPlay(){
+  mode="playing";lives=3;updateHearts();
+  document.body.classList.add("playing");
+  over.classList.remove("show");
+  dist=0;t0=0;last=0;spawnT=1;mets.length=0;parts.length=0;
+  ship.alive=true;ship.inv=1.5;parkShip();
+}
+function exitPlay(){
+  mode="ambient";
+  document.body.classList.remove("playing");
+  over.classList.remove("show");
+  dist=0;t0=0;last=0;mets.length=0;parts.length=0;
+  lives=3;ship.alive=true;ship.inv=0;parkShip();
+}
+if(playbtn)playbtn.addEventListener("click",function(e){e.stopPropagation();startPlay();});
+if(exitbtn)exitbtn.addEventListener("click",function(e){e.stopPropagation();exitPlay();});
+if(againBtn)againBtn.addEventListener("click",function(e){e.stopPropagation();startPlay();});
 function frame(now){
   if(!running){requestAnimationFrame(frame);return;}
   if(!last)last=now;
@@ -419,32 +510,38 @@ function frame(now){
   if(!t0)t0=now;
   var el=(now-t0)/1000;
   stage=Math.min(8,1+Math.floor(el/18));
-  dist+=dt*(46+stage*24);
-  var kx=((keys.ArrowRight||keys.KeyD)?1:0)-((keys.ArrowLeft||keys.KeyA)?1:0);
-  var ky=((keys.ArrowDown||keys.KeyS)?1:0)-((keys.ArrowUp||keys.KeyW)?1:0);
-  if(kx||ky){
-    ship.x=Math.max(14,Math.min(W-14,ship.x+kx*430*dt));
-    ship.y=Math.max(14,Math.min(H-14,ship.y+ky*430*dt));
-    ship.tx=ship.x;ship.ty=ship.y;
-  }else{
-    var e=Math.min(1,dt*7);
-    ship.x+=(ship.tx-ship.x)*e;ship.y+=(ship.ty-ship.y)*e;
+  if(ship.alive&&mode!=="over")dist+=dt*(46+stage*24);
+  ship.bob+=dt*2;
+  if(!ship.alive){
+    ship.resp-=dt;
+    if(ship.resp<=0){ship.alive=true;ship.inv=2;if(mode==="ambient")parkShip();}
+  }else if(mode==="playing"){
+    var kx=((keys.ArrowRight||keys.KeyD)?1:0)-((keys.ArrowLeft||keys.KeyA)?1:0);
+    var ky=((keys.ArrowDown||keys.KeyS)?1:0)-((keys.ArrowUp||keys.KeyW)?1:0);
+    if(kx||ky){
+      ship.x=Math.max(14,Math.min(W-14,ship.x+kx*430*dt));
+      ship.y=Math.max(14,Math.min(H-14,ship.y+ky*430*dt));
+      ship.tx=ship.x;ship.ty=ship.y;
+    }else{
+      var e=Math.min(1,dt*7);
+      ship.x+=(ship.tx-ship.x)*e;ship.y+=(ship.ty-ship.y)*e;
+    }
   }
   if(ship.inv>0)ship.inv-=dt;
   if(ship.flash>0)ship.flash-=dt;
-  spawnT-=dt;
-  var maxM=Math.min(44,10+stage*5);
-  if(spawnT<=0&&mets.length<maxM&&el>1.2){spawnMet();spawnT=Math.max(.16,.85-stage*.08);}
+  if(mode!=="over"){
+    spawnT-=dt;
+    var maxM=Math.min(44,10+stage*5);
+    if(spawnT<=0&&mets.length<maxM&&el>1.2){spawnMet();spawnT=Math.max(.16,.85-stage*.08);}
+  }
   var i,m,dx,dy;
   for(i=mets.length-1;i>=0;i--){
     m=mets[i];
     m.x+=m.vx*dt;m.y+=m.vy*dt;m.rot+=m.vr*dt;
     if(m.y>H+60||m.x<-70||m.x>W+70){mets.splice(i,1);continue;}
-    dx=m.x-ship.x;dy=m.y-ship.y;
-    if(ship.inv<=0&&dx*dx+dy*dy<Math.pow(m.r*.78+8,2)){
-      ship.inv=2;ship.flash=.5;burst(ship.x,ship.y);
-      for(var j=mets.length-1;j>=0;j--){var o=mets[j],ox=o.x-ship.x,oy=o.y-ship.y;if(ox*ox+oy*oy<16900)mets.splice(j,1);}
-      break;
+    if(ship.alive&&ship.inv<=0){
+      dx=m.x-ship.x;dy=m.y-ship.y;
+      if(dx*dx+dy*dy<Math.pow(m.r*.78+8,2)){die();break;}
     }
   }
   for(var p=parts.length-1;p>=0;p--){
@@ -485,9 +582,11 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 window.addEventListener("pointermove",function(e){
+  if(mode!=="playing")return;
   ship.tx=e.clientX;ship.ty=e.clientY-(e.pointerType==="touch"?46:0);
 },{passive:true});
 window.addEventListener("pointerdown",function(e){
+  if(mode!=="playing")return;
   ship.tx=e.clientX;ship.ty=e.clientY-(e.pointerType==="touch"?46:0);
 },{passive:true});
 window.addEventListener("keydown",function(e){
@@ -503,13 +602,15 @@ function paintStatic(){
   drawShip();
 }
 paintStatic();
+updateHearts();
 if(!reduced){
-  const startGame=function(){ if(!t0)requestAnimationFrame(frame); };
+  var startGame=function(){ if(!t0)requestAnimationFrame(frame); };
   if(document.readyState==="complete")setTimeout(startGame,350);
   else window.addEventListener("load",function(){setTimeout(startGame,350);});
 }
 setTimeout(function(){hud.classList.add("show");},1200);
 })();
+
 </script>
 </body>
 </html>
