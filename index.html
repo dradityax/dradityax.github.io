@@ -428,7 +428,7 @@ var cv=document.getElementById("bg");
 if(!cv||!cv.getContext)return;
 var ctx=cv.getContext("2d");
 var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-var W=0,H=0,DPR=1,stars=[],mets=[],parts=[];
+var W=0,H=0,DPR=1,stars=[],mets=[],parts=[],trail=[];
 var ship={x:0,y:0,tx:0,ty:0,inv:0,flash:0,alive:true,resp:0,bob:0};
 var keys={},dist=0,stage=1,t0=0,last=0,spawnT=0,hudT=0,running=true;
 var mode="ambient",lives=3,best=0;
@@ -442,7 +442,7 @@ var heartSvgs=heartsEl?heartsEl.querySelectorAll("svg"):[];
 function rnd(a,b){return a+Math.random()*(b-a);}
 function initStars(){
   stars.length=0;
-  var n=Math.max(36,Math.min(200,Math.round(W*H/11000)));
+  var n=Math.max(60,Math.min(200,Math.round(W*H/11000)));
   for(var i=0;i<n;i++)stars.push({x:rnd(0,W),y:rnd(0,H),z:rnd(.15,1)});
 }
 function parkShip(){ship.x=W/2;ship.y=H*0.68;ship.tx=ship.x;ship.ty=ship.y;}
@@ -473,15 +473,11 @@ function drawShip(){
   ctx.save();ctx.translate(s.x,s.y+(mode==="ambient"?Math.sin(s.bob)*4:0));
   if(s.flash>0)ctx.globalAlpha=Math.max(.25,1-s.flash*2);
   else if(s.inv>0&&Math.floor(s.inv*10)%2===0)ctx.globalAlpha=.3;
-  /* comet ship */
-  var baseA=ctx.globalAlpha;
+  /* comet head — breathing glow */
   ctx.fillStyle="#ffffff";
-  ctx.shadowColor="rgba(255,255,255,.55)";ctx.shadowBlur=14;
-  ctx.beginPath();ctx.arc(0,-9,7,0,6.29);ctx.fill();
-  ctx.shadowBlur=0;
-  var ta=[.45,.35,.25,.15];
-  for(var i=0;i<4;i++){ctx.globalAlpha=baseA*ta[i];
-    ctx.beginPath();ctx.arc(0,1+i*6.5,5.5-i*1.1,0,6.29);ctx.fill();}
+  ctx.shadowColor="rgba(255,255,255,.65)";ctx.shadowBlur=16;
+  var pr=7+Math.sin(s.bob*3)*1.4;
+  ctx.beginPath();ctx.arc(0,-9,pr,0,6.29);ctx.fill();
   ctx.restore();
 }
 function die(){
@@ -508,14 +504,14 @@ function startPlay(){
   mode="playing";lives=3;updateHearts();
   document.body.classList.add("playing");
   over.classList.remove("show");
-  dist=0;t0=0;last=0;spawnT=1;mets.length=0;parts.length=0;
+  dist=0;t0=0;last=0;spawnT=1;mets.length=0;parts.length=0;trail.length=0;
   ship.alive=true;ship.inv=1.5;parkShip();
 }
 function exitPlay(){
   mode="ambient";
   document.body.classList.remove("playing");
   over.classList.remove("show");
-  dist=0;t0=0;last=0;mets.length=0;parts.length=0;
+  dist=0;t0=0;last=0;mets.length=0;parts.length=0;trail.length=0;
   lives=3;ship.alive=true;ship.inv=0;parkShip();
 }
 if(playbtn)playbtn.addEventListener("click",function(e){e.stopPropagation();startPlay();});
@@ -547,6 +543,16 @@ function frame(now){
   }
   if(ship.inv>0)ship.inv-=dt;
   if(ship.flash>0)ship.flash-=dt;
+  /* comet trail — continuous glowing smoke */
+  if(ship.alive&&mode!=="over"){
+    var bobY=(mode==="ambient"?Math.sin(ship.bob)*4:0);
+    if(trail.length<60)trail.push({x:ship.x+rnd(-3,3),y:ship.y+bobY+rnd(6,14),vx:rnd(-18,18),vy:rnd(25,70),t:0,l:rnd(.35,.65),r:rnd(2.2,4.2)});
+  }
+  for(var tri=trail.length-1;tri>=0;tri--){
+    var trp=trail[tri];trp.t+=dt;
+    if(trp.t>trp.l){trail.splice(tri,1);continue;}
+    trp.x+=trp.vx*dt;trp.y+=trp.vy*dt;
+  }
   if(mode!=="over"){
     spawnT-=dt;
     var maxM=Math.min(44,10+stage*5);
@@ -594,6 +600,15 @@ function frame(now){
     ctx.fillStyle="rgba(255,255,255,"+(al*.9).toFixed(2)+")";
     ctx.fillRect(bp.x,bp.y,2.4,2.4);
   }
+  ctx.save();
+  ctx.fillStyle="#ffffff";
+  ctx.shadowColor="rgba(255,255,255,.6)";ctx.shadowBlur=10;
+  for(var tdi=0;tdi<trail.length;tdi++){
+    var tdp=trail[tdi],tal=1-tdp.t/tdp.l;
+    ctx.globalAlpha=tal*.8;
+    ctx.beginPath();ctx.arc(tdp.x,tdp.y,Math.max(.4,tdp.r*tal),0,6.29);ctx.fill();
+  }
+  ctx.restore();
   drawShip();
   hudT-=dt;
   if(hudT<=0){hud.textContent=Math.floor(dist).toLocaleString("en-US")+" m";hudT=.25;}
