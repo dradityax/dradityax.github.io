@@ -473,14 +473,15 @@ function drawShip(){
   ctx.save();ctx.translate(s.x,s.y+(mode==="ambient"?Math.sin(s.bob)*4:0));
   if(s.flash>0)ctx.globalAlpha=Math.max(.25,1-s.flash*2);
   else if(s.inv>0&&Math.floor(s.inv*10)%2===0)ctx.globalAlpha=.3;
-  /* X mascot ship */
-  ctx.strokeStyle="#ffffff";ctx.lineWidth=5;ctx.lineCap="round";
+  /* comet ship */
+  var baseA=ctx.globalAlpha;
+  ctx.fillStyle="#ffffff";
   ctx.shadowColor="rgba(255,255,255,.55)";ctx.shadowBlur=14;
-  var r=10.5;
-  ctx.beginPath();
-  ctx.moveTo(-r*.72,-r);ctx.lineTo(r*.72,r);
-  ctx.moveTo(r*.72,-r);ctx.lineTo(-r*.72,r);
-  ctx.stroke();
+  ctx.beginPath();ctx.arc(0,-9,7,0,6.29);ctx.fill();
+  ctx.shadowBlur=0;
+  var ta=[.45,.35,.25,.15];
+  for(var i=0;i<4;i++){ctx.globalAlpha=baseA*ta[i];
+    ctx.beginPath();ctx.arc(0,1+i*6.5,5.5-i*1.1,0,6.29);ctx.fill();}
   ctx.restore();
 }
 function die(){
