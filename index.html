@@ -126,6 +126,31 @@ body.playing #hud{color:rgba(255,255,255,.8);font-size:.8rem}
  box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .dx .p1{left:0;transform:skewY(-7deg);transform-origin:right center;border-radius:.02em 0 0 .05em}
 .dx .p2{right:0;transform:skewY(7deg);transform-origin:left center;border-radius:0 .02em .05em 0}
+/* mascot eyes : follow the pointer, blink */
+.dx .meyes{position:absolute;inset:0;pointer-events:none}
+.dx .meye{position:absolute;top:50%;width:.16em;height:.19em;background:#fff;border-radius:50%;
+ transform:translate(-50%,-50%);box-shadow:0 0 8px rgba(255,255,255,.35),inset 0 0 0 .018em rgba(0,0,0,.28);
+ overflow:hidden;transition:transform .13s ease}
+.dx .me1{left:25%}
+.dx .me2{left:75%}
+.dx .mpup{position:absolute;left:50%;top:52%;width:.085em;height:.095em;background:#0a0a0c;
+ border-radius:50%;transform:translate(-50%,-50%)}
+.dx .meye.blink{transform:translate(-50%,-50%) scaleY(.12)}
+/* play mode : ADITYA slides away, mascot walks in its place */
+.brand .aditya-txt{display:inline-block;max-width:9em;overflow:hidden;white-space:nowrap;vertical-align:baseline;
+ transition:max-width .6s cubic-bezier(.3,1,.3,1),opacity .45s ease,transform .55s cubic-bezier(.3,1,.3,1),filter .45s ease}
+body.playing .brand .aditya-txt{max-width:0;opacity:0;transform:translateX(-42px);filter:blur(8px);pointer-events:none}
+body.playing .brand .xslot{animation:xwalk .8s ease-in-out infinite}
+@keyframes xwalk{
+ 0%,100%{transform:translateY(0) rotate(-5deg)}
+ 25%{transform:translateY(-.07em) rotate(4deg)}
+ 50%{transform:translateY(0) rotate(-4deg)}
+ 75%{transform:translateY(-.05em) rotate(5deg)}
+}
+@media (prefers-reduced-motion: reduce){
+ body.playing .brand .xslot{animation:none}
+ body.playing .brand .aditya-txt{transition-duration:.01s}
+}
 .tagline{font-family:Quicksand,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;margin-top:.8rem;font-size:clamp(.95rem,2.2vw,1.25rem);font-weight:600;letter-spacing:.06em;color:rgba(255,255,255,.85);white-space:nowrap;
  text-shadow:0 0 18px rgba(255,255,255,.38),0 1px 8px rgba(0,0,0,.5);opacity:0;transition:opacity 1s ease;animation:tagglow 7s ease-in-out 2.2s infinite alternate}
 @keyframes tagglow{from{text-shadow:-14px 0 22px rgba(255,255,255,.5),0 1px 8px rgba(0,0,0,.5)}
@@ -227,7 +252,7 @@ body.playing #hud{color:rgba(255,255,255,.8);font-size:.8rem}
 <canvas id="bg" aria-hidden="true"></canvas>
 <div id="shade"></div>
 <header class="brand">
-  <h1 id="name" aria-label="ADITYA X">ADITYA <span class="xslot" aria-hidden="true"><span class="dx"><span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span><span class="glasses" id="dxg" aria-hidden="true"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span><span class="book" id="dxb" aria-hidden="true"><span class="page p1"></span><span class="page p2"></span></span></span></span></h1>
+  <h1 id="name" aria-label="ADITYA X"><span class="aditya-txt">ADITYA&nbsp;</span><span class="xslot" aria-hidden="true"><span class="dx"><span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span><span class="glasses" id="dxg" aria-hidden="true"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span><span class="book" id="dxb" aria-hidden="true"><span class="page p1"></span><span class="page p2"></span></span><span class="meyes" aria-hidden="true"><span class="meye me1"><span class="mpup"></span></span><span class="meye me2"><span class="mpup"></span></span></span></span></span></h1>
   <p class="tagline" id="tagline">Medicinae Studiosus</p>
 </header>
 <div class="bio" id="bio" aria-label="Mortui vivos docent"></div>
@@ -406,6 +431,41 @@ async function dxLoop(){
   }
 }
 setTimeout(function(){ if(!reduce) dxLoop(); }, 1500);
+
+/* X mascot eyes : follow the pointer, blink */
+(function(){
+  "use strict";
+  var eyes=document.querySelectorAll(".dx .meye");
+  if(!eyes.length)return;
+  var pups=document.querySelectorAll(".dx .mpup");
+  var tx=0,ty=0,cx=0,cy=0;
+  function aim(px,py){
+    var r=eyes[0].getBoundingClientRect();
+    var ex=r.left+r.width/2, ey=r.top+r.height/2;
+    var dx=px-ex, dy=py-ey, d=Math.hypot(dx,dy)||1;
+    var m=Math.min(d/320,1)*(r.width*0.24);
+    tx=dx/d*m; ty=dy/d*m;
+  }
+  window.addEventListener("pointermove",function(e){aim(e.clientX,e.clientY);},{passive:true});
+  window.addEventListener("touchmove",function(e){var t=e.touches[0];if(t)aim(t.clientX,t.clientY);},{passive:true});
+  (function loop(){
+    cx+=(tx-cx)*0.16; cy+=(ty-cy)*0.16;
+    var t="translate(calc(-50% + "+cx.toFixed(1)+"px), calc(-50% + "+cy.toFixed(1)+"px))";
+    for(var i=0;i<pups.length;i++)pups[i].style.transform=t;
+    requestAnimationFrame(loop);
+  })();
+  if(!reduce){
+    (function blink(){
+      setTimeout(function(){
+        for(var i=0;i<eyes.length;i++)eyes[i].classList.add("blink");
+        setTimeout(function(){
+          for(var j=0;j<eyes.length;j++)eyes[j].classList.remove("blink");
+          blink();
+        },150);
+      },2400+Math.random()*3400);
+    })();
+  }
+})();
 
 revealAll();
 })();
