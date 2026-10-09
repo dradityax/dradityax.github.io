@@ -106,7 +106,8 @@
 <script>
 const SUPABASE_URL = "https://vpduxwujkzahjhkaehyz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_GnnsBs6fTl_z-I7JkOcyRA_qoObJFhU";
-const ADMIN_UID = "49d78b74-391f-47bc-b382-ba8066281b79";
+const ADMIN_EMAIL = "dradityax@gmail.com";
+const isAdmin = (u) => !!u && u.email === ADMIN_EMAIL;
 const ADMIN_URL = "https://dradityax.pages.dev/project-1/admin/";
 const $ = id => document.getElementById(id);
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -211,7 +212,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
   $("viewAdmin").style.display = "none";
   if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session && session.user){
     try { history.replaceState(null, "", location.pathname); } catch(e){}
-    if (session.user.id === ADMIN_UID){ await ensureOwnProfile(session.user); loadAdmin(); }
+    if (isAdmin(session.user)){ await ensureOwnProfile(session.user); loadAdmin(); }
     else { $("viewNope").style.display = "block"; }
   } else if (event === "SIGNED_OUT" || !session){
     $("viewSignin").style.display = "block";
@@ -221,7 +222,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
   const { data } = await sb.auth.getSession();
   $("viewLoading").style.display = "none";
   if (data && data.session && data.session.user){
-    if (data.session.user.id === ADMIN_UID){ await ensureOwnProfile(data.session.user); loadAdmin(); }
+    if (isAdmin(data.session.user)){ await ensureOwnProfile(data.session.user); loadAdmin(); }
     else $("viewNope").style.display = "block";
   } else $("viewSignin").style.display = "block";
 })();
