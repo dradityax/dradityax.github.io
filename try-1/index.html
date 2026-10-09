@@ -30,7 +30,7 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:6px}
 
 .footer{isolation:isolate;overflow:hidden}
 .footer-background{position:absolute;inset:0;z-index:-1;pointer-events:none}
-.footer-background video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.footer-background svg{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:pan-y}
 
 @media(max-width:700px){
   :root{--background:#f0eefa;background:var(--background)}
@@ -51,14 +51,92 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:6px}
   .socials img{width:30px;height:30px}
   .socials span:first-child{margin-left:-7px}
   .footer-background{position:relative;inset:auto;order:3;z-index:auto;flex:none;align-self:center;width:calc(100% + 48px);aspect-ratio:4/3;margin-top:-16px}
-  .footer-background video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+  .footer-background svg{position:absolute;inset:0;width:100%;height:100%}
 }
 </style>
 </head>
 <body>
 <footer class="footer" aria-label="Footer">
   <div class="footer-background" aria-hidden="true">
-    <video id="footerVideo" src="/try-1/footer-scrub.mp4" muted playsinline preload="auto"></video>
+    <!-- Our own coded cutie: a hand-drawn SVG lavender blob holding a pink heart.
+         Its eyes genuinely track the pointer (and finger on touch) with easing,
+         blinks every few seconds, and drifts gently when idle. No video, no scrub. -->
+    <svg id="cutieScene" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id="bodyGrad" cx="50%" cy="32%" r="78%">
+          <stop offset="0%" stop-color="#ded4f4"/>
+          <stop offset="58%" stop-color="#c9b9ee"/>
+          <stop offset="100%" stop-color="#b3a0e4"/>
+        </radialGradient>
+        <radialGradient id="heartGrad" cx="50%" cy="32%" r="82%">
+          <stop offset="0%" stop-color="#f8c4da"/>
+          <stop offset="100%" stop-color="#efa1c1"/>
+        </radialGradient>
+        <filter id="fuzz" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.016" numOctaves="3" seed="7" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="44"/>
+        </filter>
+        <filter id="fuzzSoft" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="4" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="24"/>
+        </filter>
+        <filter id="grain" x="0%" y="0%" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="11" stitchTiles="stitch"/>
+          <feColorMatrix type="matrix" values="0 0 0 0 0.42  0 0 0 0 0.34  0 0 0 0 0.62  0 0 0 0.07 0"/>
+        </filter>
+        <clipPath id="bodyClip">
+          <path d="M960 250 C1195 250 1345 430 1345 665 C1345 890 1170 1020 960 1020 C750 1020 575 890 575 665 C575 430 725 250 960 250 Z"/>
+        </clipPath>
+      </defs>
+
+      <!-- ground shadow -->
+      <ellipse cx="960" cy="1032" rx="440" ry="38" fill="#7d6bad" opacity="0.22"/>
+      <!-- feet -->
+      <ellipse cx="820" cy="992" rx="80" ry="44" fill="#b3a0e2"/>
+      <ellipse cx="1100" cy="992" rx="80" ry="44" fill="#b3a0e2"/>
+      <!-- fuzzy body -->
+      <g filter="url(#fuzz)">
+        <ellipse cx="728" cy="298" rx="68" ry="88" fill="#c2aee8" transform="rotate(-18 728 298)"/>
+        <ellipse cx="1192" cy="298" rx="68" ry="88" fill="#c2aee8" transform="rotate(18 1192 298)"/>
+        <path d="M960 250 C1195 250 1345 430 1345 665 C1345 890 1170 1020 960 1020 C750 1020 575 890 575 665 C575 430 725 250 960 250 Z" fill="url(#bodyGrad)"/>
+      </g>
+      <!-- felt grain, clipped inside the body -->
+      <g clip-path="url(#bodyClip)">
+        <rect x="520" y="200" width="880" height="880" filter="url(#grain)"/>
+      </g>
+      <!-- blush -->
+      <ellipse cx="688" cy="662" rx="42" ry="26" fill="#f2a3c4" opacity="0.5"/>
+      <ellipse cx="1232" cy="662" rx="42" ry="26" fill="#f2a3c4" opacity="0.5"/>
+      <!-- brows -->
+      <path d="M742 402 Q800 376 858 402" stroke="#d9a05f" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <path d="M1062 402 Q1120 376 1178 402" stroke="#d9a05f" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <!-- arms (behind the heart) -->
+      <path d="M648 768 C702 800 762 816 822 822" stroke="#a68fd8" stroke-width="56" stroke-linecap="round" fill="none"/>
+      <path d="M1272 768 C1218 800 1158 816 1098 822" stroke="#a68fd8" stroke-width="56" stroke-linecap="round" fill="none"/>
+      <!-- heart -->
+      <path d="M960 955 C855 875 785 800 785 718 C785 658 832 622 884 622 C921 622 951 644 960 672 C969 644 999 622 1036 622 C1088 622 1135 658 1135 718 C1135 800 1065 875 960 955 Z"
+            fill="url(#heartGrad)" filter="url(#fuzzSoft)"/>
+      <ellipse cx="878" cy="706" rx="28" ry="44" fill="#ffffff" opacity="0.35" transform="rotate(-18 878 706)"/>
+      <!-- eyes -->
+      <g id="lidL">
+        <ellipse cx="800" cy="545" rx="98" ry="112" fill="#fffdf9"/>
+        <ellipse cx="800" cy="545" rx="98" ry="112" fill="none" stroke="#e6d9f6" stroke-width="6"/>
+        <g id="pupilL">
+          <circle cx="800" cy="545" r="44" fill="#262032"/>
+          <circle cx="784" cy="528" r="15" fill="#ffffff" opacity="0.95"/>
+          <circle cx="815" cy="561" r="7" fill="#ffffff" opacity="0.5"/>
+        </g>
+      </g>
+      <g id="lidR">
+        <ellipse cx="1120" cy="545" rx="98" ry="112" fill="#fffdf9"/>
+        <ellipse cx="1120" cy="545" rx="98" ry="112" fill="none" stroke="#e6d9f6" stroke-width="6"/>
+        <g id="pupilR">
+          <circle cx="1120" cy="545" r="44" fill="#262032"/>
+          <circle cx="1104" cy="528" r="15" fill="#ffffff" opacity="0.95"/>
+          <circle cx="1135" cy="561" r="7" fill="#ffffff" opacity="0.5"/>
+        </g>
+      </g>
+    </svg>
   </div>
   <div class="jobs">
     <span class="tag">have a fresh idea?</span>
@@ -95,119 +173,91 @@ a:focus-visible{outline:2px solid currentColor;outline-offset:6px}
 <script>
 (function () {
   'use strict';
-  var TAU = Math.PI * 2;
-  function wrappedAngle(angle) { return (angle % TAU + TAU) % TAU; }
+  var svg = document.getElementById('cutieScene');
+  var pupils = [document.getElementById('pupilL'), document.getElementById('pupilR')];
+  var lids = [document.getElementById('lidL'), document.getElementById('lidR')];
+  var eyes = [{ cx: 800, cy: 545 }, { cx: 1120, cy: 545 }];
+  var MAX_TRAVEL = 42; // pupil travel in SVG units
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  /* gaze-frames.json — RECONSTRUCTED (original was truncated in the paste).
-     16 evenly-spaced angles, piecewise-linear interpolation between the four
-     calibrated cardinal anchors: Right→2.54167s, Down→0.33333s, Left→1.0s,
-     Up→1.70833s (orbit period 2.94445s). Rows: [angleInRadians, videoTimeInSeconds]. */
-  var GAZE_FRAMES = [
-    [0, 2.54167], [0.3927, 2.7257], [0.7854, 2.90973], [1.1781, 3.09375],
-    [1.5708, 0.33333], [1.9635, 0.5], [2.35619, 0.66667], [2.74889, 0.83333],
-    [3.14159, 1], [3.53429, 1.17708], [3.92699, 1.35417], [4.31969, 1.53125],
-    [4.71239, 1.70833], [5.10509, 1.91667], [5.49779, 2.125], [5.89049, 2.33333]
-  ];
+  var target = { x: 960, y: 545 }; // look target in SVG coords; starts looking forward
+  var cur = [{ x: 0, y: 0 }, { x: 0, y: 0 }];
+  var hasPointer = false;
+  var lastPointer = 0;
+  var t0 = performance.now();
+  var pt = svg.createSVGPoint();
 
-  function timeForAngle(angle) {
-    var target = wrappedAngle(angle);
-    var nearestTime = GAZE_FRAMES[0][1];
-    var nearestDistance = Infinity;
-    for (var i = 0; i < GAZE_FRAMES.length; i++) {
-      var sampleAngle = GAZE_FRAMES[i][0], time = GAZE_FRAMES[i][1];
-      var difference = Math.abs(target - sampleAngle);
-      var distance = Math.min(difference, TAU - difference);
-      if (distance < nearestDistance) { nearestDistance = distance; nearestTime = time; }
-    }
-    return nearestTime + 1 / 240;
+  function toSVG(clientX, clientY) {
+    var ctm = svg.getScreenCTM();
+    if (!ctm) return null;
+    pt.x = clientX; pt.y = clientY;
+    return pt.matrixTransform(ctm.inverse());
   }
-
-  var video = document.getElementById('footerVideo');
-  var frame = 0;
-  var desiredTime = 0;
-  var pointer = null;
-  var disposed = false;
-  var mobile = window.matchMedia('(max-width: 700px)');
-  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-  function seek() {
-    frame = 0;
-    if (disposed || mobile.matches || video.readyState < 2 || video.seeking) return;
-    if (Math.abs(video.currentTime - desiredTime) > 1 / 48) {
-      video.currentTime = Math.min(desiredTime, video.duration - 1 / 24);
-    }
+  function onMove(e) {
+    var p = toSVG(e.clientX, e.clientY);
+    if (!p) return;
+    target.x = p.x; target.y = p.y;
+    hasPointer = true;
+    lastPointer = performance.now();
   }
-  function schedule() {
-    if (!frame) frame = requestAnimationFrame(seek);
-  }
-  function updateTarget() {
-    if (mobile.matches || !pointer) return;
-    var rect = video.getBoundingClientRect();
-    var scale = Math.max(rect.width / 1920, rect.height / 1080);
-    // Match the exact object-fit: cover positioning, including mobile crops.
-    var eyeX = rect.left + rect.width / 2 + (948 - 960) * scale;
-    var eyeY = rect.top + rect.height / 2 + (418 - 540) * scale;
-    var dx = pointer.x - eyeX;
-    var dy = pointer.y - eyeY;
-    // Avoid unstable angles directly between the eyes.
-    if (Math.hypot(dx, dy) > 8) {
-      desiredTime = timeForAngle(Math.atan2(dy, dx));
-      schedule();
-    }
-  }
-  function onMove(event) {
-    pointer = { x: event.clientX, y: event.clientY };
-    updateTarget();
-  }
-  function onScrollResize() {
-    updateTarget();
-  }
-  // Apply the current mode: mobile = muted loop (paused under reduced-motion),
-  // desktop = paused at t=0 until the pointer scrubs. Unavailable autoplay leaves
-  // the available frame visible; no error is shown and no controls are forced.
-  function applyMode() {
-    video.loop = mobile.matches;
-    if (mobile.matches && !reducedMotion.matches) {
-      var p = video.play();
-      if (p && typeof p.catch === 'function') { p.catch(function () {}); }
-    } else {
-      video.pause();
-    }
-  }
-  function onMobileChange() { applyMode(); updateTarget(); }
-  function onMotionChange() { applyMode(); }
-  function onSeeked() { schedule(); } // apply the newest target once decoding finishes
-
-  video.addEventListener('loadeddata', applyMode);
-  video.addEventListener('seeked', onSeeked);
   window.addEventListener('pointermove', onMove, { passive: true });
-  window.addEventListener('scroll', onScrollResize, { passive: true });
-  window.addEventListener('resize', onScrollResize);
-  if (mobile.addEventListener) {
-    mobile.addEventListener('change', onMobileChange);
-    reducedMotion.addEventListener('change', onMotionChange);
-  } else if (mobile.addListener) {
-    mobile.addListener(onMobileChange);
-    reducedMotion.addListener(onMotionChange);
-  }
-  applyMode();
 
-  // Single-page equivalent of the component's unmount cleanup.
-  window.addEventListener('pagehide', function cleanup() {
-    disposed = true;
-    if (frame) { cancelAnimationFrame(frame); frame = 0; }
-    window.removeEventListener('pointermove', onMove);
-    window.removeEventListener('scroll', onScrollResize);
-    window.removeEventListener('resize', onScrollResize);
-    video.removeEventListener('seeked', onSeeked);
-    if (mobile.removeEventListener) {
-      mobile.removeEventListener('change', onMobileChange);
-      reducedMotion.removeEventListener('change', onMotionChange);
-    } else if (mobile.removeListener) {
-      mobile.removeListener(onMobileChange);
-      reducedMotion.removeListener(onMotionChange);
+  // Blink state
+  var blinking = false, blinkT = 0, nextBlink = 2200 + Math.random() * 2500;
+  function setLidScale(s) {
+    lids[0].setAttribute('transform', 'translate(800 545) scale(1 ' + s.toFixed(3) + ') translate(-800 -545)');
+    lids[1].setAttribute('transform', 'translate(1120 545) scale(1 ' + s.toFixed(3) + ') translate(-1120 -545)');
+  }
+  function clearLids() {
+    lids[0].removeAttribute('transform');
+    lids[1].removeAttribute('transform');
+  }
+
+  var last = 0;
+  function frame(now) {
+    var dt = Math.min(50, now - (last || now));
+    last = now;
+
+    // Idle: gentle gaze drift so the cutie feels alive (never a constant spin).
+    var idle = !hasPointer || (now - lastPointer > 5000);
+    var tx = target.x, ty = target.y;
+    if (idle) {
+      if (reduced.matches) { tx = 960; ty = 545; }
+      else {
+        var s = (now - t0) / 1000;
+        tx = 960 + Math.sin(s * 0.5) * 70;
+        ty = 545 + Math.cos(s * 0.34) * 34;
+      }
     }
-  });
+
+    for (var i = 0; i < 2; i++) {
+      var dx = tx - eyes[i].cx, dy = ty - eyes[i].cy;
+      var d = Math.hypot(dx, dy) || 1;
+      var travel = Math.min(d, MAX_TRAVEL);
+      var ox = (dx / d) * travel, oy = (dy / d) * travel;
+      cur[i].x += (ox - cur[i].x) * 0.14;
+      cur[i].y += (oy - cur[i].y) * 0.14;
+      pupils[i].setAttribute('transform', 'translate(' + cur[i].x.toFixed(2) + ' ' + cur[i].y.toFixed(2) + ')');
+    }
+
+    if (!reduced.matches) {
+      if (!blinking && now > nextBlink) { blinking = true; blinkT = 0; }
+      if (blinking) {
+        blinkT += dt;
+        var ph = blinkT / 260;
+        var k = ph < 0.5 ? ph * 2 : (1 - ph) * 2;
+        setLidScale(1 - 0.92 * Math.max(0, Math.min(1, k)));
+        if (ph >= 1) {
+          blinking = false;
+          clearLids();
+          nextBlink = now + 2400 + Math.random() * 3200;
+        }
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
