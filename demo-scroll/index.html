@@ -94,15 +94,19 @@ body.playing .scrollhint{opacity:0}
 /* merge zones */
 .mergezone{height:44vh;background:linear-gradient(to bottom,var(--blk) 0%,#3a3a40 45%,#c9c9ce 70%,var(--wht) 100%)}
 .mergeback{height:44vh;background:linear-gradient(to bottom,var(--wht) 0%,#c9c9ce 30%,#3a3a40 55%,var(--blk) 100%)}
-/* SECTION B : white, human */
-.sec-b{background:var(--wht);color:#111;padding:110px 20px 90px;text-align:center;overflow:hidden}
+/* SECTION B : white, character */
+.sec-b{background:var(--wht);color:#111;padding:110px 20px 0;text-align:center;overflow:hidden}
 .sec-b h2{font-size:clamp(1.5rem,6vw,2.4rem);letter-spacing:.3em;font-weight:600;margin-bottom:14px}
-.sec-b .sub{opacity:.6;letter-spacing:.12em;margin-bottom:56px;font-size:.95rem}
-.humanwrap{display:flex;justify-content:center}
-.humanfig{width:min(78vw,340px);height:440px;border:2px dashed rgba(0,0,0,.28);border-radius:170px 170px 26px 26px;
-  display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.025);will-change:transform}
-.humanfig .note{font-size:.8rem;letter-spacing:.24em;opacity:.5;line-height:2.1;padding:0 24px}
-.brainchips{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:48px;max-width:720px;margin-left:auto;margin-right:auto}
+.sec-b .sub{opacity:.6;letter-spacing:.12em;margin-bottom:8px;font-size:.95rem}
+.scrubhint{display:block;margin:12px 0 30px;font-size:.72rem;letter-spacing:.32em;opacity:.5}
+.bustwrap{position:relative;height:74vh;min-height:480px;overflow:hidden}
+#humanvid{position:absolute;left:50%;bottom:-3%;height:105%;width:auto;aspect-ratio:1/1;
+  transform:translateX(-50%);object-fit:cover;display:block;pointer-events:none;user-select:none;
+  filter:brightness(1.18) saturate(1.22);mix-blend-mode:multiply;
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 12%,#000 100%);
+  mask-image:linear-gradient(to right,transparent 0,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 12%,#000 100%);
+  -webkit-mask-composite:source-in;mask-composite:intersect}
+.brainchips{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:44px 20px 60px;max-width:760px;margin:0 auto;background:var(--wht)}
 .brainchips span{font-size:.78rem;letter-spacing:.18em;border:1px solid rgba(0,0,0,.22);border-radius:999px;padding:9px 20px;opacity:.7}
 /* SECTION C : black, ambitions horizontal */
 .hwrap{height:420vh;background:var(--blk)}
@@ -162,9 +166,11 @@ footer{font-size:.7rem;letter-spacing:.3em;opacity:.4}
 <section class="sec-b">
   <h2 class="rv">INSIDE THE MACHINE</h2>
   <p class="sub rv">Half human. Half skeleton. Every part thinks.</p>
-  <div class="humanwrap rv"><div class="humanfig" id="humanfig">
-    <div class="note">HUMAN FIGURE<br><span style="font-size:.68rem">half-skeleton · brain map<br>(prompt coming)</span></div>
-  </div></div>
+  <span class="scrubhint rv">←&nbsp;&nbsp;MOVE YOUR MOUSE&nbsp;&nbsp;→</span>
+  <div class="bustwrap rv">
+    <video id="humanvid" muted playsinline loop preload="auto" disablepictureinpicture
+      tabindex="-1" aria-hidden="true" src="assets/character.mp4"></video>
+  </div>
   <div class="brainchips rv">
     <span>PREFRONTAL — the empire plan</span>
     <span>AMYGDALA — never bow</span>
@@ -545,17 +551,47 @@ document.getElementById("bg").classList.add("show");
   },{threshold:.12});
   document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
 })();
-/* playbtn + parallax + scrolled class */
+/* character scrub — mouse is a dial, separate IIFE */
 (function(){
-  var hf=document.getElementById('humanfig');
+"use strict";
+var v=document.getElementById('humanvid');
+if(!v)return;
+var SENS=0.8,EPS=0.04;
+var prevX=null,targetTime=0,seeking=false,requested=-1;
+function dur(){var d=v.duration;return (d&&isFinite(d)&&d>0)?d:0;}
+function pump(){
+  if(seeking||Math.abs(targetTime-v.currentTime)<EPS)return;
+  seeking=true;requested=targetTime;
+  try{v.currentTime=targetTime;}catch(e){seeking=false;}
+}
+v.addEventListener('seeked',function(){seeking=false;if(targetTime!==requested)pump();});
+function reanchor(){prevX=null;}
+document.addEventListener('mouseleave',reanchor);
+window.addEventListener('blur',reanchor);
+document.addEventListener('visibilitychange',reanchor);
+var reduce=false,nohover=false;
+try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+try{nohover=!matchMedia('(hover: hover) and (pointer: fine)').matches;}catch(e){}
+v.pause();
+function anchor(){targetTime=v.currentTime;if(!v.currentTime){try{v.currentTime=0.001;}catch(e){}}}
+v.addEventListener('loadeddata',anchor,{once:true});
+if(v.readyState>=2)anchor();
+if(reduce){return;}
+if(nohover){v.addEventListener('canplay',function(){try{var p=v.play();if(p)p.catch(function(){});}catch(e){}},{once:true});return;}
+window.addEventListener('mousemove',function(e){
+  var d=dur();
+  if(prevX===null||!d){prevX=e.clientX;return;}
+  var delta=prevX-e.clientX;prevX=e.clientX;
+  if(!delta)return;
+  var t=targetTime+(delta/window.innerWidth)*SENS*d;
+  targetTime=Math.min(d,Math.max(0,t));
+  pump();
+},{passive:true});
+})();
+/* playbtn + scrolled class */
+(function(){
   function upd(){
-    var y=window.scrollY;
-    document.body.classList.toggle('scrolled',y>innerHeight*0.55);
-    if(hf){
-      var r=hf.getBoundingClientRect();
-      var p=(r.top+r.height/2-innerHeight/2)/innerHeight;
-      hf.style.transform='translateY('+(-p*70)+'px)';
-    }
+    document.body.classList.toggle('scrolled',window.scrollY>innerHeight*0.55);
   }
   addEventListener('scroll',upd,{passive:true});upd();
 })();
