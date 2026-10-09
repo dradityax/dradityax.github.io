@@ -74,7 +74,12 @@
 
   <div class="card" id="viewSignin">
     <h1>SIGN IN</h1>
-    <p class="sub">One tap on the email link signs you in.</p>
+    <p class="sub">Continue with Google, or one tap on the email link.</p>
+    <button class="go" id="d_google" style="background:#fff;color:#111;display:flex;align-items:center;justify-content:center;gap:10px">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.45c-.28 1.48-1.12 2.73-2.4 3.58v2.97h3.87c2.27-2.09 3.58-5.17 3.58-8.74z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.91l-3.87-2.97c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.29v3.07C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.31c-.24-.72-.38-1.49-.38-2.31s.14-1.59.38-2.31V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.07z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.07c.95-2.85 3.6-4.94 6.73-4.94z"/></svg>
+      CONTINUE WITH GOOGLE
+    </button>
+    <p class="sub" style="margin:14px 0 0">— or —</p>
     <label>Email address</label>
     <input type="email" id="d_email" placeholder="you@example.com" autocomplete="email">
     <button class="go" id="d_send">SEND LINK →</button>
@@ -163,8 +168,14 @@ async function loadDash(){
   }
 }
 
-$("d_send").addEventListener("click", async () => {
-  const em = $("d_email").value.trim();
+$("d_google").addEventListener("click", async () => {
+  $("d_google").disabled = true;
+  try {
+    const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: DASH_URL } });
+    if (error) throw error;
+  } catch(e){ alert("Google sign-in failed: " + (e.message || e)); $("d_google").disabled = false; }
+});
+$("d_send").addEventListener("click", async () => {  const em = $("d_email").value.trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){ alert("Please enter a valid email address."); return; }
   $("d_send").disabled = true; $("d_send").textContent = "SENDING…";
   try {
@@ -178,6 +189,7 @@ $("d_out").addEventListener("click", async () => { await sb.auth.signOut(); loca
 
 sb.auth.onAuthStateChange(async (event, session) => {
   if ((event === "SIGNED_IN" || event === "INITIAL_SESSION") && session && session.user){
+    if (!((session.user.user_metadata)||{}).profile_complete){ location.href = "../signup/"; return; }
     me = session.user; await loadDash();
     try { history.replaceState(null, "", location.pathname); } catch(e){}
   } else if (event === "SIGNED_OUT"){
@@ -187,7 +199,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
 (async () => {
   show("loading");
   const { data } = await sb.auth.getSession();
-  if (data && data.session && data.session.user){ me = data.session.user; await loadDash(); }
+  if (data && data.session && data.session.user){ if (!((data.session.user.user_metadata)||{}).profile_complete){ location.href = "../signup/"; return; } me = data.session.user; await loadDash(); }
   else { show("signin"); }
 })();
 </script>
