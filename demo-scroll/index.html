@@ -100,12 +100,21 @@ body.playing .scrollhint{opacity:0}
 .sec-b .sub{opacity:.6;letter-spacing:.12em;margin-bottom:8px;font-size:.95rem}
 .scrubhint{display:block;margin:12px 0 30px;font-size:.72rem;letter-spacing:.32em;opacity:.5}
 .bustwrap{position:relative;height:74vh;min-height:480px;overflow:hidden}
+.bustmove{position:absolute;inset:0;will-change:transform}
 #humanvid{position:absolute;left:50%;bottom:-3%;height:105%;width:auto;aspect-ratio:1/1;
   transform:translateX(-50%);object-fit:cover;display:block;pointer-events:none;user-select:none;
   filter:brightness(1.18) saturate(1.22);mix-blend-mode:multiply;
   -webkit-mask-image:linear-gradient(to right,transparent 0,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 12%,#000 100%);
   mask-image:linear-gradient(to right,transparent 0,#000 10%,#000 90%,transparent 100%),linear-gradient(to bottom,transparent 0,#000 12%,#000 100%);
   -webkit-mask-composite:source-in;mask-composite:intersect}
+.hotspot{position:absolute;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;
+  border:1.5px solid rgba(0,0,0,.55);background:rgba(255,255,255,.7);cursor:pointer;z-index:3;padding:0}
+.hotspot::after{content:"";position:absolute;inset:7px;border-radius:50%;background:#111;animation:hpulse 2s ease-in-out infinite}
+@keyframes hpulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(.55);opacity:.45}}
+.hottipt{position:absolute;left:50%;top:6%;transform:translateX(-50%);background:#111;color:#fff;
+  font-size:.7rem;letter-spacing:.22em;padding:9px 20px;border-radius:999px;opacity:0;
+  transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:4}
+.hottipt.show{opacity:1}
 .brainchips{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:44px 20px 60px;max-width:760px;margin:0 auto;background:var(--wht)}
 .brainchips span{font-size:.78rem;letter-spacing:.18em;border:1px solid rgba(0,0,0,.22);border-radius:999px;padding:9px 20px;opacity:.7}
 /* SECTION C : black, ambitions horizontal */
@@ -121,10 +130,22 @@ body.playing .scrollhint{opacity:0}
 .hpanel p{font-size:.98rem;line-height:1.75;opacity:.72;max-width:34em}
 .hpanel .yr{margin-top:22px;font-size:.72rem;letter-spacing:.3em;opacity:.5}
 .hdrag{text-align:center;margin-top:30px;font-size:.72rem;letter-spacing:.34em;opacity:.45}
+.hprog{width:min(60vw,380px);height:2px;background:rgba(255,255,255,.16);border-radius:2px;margin:22px auto 0;overflow:hidden}
+.hprog span{display:block;height:100%;width:0;background:#fff;border-radius:2px}
+.hpanel.hintro{background:transparent;border:none;justify-content:center}
+.hpanel.hintro h3{font-size:clamp(2.6rem,8vw,5rem);letter-spacing:.1em}
+.hpanel.hintro .ch{opacity:.6}
+.hpanel.hintro p{font-size:1.05rem}
 /* SECTION D : white placeholder */
 .sec-d{background:var(--wht);color:#111;padding:130px 20px;text-align:center}
-.sec-d h2{font-size:clamp(1.5rem,6vw,2.4rem);letter-spacing:.3em;font-weight:600;margin-bottom:16px}
-.sec-d p{opacity:.55;letter-spacing:.14em}
+.sec-d h2{font-size:clamp(1.5rem,6vw,2.4rem);letter-spacing:.3em;font-weight:600;margin-bottom:20px}
+.sec-d .shimmer{font-size:1.05rem;letter-spacing:.14em;
+  background:linear-gradient(100deg,rgba(0,0,0,.45) 20%,#000 45%,rgba(0,0,0,.45) 70%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shim 3.2s linear infinite}
+@keyframes shim{from{background-position:200% 0}to{background-position:-20% 0}}
+.sec-d .soon{margin-top:22px;font-size:.75rem;letter-spacing:.4em;opacity:.55;display:flex;align-items:center;justify-content:center;gap:12px}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:#111;animation:hpulse 2s ease-in-out infinite}
 /* SECTION E : contacts */
 .sec-e{background:var(--blk);text-align:center;padding:120px 20px 70px}
 .sec-e h2{font-size:clamp(2rem,8vw,3.6rem);letter-spacing:.14em;margin-bottom:14px}
@@ -133,6 +154,12 @@ body.playing .scrollhint{opacity:0}
 .links a{color:#fff;text-decoration:none;font-size:.78rem;letter-spacing:.24em;
   border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:11px 24px;transition:.3s}
 .links a:hover{background:#fff;color:#000}
+.links.rv.in a{opacity:0;animation:linkup .7s cubic-bezier(.2,.9,.3,1.15) forwards}
+.links.rv.in a:nth-child(2){animation-delay:.08s}
+.links.rv.in a:nth-child(3){animation-delay:.16s}
+.links.rv.in a:nth-child(4){animation-delay:.24s}
+.links.rv.in a:nth-child(5){animation-delay:.32s}
+@keyframes linkup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 footer{font-size:.7rem;letter-spacing:.3em;opacity:.4}
 .rv{opacity:0;transform:translateY(36px);transition:opacity .9s ease,transform .9s ease}
 .rv.in{opacity:1;transform:none}
@@ -166,10 +193,16 @@ footer{font-size:.7rem;letter-spacing:.3em;opacity:.4}
 <section class="sec-b">
   <h2 class="rv">INSIDE THE MACHINE</h2>
   <p class="sub rv">Half human. Half skeleton. Every part thinks.</p>
-  <span class="scrubhint rv">←&nbsp;&nbsp;MOVE YOUR MOUSE&nbsp;&nbsp;→</span>
+  <span class="scrubhint rv">IT FOLLOWS YOUR CURSOR</span>
   <div class="bustwrap rv">
-    <video id="humanvid" muted playsinline loop preload="auto" disablepictureinpicture
-      tabindex="-1" aria-hidden="true" src="assets/character.mp4"></video>
+    <div class="bustmove" id="bustmove">
+      <video id="humanvid" muted playsinline loop preload="auto" disablepictureinpicture
+        tabindex="-1" aria-hidden="true" src="assets/character.mp4"></video>
+      <button class="hotspot" style="left:50%;top:15%" data-part="prefrontal" aria-label="Prefrontal cortex"></button>
+      <button class="hotspot" style="left:42%;top:22%" data-part="temporal" aria-label="Temporal lobe"></button>
+      <button class="hotspot" style="left:58%;top:22%" data-part="parietal" aria-label="Parietal lobe"></button>
+      <div class="hottipt" id="hottipt">info coming soon</div>
+    </div>
   </div>
   <div class="brainchips rv">
     <span>PREFRONTAL — the empire plan</span>
@@ -185,6 +218,8 @@ footer{font-size:.7rem;letter-spacing:.3em;opacity:.4}
   <div class="hsticky">
     <div class="hlabel">AMBITIONS →</div>
     <div class="htrack" id="htrack">
+      <div class="hpanel hintro"><div class="ch">THE ARC, FRAME BY FRAME</div><h3>AMBITIONS</h3>
+        <p>Keep scrolling — the story moves sideways from here.</p></div>
       <div class="hpanel"><div class="ch">NOW</div><h3>MBBS Student</h3>
         <p>The foundation years at Madhubani Medical College. Anatomy by day, ideas by night.</p><div class="yr">2026 —</div></div>
       <div class="hpanel"><div class="ch">BUILDING</div><h3>Builder</h3>
@@ -199,6 +234,7 @@ footer{font-size:.7rem;letter-spacing:.3em;opacity:.4}
         <p>Mehnat apni. Natija Uparwale pe. Picture abhi baaki hai.</p><div class="yr">—</div></div>
     </div>
     <div class="hdrag">KEEP&nbsp;SCROLLING&nbsp;→</div>
+    <div class="hprog"><span id="hprogfill"></span></div>
   </div>
 </section>
 
@@ -206,7 +242,8 @@ footer{font-size:.7rem;letter-spacing:.3em;opacity:.4}
 
 <section class="sec-d">
   <h2 class="rv">SECTION D</h2>
-  <p class="rv">Something lives here. Soon.</p>
+  <p class="rv shimmer">Something lives here.</p>
+  <p class="rv soon"><span class="pulse-dot"></span>SOON</p>
 </section>
 
 <section class="sec-e">
@@ -304,7 +341,7 @@ var heartSvgs=heartsEl?heartsEl.querySelectorAll("svg"):[];
 function rnd(a,b){return a+Math.random()*(b-a);}
 function initStars(){
   stars.length=0;
-  var n=Math.max(60,Math.min(200,Math.round(W*H/11000)));
+  var n=Math.max(33,Math.min(110,Math.round(W*H/20000)));
   for(var i=0;i<n;i++)stars.push({x:rnd(0,W),y:rnd(0,H),z:rnd(.15,1)});
 }
 function parkShip(){ship.x=W/2;ship.y=H*0.68;ship.tx=ship.x;ship.ty=ship.y;}
@@ -439,12 +476,10 @@ function frame(now){
   var spd=1+stage*.32,s,st;
   for(s=0;s<stars.length;s++){
     st=stars[s];
-    st.y+=st.z*46*spd*dt;
+    st.y+=st.z*30*spd*dt;
     if(st.y>H+8){st.y=-8;st.x=rnd(0,W);}
-    var len=st.z*stage*9*spd;
-    ctx.strokeStyle="rgba(255,255,255,"+(0.25+st.z*0.5).toFixed(2)+")";
-    ctx.lineWidth=st.z*1.6;
-    ctx.beginPath();ctx.moveTo(st.x,st.y);ctx.lineTo(st.x,st.y-len);ctx.stroke();
+    ctx.fillStyle="rgba(255,255,255,"+(0.10+st.z*0.22).toFixed(2)+")";
+    ctx.beginPath();ctx.arc(st.x,st.y,st.z*1.8,0,6.29);ctx.fill();
   }
   for(var k=0;k<mets.length;k++){
     var mm=mets[k];
@@ -534,13 +569,15 @@ document.getElementById("bg").classList.add("show");
     requestAnimationFrame(loop);
   })(0);
 })();
-/* horizontal ambitions */
+/* horizontal ambitions + progress */
 (function(){
-  var w=document.getElementById('hwrap'),t=document.getElementById('htrack');
+  var w=document.getElementById('hwrap'),t=document.getElementById('htrack'),f=document.getElementById('hprogfill');
   function upd(){
     var r=w.getBoundingClientRect();
     var pr=Math.min(1,Math.max(0,-r.top/(r.height-innerHeight)));
     t.style.transform='translateX('+(-pr*(t.scrollWidth-innerWidth))+'px)';
+    if(f)f.style.width=(pr*100).toFixed(1)+'%';
+    w.classList.toggle('hgo',pr>0.02);
   }
   addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();
 })();
@@ -551,42 +588,40 @@ document.getElementById("bg").classList.add("show");
   },{threshold:.12});
   document.querySelectorAll('.rv').forEach(function(el){io.observe(el);});
 })();
-/* character scrub — mouse is a dial, separate IIFE */
+/* character cursor-follow + head hotspots (hooks for later info integration) */
 (function(){
 "use strict";
-var v=document.getElementById('humanvid');
-if(!v)return;
-var SENS=0.8,EPS=0.04;
-var prevX=null,targetTime=0,seeking=false,requested=-1;
-function dur(){var d=v.duration;return (d&&isFinite(d)&&d>0)?d:0;}
-function pump(){
-  if(seeking||Math.abs(targetTime-v.currentTime)<EPS)return;
-  seeking=true;requested=targetTime;
-  try{v.currentTime=targetTime;}catch(e){seeking=false;}
-}
-v.addEventListener('seeked',function(){seeking=false;if(targetTime!==requested)pump();});
-function reanchor(){prevX=null;}
-document.addEventListener('mouseleave',reanchor);
-window.addEventListener('blur',reanchor);
-document.addEventListener('visibilitychange',reanchor);
-var reduce=false,nohover=false;
-try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+var mv=document.getElementById('bustmove'),v=document.getElementById('humanvid');
+if(!mv||!v)return;
+var tx=0,ty=0,cx=0,cy=0;
+var nohover=false,reduce=false;
 try{nohover=!matchMedia('(hover: hover) and (pointer: fine)').matches;}catch(e){}
+try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 v.pause();
-function anchor(){targetTime=v.currentTime;if(!v.currentTime){try{v.currentTime=0.001;}catch(e){}}}
+function anchor(){if(!v.currentTime){try{v.currentTime=0.001;}catch(e){}}}
 v.addEventListener('loadeddata',anchor,{once:true});
 if(v.readyState>=2)anchor();
-if(reduce){return;}
-if(nohover){v.addEventListener('canplay',function(){try{var p=v.play();if(p)p.catch(function(){});}catch(e){}},{once:true});return;}
-window.addEventListener('mousemove',function(e){
-  var d=dur();
-  if(prevX===null||!d){prevX=e.clientX;return;}
-  var delta=prevX-e.clientX;prevX=e.clientX;
-  if(!delta)return;
-  var t=targetTime+(delta/window.innerWidth)*SENS*d;
-  targetTime=Math.min(d,Math.max(0,t));
-  pump();
-},{passive:true});
+if(nohover&&!reduce){v.addEventListener('canplay',function(){try{var p=v.play();if(p&&p.catch)p.catch(function(){});}catch(e){}},{once:true});}
+if(!nohover&&!reduce){
+  window.addEventListener('mousemove',function(e){
+    tx=(e.clientX/window.innerWidth-0.5)*2;
+    ty=(e.clientY/window.innerHeight-0.5)*2;
+  },{passive:true});
+  (function loop(){
+    cx+=(tx-cx)*0.055;cy+=(ty-cy)*0.055;
+    mv.style.transform='translate3d('+(cx*38).toFixed(1)+'px,'+(cy*26).toFixed(1)+'px,0)';
+    requestAnimationFrame(loop);
+  })();
+}
+var tip=document.getElementById('hottipt'),tt=null;
+mv.querySelectorAll('.hotspot').forEach(function(h){
+  h.addEventListener('click',function(e){
+    e.stopPropagation();
+    tip.textContent=(h.getAttribute('data-part')||'part').toUpperCase()+' — info coming soon';
+    tip.classList.add('show');
+    clearTimeout(tt);tt=setTimeout(function(){tip.classList.remove('show');},1600);
+  });
+});
 })();
 /* playbtn + scrolled class */
 (function(){
