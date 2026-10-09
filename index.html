@@ -62,7 +62,7 @@ body{background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF
  color:rgba(255,255,255,.42);text-shadow:0 0 8px rgba(255,255,255,.2);opacity:0;transition:opacity 1.2s ease;white-space:nowrap}
 #hud.show{opacity:1}
 /* ---- Starfall play mode ---- */
-#playbtn{position:fixed;left:50%;bottom:calc(66px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;width:58px;height:58px;border-radius:50%;cursor:pointer;border:1px solid rgba(255,255,255,.24);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.20),rgba(255,255,255,.06));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(255,255,255,.12),0 10px 26px rgba(0,0,0,.45);transition:opacity .45s ease,transform .45s cubic-bezier(.2,1.4,.4,1)}
+#playbtn{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;width:58px;height:58px;border-radius:50%;cursor:pointer;border:1px solid rgba(255,255,255,.24);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.20),rgba(255,255,255,.06));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(255,255,255,.12),0 10px 26px rgba(0,0,0,.45);transition:opacity .45s ease,transform .45s cubic-bezier(.2,1.4,.4,1)}
 #playbtn svg{width:22px;height:22px;fill:#fff;margin-left:2px;filter:drop-shadow(0 0 4px rgba(255,255,255,.3))}
 #playbtn:active{transform:translateX(-50%) scale(.86)}
 body.playing #playbtn{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(16px) scale(.6)}
@@ -214,8 +214,8 @@ body.playing .brand .xslot{transform:scale(1.14);transition:transform .5s cubic-
 @media (max-width:820px){
  .brand h1{font-size:clamp(2rem,10vw,3rem)}
  .tagline{font-size:.92rem}
- .bio{top:44%;font-size:clamp(1.4rem,7vw,2.2rem);white-space:nowrap}
- .plinks{top:75%;gap:.8rem}
+ .bio{top:43%;font-size:clamp(1.3rem,6.4vw,2rem);white-space:nowrap}
+ .plinks{top:73%;gap:1rem}
  .plink{font-size:.9rem}
  .fabwrap{right:14px;bottom:18px;gap:.8rem}
  .fab{width:52px;height:52px}
@@ -442,7 +442,7 @@ var heartSvgs=heartsEl?heartsEl.querySelectorAll("svg"):[];
 function rnd(a,b){return a+Math.random()*(b-a);}
 function initStars(){
   stars.length=0;
-  var n=Math.max(60,Math.min(200,Math.round(W*H/11000)));
+  var n=Math.max(36,Math.min(200,Math.round(W*H/11000)));
   for(var i=0;i<n;i++)stars.push({x:rnd(0,W),y:rnd(0,H),z:rnd(.15,1)});
 }
 function parkShip(){ship.x=W/2;ship.y=H*0.68;ship.tx=ship.x;ship.ty=ship.y;}
@@ -473,11 +473,14 @@ function drawShip(){
   ctx.save();ctx.translate(s.x,s.y+(mode==="ambient"?Math.sin(s.bob)*4:0));
   if(s.flash>0)ctx.globalAlpha=Math.max(.25,1-s.flash*2);
   else if(s.inv>0&&Math.floor(s.inv*10)%2===0)ctx.globalAlpha=.3;
-  var fl=5+Math.random()*7+stage;
-  ctx.fillStyle="rgba(150,190,255,.5)";
-  ctx.beginPath();ctx.moveTo(-3.5,7);ctx.lineTo(0,7+fl);ctx.lineTo(3.5,7);ctx.closePath();ctx.fill();
-  ctx.fillStyle="#ffffff";
-  ctx.beginPath();ctx.moveTo(0,-11);ctx.lineTo(6.5,8);ctx.lineTo(0,3.5);ctx.lineTo(-6.5,8);ctx.closePath();ctx.fill();
+  /* X mascot ship */
+  ctx.strokeStyle="#ffffff";ctx.lineWidth=5;ctx.lineCap="round";
+  ctx.shadowColor="rgba(255,255,255,.55)";ctx.shadowBlur=14;
+  var r=10.5;
+  ctx.beginPath();
+  ctx.moveTo(-r*.72,-r);ctx.lineTo(r*.72,r);
+  ctx.moveTo(r*.72,-r);ctx.lineTo(-r*.72,r);
+  ctx.stroke();
   ctx.restore();
 }
 function die(){
