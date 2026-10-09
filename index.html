@@ -126,11 +126,13 @@ body.playing #hud{color:rgba(255,255,255,.8);font-size:.8rem}
  box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .dx .p1{left:0;transform:skewY(-7deg);transform-origin:right center;border-radius:.02em 0 0 .05em}
 .dx .p2{right:0;transform:skewY(7deg);transform-origin:left center;border-radius:0 .02em .05em 0}
-/* play mode : ADITYA slides away, X stays in its place */
+/* play mode : ADITYA slides away, X glides into its place */
 .brand .aditya-txt{display:inline-block;white-space:nowrap;vertical-align:baseline;
- clip-path:inset(-8% 0 -8% 0);
- transition:clip-path .55s cubic-bezier(.3,1,.3,1),opacity .45s ease,transform .55s cubic-bezier(.3,1,.3,1),filter .45s ease}
-body.playing .brand .aditya-txt{clip-path:inset(-8% 100% -8% 0);opacity:0;transform:translateX(-42px);filter:blur(8px);pointer-events:none}
+ max-width:7em;clip-path:inset(-8% 0 -8% 0);
+ transition:max-width .55s cubic-bezier(.3,1,.3,1),clip-path .55s cubic-bezier(.3,1,.3,1),opacity .45s ease,transform .55s cubic-bezier(.3,1,.3,1),filter .45s ease}
+body.playing .brand .aditya-txt{max-width:0;clip-path:inset(-8% 100% -8% 0);opacity:0;transform:translateX(-42px);filter:blur(8px);pointer-events:none}
+.brand .xslot{transition:transform .5s cubic-bezier(.2,1.4,.4,1)}
+body.playing .brand .xslot{transform:scale(1.14);transition:transform .5s cubic-bezier(.2,1.4,.4,1) .12s}
 @media (prefers-reduced-motion: reduce){
  body.playing .brand .aditya-txt{transition-duration:.01s}
 }
