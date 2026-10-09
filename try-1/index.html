@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio — Footer</title>
+<meta name="description" content="Fresh ideas, imagination, and creative collaboration.">
+<link rel="icon" type="image/svg+xml" href="/try-1/logo.svg">
+<style>
+@font-face{font-family:'DM Sans';src:url('/try-1/fonts/DMSans-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:Epilogue;src:url('/try-1/fonts/Epilogue-Black.woff2') format('woff2');font-weight:900;font-style:normal;font-display:swap}
+:root{--background:#dfe4f2;--foreground:#080909;font-family:'DM Sans',Arial,sans-serif;font-weight:400;color:var(--foreground);background:var(--background);font-synthesis:none}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh}
+a{color:inherit;text-decoration:none}
+a:focus-visible{outline:2px solid currentColor;outline-offset:6px}
+.footer{position:relative;min-height:100vh;padding-top:6.54vw}
+.jobs{margin-left:8.65vw;width:25vw}
+.tag{display:inline-flex;align-items:center;border-radius:100px;background:#f7f8fa;padding:.39vw .61vw;font-size:.88vw;line-height:1.2;height:1.9vw;white-space:nowrap}
+.headline{font-family:Epilogue,Arial,sans-serif;font-weight:900;font-size:1.66vw;line-height:1.2;letter-spacing:0}
+.job-title{display:block;margin-top:1.45vw}
+.footer-nav{display:flex;flex-direction:column;align-items:flex-start;gap:.93vw;margin-top:1.3vw;font-size:1.075vw;line-height:1.35}
+.logo{position:absolute;left:40.33vw;top:7.7vw;width:17vw}
+.logo svg{display:block;width:100%;height:auto}
+.contact{position:absolute;left:74.3vw;top:6.54vw}
+.contact-links{display:flex;flex-direction:column;align-items:flex-start;margin-top:1.45vw;white-space:nowrap}
+.note{margin:1.05vw 0 0;font-size:.733vw;line-height:1.4;white-space:nowrap}
+.socials{display:flex;align-items:center;gap:1.43vw;margin-top:1.61vw}
+.socials span,.socials img{display:block;width:1.71vw;height:1.71vw}
+
+.footer{isolation:isolate;overflow:hidden}
+.footer-background{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.footer-background video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+
+@media(max-width:700px){
+  :root{--background:#f0eefa;background:var(--background)}
+  body{background:var(--background)}
+  .footer{display:flex;flex-direction:column;gap:36px;min-height:100svh;padding:40px 24px 0;background:var(--background)}
+  .logo{position:static;order:0;align-self:flex-start;width:210px;max-width:75%;margin-bottom:4px}
+  .jobs{order:1;margin:0;width:100%}
+  .tag{height:30px;padding:6px 11px;font-size:14px}
+  .headline{font-size:clamp(22px,6.3vw,30px);line-height:1.25}
+  .job-title,.contact-links{margin-top:19px}
+  .footer-nav{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;margin-top:20px;font-size:17px;line-height:1.4}
+  .footer-nav span{display:flex;align-items:center;min-height:44px}
+  .contact{position:static;order:2;width:100%}
+  .contact-links{gap:4px;white-space:normal}
+  .note{max-width:34ch;margin:16px 0 0;font-size:14px;line-height:1.5;white-space:normal}
+  .socials{gap:18px;margin-top:20px}
+  .socials span{display:flex;align-items:center;justify-content:center;width:44px;height:44px}
+  .socials img{width:30px;height:30px}
+  .socials span:first-child{margin-left:-7px}
+  .footer-background{position:relative;inset:auto;order:3;z-index:auto;flex:none;align-self:center;width:calc(100% + 48px);aspect-ratio:4/3;margin-top:-16px}
+  .footer-background video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+}
+</style>
+</head>
+<body>
+<footer class="footer" aria-label="Footer">
+  <div class="footer-background" aria-hidden="true">
+    <video id="footerVideo" src="/try-1/footer-scrub.mp4" muted playsinline preload="auto"></video>
+  </div>
+  <div class="jobs">
+    <span class="tag">have a fresh idea?</span>
+    <span class="headline job-title">imagination<br>meets craft</span>
+    <div class="footer-nav">
+      <span>Made</span>
+      <span>Story</span>
+      <span>In the lab</span>
+      <span>Say hey</span>
+    </div>
+  </div>
+  <div class="logo" role="img" aria-label="Studio logo">
+    <!-- TEMPORARY stand-in: the supplied BrandLogo SVG (outlined script Logoipsum, 169x40 viewBox)
+         was truncated in Aditya's paste and never recovered. Swap in the exact path when supplied.
+         Inline copy uses fill="currentColor" (#080909); standalone /try-1/logo.svg uses #080909. -->
+    <svg viewBox="0 0 169 40" aria-hidden="true" focusable="false">
+      <text x="84.5" y="28" text-anchor="middle" font-family="'Snell Roundhand','Brush Script MT','Segoe Script','Apple Chancery',cursive" font-size="30" font-style="italic" fill="currentColor">studio</text>
+    </svg>
+  </div>
+  <div class="contact">
+    <span class="tag">say hey</span>
+    <div class="headline contact-links">
+      <span>let’s team up!</span>
+      <span>bring us your idea*</span>
+    </div>
+    <p class="note">*good things start with one spark. let’s make yours.</p>
+    <div class="socials">
+      <span aria-label="LinkedIn"><img src="/try-1/linkedin.svg" alt="" width="35" height="35"></span>
+      <span aria-label="Instagram"><img src="/try-1/instagram.svg" alt="" width="35" height="35"></span>
+      <span aria-label="TikTok"><img src="/try-1/tiktok.svg" alt="" width="35" height="35"></span>
+    </div>
+  </div>
+</footer>
+<script>
+(function () {
+  'use strict';
+  var TAU = Math.PI * 2;
+  function wrappedAngle(angle) { return (angle % TAU + TAU) % TAU; }
+
+  /* gaze-frames.json — RECONSTRUCTED (original was truncated in the paste).
+     16 evenly-spaced angles, piecewise-linear interpolation between the four
+     calibrated cardinal anchors: Right→2.54167s, Down→0.33333s, Left→1.0s,
+     Up→1.70833s (orbit period 2.94445s). Rows: [angleInRadians, videoTimeInSeconds]. */
+  var GAZE_FRAMES = [
+    [0, 2.54167], [0.3927, 2.7257], [0.7854, 2.90973], [1.1781, 3.09375],
+    [1.5708, 0.33333], [1.9635, 0.5], [2.35619, 0.66667], [2.74889, 0.83333],
+    [3.14159, 1], [3.53429, 1.17708], [3.92699, 1.35417], [4.31969, 1.53125],
+    [4.71239, 1.70833], [5.10509, 1.91667], [5.49779, 2.125], [5.89049, 2.33333]
+  ];
+
+  function timeForAngle(angle) {
+    var target = wrappedAngle(angle);
+    var nearestTime = GAZE_FRAMES[0][1];
+    var nearestDistance = Infinity;
+    for (var i = 0; i < GAZE_FRAMES.length; i++) {
+      var sampleAngle = GAZE_FRAMES[i][0], time = GAZE_FRAMES[i][1];
+      var difference = Math.abs(target - sampleAngle);
+      var distance = Math.min(difference, TAU - difference);
+      if (distance < nearestDistance) { nearestDistance = distance; nearestTime = time; }
+    }
+    return nearestTime + 1 / 240;
+  }
+
+  var video = document.getElementById('footerVideo');
+  var frame = 0;
+  var desiredTime = 0;
+  var pointer = null;
+  var disposed = false;
+  var mobile = window.matchMedia('(max-width: 700px)');
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function seek() {
+    frame = 0;
+    if (disposed || mobile.matches || video.readyState < 2 || video.seeking) return;
+    if (Math.abs(video.currentTime - desiredTime) > 1 / 48) {
+      video.currentTime = Math.min(desiredTime, video.duration - 1 / 24);
+    }
+  }
+  function schedule() {
+    if (!frame) frame = requestAnimationFrame(seek);
+  }
+  function updateTarget() {
+    if (mobile.matches || !pointer) return;
+    var rect = video.getBoundingClientRect();
+    var scale = Math.max(rect.width / 1920, rect.height / 1080);
+    // Match the exact object-fit: cover positioning, including mobile crops.
+    var eyeX = rect.left + rect.width / 2 + (948 - 960) * scale;
+    var eyeY = rect.top + rect.height / 2 + (418 - 540) * scale;
+    var dx = pointer.x - eyeX;
+    var dy = pointer.y - eyeY;
+    // Avoid unstable angles directly between the eyes.
+    if (Math.hypot(dx, dy) > 8) {
+      desiredTime = timeForAngle(Math.atan2(dy, dx));
+      schedule();
+    }
+  }
+  function onMove(event) {
+    pointer = { x: event.clientX, y: event.clientY };
+    updateTarget();
+  }
+  function onScrollResize() {
+    updateTarget();
+  }
+  // Apply the current mode: mobile = muted loop (paused under reduced-motion),
+  // desktop = paused at t=0 until the pointer scrubs. Unavailable autoplay leaves
+  // the available frame visible; no error is shown and no controls are forced.
+  function applyMode() {
+    video.loop = mobile.matches;
+    if (mobile.matches && !reducedMotion.matches) {
+      var p = video.play();
+      if (p && typeof p.catch === 'function') { p.catch(function () {}); }
+    } else {
+      video.pause();
+    }
+  }
+  function onMobileChange() { applyMode(); updateTarget(); }
+  function onMotionChange() { applyMode(); }
+  function onSeeked() { schedule(); } // apply the newest target once decoding finishes
+
+  video.addEventListener('loadeddata', applyMode);
+  video.addEventListener('seeked', onSeeked);
+  window.addEventListener('pointermove', onMove, { passive: true });
+  window.addEventListener('scroll', onScrollResize, { passive: true });
+  window.addEventListener('resize', onScrollResize);
+  if (mobile.addEventListener) {
+    mobile.addEventListener('change', onMobileChange);
+    reducedMotion.addEventListener('change', onMotionChange);
+  } else if (mobile.addListener) {
+    mobile.addListener(onMobileChange);
+    reducedMotion.addListener(onMotionChange);
+  }
+  applyMode();
+
+  // Single-page equivalent of the component's unmount cleanup.
+  window.addEventListener('pagehide', function cleanup() {
+    disposed = true;
+    if (frame) { cancelAnimationFrame(frame); frame = 0; }
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('scroll', onScrollResize);
+    window.removeEventListener('resize', onScrollResize);
+    video.removeEventListener('seeked', onSeeked);
+    if (mobile.removeEventListener) {
+      mobile.removeEventListener('change', onMobileChange);
+      reducedMotion.removeEventListener('change', onMotionChange);
+    } else if (mobile.removeListener) {
+      mobile.removeListener(onMobileChange);
+      reducedMotion.removeListener(onMotionChange);
+    }
+  });
+})();
+</script>
+</body>
+</html>
