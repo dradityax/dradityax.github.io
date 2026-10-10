@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Journal — Aditya X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Inter:wght@400;500;600&family=Parisienne&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stack.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #070b16; color: #eef1ff;
+    font-family: Inter, system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  #intro { text-align: center; padding: 64px 20px 8px; }
+  #intro .signature {
+    font-family: Parisienne, cursive;
+    font-size: clamp(38px, 8vw, 56px);
+    color: #f4f6ff;
+  }
+  #intro .sub {
+    margin-top: 6px; font-size: 12px; letter-spacing: .22em;
+    text-transform: uppercase; color: #7a86b8;
+  }
+  header.hero { text-align: center; padding: 26px 20px 6px; }
+  header.hero h1 {
+    font-family: Fraunces, Georgia, serif; font-weight: 500;
+    font-size: clamp(30px, 6vw, 44px); margin: 0 0 8px; color: #f4f6ff;
+  }
+  header.hero .lede { color: #8b93b8; margin: 0; font-size: 15px; }
+  footer {
+    text-align: center; color: #5d6690; font-size: 13px;
+    padding: 28px 16px 40px;
+  }
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <div class="signature">Aditya X</div>
+  <div class="sub">Private Journal</div>
+</div>
+
+<div id="app">
+<header class="hero">
+  <h1>Journal</h1>
+  <p class="lede">One card per day, newest on top. Tap a card to read it fully.</p>
+</header>
+
+<div class="stk-toolbar">
+  <label for="stk-date">Jump to date</label>
+  <input type="date" id="stk-date">
+  <button type="button" id="stk-today">Latest</button>
+</div>
+
+<section class="stk-wrap">
+  <div id="stk-stack" class="stk-stack"></div>
+  <p class="stk-note" id="stk-note"></p>
+</section>
+
+<footer>&copy; <span id="year"></span> Aditya X.</footer>
+</div>
+
+<script src="journal.js"></script>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
