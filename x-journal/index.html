@@ -789,10 +789,21 @@ function boot(){
   requestAnimationFrame(tick);
   runEntrance();
   setTimeout(function(){ if(!reduced) jdxLoop(); }, 1500);
+  /* ---------- auto-lock: reload (back to password) after 2 min idle ---------- */
+  var IDLE_MS = 120000, lockTimer = null;
+  function armIdle(){
+    clearTimeout(lockTimer);
+    lockTimer = setTimeout(function(){ location.reload(); }, IDLE_MS);
+  }
+  ["pointerdown","keydown","touchstart","wheel"].forEach(function(evt){
+    window.addEventListener(evt, armIdle, {passive:true});
+  });
+  var rc = document.querySelector(".reader-card");
+  if(rc){ rc.addEventListener("scroll", armIdle, {passive:true}); }
+  armIdle();
 }
 function unlock(){
   document.getElementById("lock").classList.add("hide");
-  try{ sessionStorage.setItem("xj-auth","1"); }catch(_){}
   boot();
 }
 async function tryPass(pw){
@@ -815,10 +826,8 @@ document.getElementById("lockForm").addEventListener("submit", async function(ev
   }
 });
 (function initLock(){
-  var ok=false;
-  try{ ok = sessionStorage.getItem("xj-auth")==="1"; }catch(_){}
-  if(ok){ unlock(); }
-  else{ document.getElementById("lockInput").focus(); }
+  /* password is asked on EVERY fresh load — no persistence */
+  document.getElementById("lockInput").focus();
 })();
 })();
 </script>
