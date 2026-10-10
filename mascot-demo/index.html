@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mascot Demo — Aditya X</title>
+<meta name="description" content="Demo: the living X mascot from the Aditya X homepage. Trigger every activity on demand.">
+<meta name="robots" content="noindex, nofollow">
+<style>
+  @font-face{font-family:'Quicksand';src:url('../assets/quicksand.woff2') format('woff2');font-weight:400 700;font-display:swap}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;background:#000;color:#fff;font-family:'Quicksand',system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;padding:24px;text-align:center}
+  .kick{font-size:.68rem;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+  h1.title{font-size:clamp(1.4rem,5vw,2rem);font-weight:700;letter-spacing:.04em}
+  .stage{font-size:clamp(120px,32vw,210px);line-height:1;padding:.4em 0 .1em}
+  /* ---- cute X : copied from homepage ---- */
+  .xslot{position:relative;display:inline-block;width:.78em;height:.72em;vertical-align:baseline}
+  .dx{position:absolute;inset:0}
+  .dx .ln{position:absolute;top:0;left:50%;width:.17em;height:100%;background:#fff;
+   border-radius:50%;box-shadow:0 0 12px rgba(255,255,255,.25);transform-origin:center}
+  .dx .l1{transform:translateX(-.20em) scaleY(.236)}
+  .dx .l2{transform:translateX(.20em) scaleY(.236)}
+  .dx .glasses{position:absolute;inset:0;opacity:0;transform:scale(.6);transform-origin:center;
+   transition:opacity .35s ease,transform .45s cubic-bezier(.2,1.6,.4,1);pointer-events:none}
+  .dx .glasses.show{opacity:1;transform:scale(1)}
+  .dx .rim{position:absolute;top:50%;left:50%;width:.26em;height:.26em;border:.04em solid #fff;
+   border-radius:50%;box-shadow:0 0 10px rgba(255,255,255,.3)}
+  .dx .r1{transform:translate(-50%,-50%) translateX(-.20em)}
+  .dx .r2{transform:translate(-50%,-50%) translateX(.20em)}
+  .dx .bridge{position:absolute;top:50%;left:50%;width:.18em;height:.04em;background:#fff;
+   border-radius:.02em;transform:translate(-50%,-50%)}
+  .dx .book{position:absolute;left:50%;bottom:-4%;width:.48em;height:.26em;
+   transform:translateX(-50%) scale(0);transform-origin:center bottom;
+   transition:transform .45s cubic-bezier(.2,1.5,.4,1);pointer-events:none}
+  .dx .book.open{transform:translateX(-50%) scale(1)}
+  .dx .page{position:absolute;top:0;width:50%;height:100%;
+   background:repeating-linear-gradient(to bottom,#f7f2e7 0 .045em,#d9d4c4 .045em .06em);
+   box-shadow:0 2px 8px rgba(0,0,0,.4)}
+  .dx .p1{left:0;transform:skewY(-7deg);transform-origin:right center;border-radius:.02em 0 0 .05em}
+  .dx .p2{right:0;transform:skewY(7deg);transform-origin:left center;border-radius:0 .02em .05em 0}
+  /* ---- caption + controls ---- */
+  #caption{min-height:3.2em;max-width:34ch;font-size:.95rem;line-height:1.6;color:rgba(255,255,255,.72)}
+  .controls{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;max-width:560px}
+  .controls button{font-family:inherit;font-size:.82rem;font-weight:700;letter-spacing:.08em;
+   padding:.85rem 1.4rem;border-radius:999px;cursor:pointer;color:#fff;
+   border:1px solid rgba(255,255,255,.24);
+   background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.16),rgba(255,255,255,.05));
+   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+   transition:transform .15s ease,box-shadow .3s ease,opacity .3s}
+  .controls button:hover{box-shadow:0 0 22px rgba(255,255,255,.22)}
+  .controls button:active{transform:scale(.93)}
+  .controls button:disabled{opacity:.35;cursor:default;box-shadow:none}
+  .home{margin-top:.4rem;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;
+   color:rgba(255,255,255,.45);text-decoration:none}
+</style>
+</head>
+<body>
+  <div class="kick">Aditya X · mascot demo</div>
+  <h1 class="title">The living X</h1>
+  <div class="stage" aria-hidden="true">
+    <span class="xslot"><span class="dx"><span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span><span class="glasses" id="dxg"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span><span class="book" id="dxb"><span class="page p1"></span><span class="page p2"></span></span></span></span>
+  </div>
+  <p id="caption">Tap an activity below — the X performs it on demand.</p>
+  <div class="controls">
+    <button data-act="blink">👁&nbsp; Blink</button>
+    <button data-act="glasses">🤓&nbsp; Glasses</button>
+    <button data-act="read">📖&nbsp; Read</button>
+    <button data-act="morph">✖&nbsp; Morph to X</button>
+  </div>
+  <a class="home" href="../">← home</a>
+
+<script>
+(function(){
+"use strict";
+var dx1=document.getElementById('dx1'), dx2=document.getElementById('dx2');
+var dxg=document.getElementById('dxg'), dxb=document.getElementById('dxb');
+var caption=document.getElementById('caption');
+var btns=Array.prototype.slice.call(document.querySelectorAll('.controls button'));
+var busy=false;
+
+var DX_DOT1="translateX(-.20em) scaleY(.236)", DX_DOT2="translateX(.20em) scaleY(.236)";
+var DX_BLINK1="translateX(-.20em) scaleY(.02)", DX_BLINK2="translateX(.20em) scaleY(.02)";
+var DX_LINE1="translateX(-.20em) scaleY(1)", DX_LINE2="translateX(.20em) scaleY(1)";
+var DX_X1="translateX(-50%) rotate(40deg) scaleY(1)", DX_X2="translateX(-50%) rotate(-40deg) scaleY(1)";
+
+function wait(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+function dxSet(el,tf,ms,ease){
+  el.style.transition="transform "+ms+"ms "+(ease||"ease-in-out");
+  el.style.transform=tf;
+  return wait(ms);
+}
+function dxBlink(){
+  return Promise.all([dxSet(dx1,DX_BLINK1,150,"ease-in"),dxSet(dx2,DX_BLINK2,150,"ease-in")])
+    .then(function(){ return Promise.all([dxSet(dx1,DX_DOT1,200,"ease-out"),dxSet(dx2,DX_DOT2,200,"ease-out")]); });
+}
+function dxGlasses(){
+  dxg.classList.add("show");
+  return wait(700).then(dxBlink)
+    .then(function(){ return wait(2200); })
+    .then(function(){ dxg.classList.remove("show"); return wait(450); });
+}
+function dxRead(){
+  dxb.classList.add("open");
+  return wait(550).then(function(){
+    var p=Promise.resolve();
+    for(var i=0;i<3;i++){
+      p=p.then(function(){
+        return Promise.all([dxSet(dx1,"translateX(-.14em) scaleY(.236)",380),dxSet(dx2,"translateX(.26em) scaleY(.236)",380)]);
+      }).then(function(){
+        return Promise.all([dxSet(dx1,"translateX(-.26em) scaleY(.236)",380),dxSet(dx2,"translateX(.14em) scaleY(.236)",380)]);
+      });
+    }
+    return p;
+  }).then(function(){
+    return Promise.all([dxSet(dx1,DX_DOT1,320),dxSet(dx2,DX_DOT2,320)]);
+  }).then(function(){ return wait(350); })
+    .then(function(){ dxb.classList.remove("open"); return wait(500); });
+}
+function dxMorph(){
+  return Promise.all([dxSet(dx1,DX_LINE1,1100),dxSet(dx2,DX_LINE2,1100)])
+    .then(function(){ return wait(600); })
+    .then(function(){
+      return Promise.all([dxSet(dx1,DX_X1,1500,"cubic-bezier(.3,1.2,.4,1)"),dxSet(dx2,DX_X2,1500,"cubic-bezier(.3,1.2,.4,1)")]);
+    })
+    .then(function(){ return wait(2500); })
+    .then(function(){ return Promise.all([dxSet(dx1,DX_LINE1,1300),dxSet(dx2,DX_LINE2,1300)]); })
+    .then(function(){ return wait(500); })
+    .then(function(){ return Promise.all([dxSet(dx1,DX_DOT1,1100),dxSet(dx2,DX_DOT2,1100)]); });
+}
+
+var CAPTIONS={
+  blink:"The X blinks — its two dots are living eyes.",
+  glasses:"It pops on its round reading glasses, blinks behind them, and takes them off.",
+  read:"It opens a tiny book and reads — watch the eyes dart side to side.",
+  morph:"The dots stretch into parallel lines, cross into the X, hold it… then relax back."
+};
+var ACTS={blink:dxBlink,glasses:dxGlasses,read:dxRead,morph:dxMorph};
+
+function setBusy(b){ busy=b; btns.forEach(function(x){ x.disabled=b; }); }
+btns.forEach(function(b){
+  b.addEventListener('click',function(){
+    if(busy) return;
+    var act=b.getAttribute('data-act');
+    caption.textContent=CAPTIONS[act];
+    setBusy(true);
+    ACTS[act]().then(function(){ setBusy(false); });
+  });
+});
+
+/* gentle idle life: blink now and then, like the homepage */
+setInterval(function(){ if(!busy) dxBlink(); },4500);
+setTimeout(dxBlink,1200);
+})();
+</script>
+</body>
+</html>
