@@ -287,16 +287,16 @@ html.intro .topbtns{opacity:0}
   .acts{margin-top:18px}
   .btn-pill{padding:13px 22px;font-size:13.5px}
   .link-bold{font-size:13.5px}
-  .grid-wrap{height:64svh;--pitch:190px;--r:14px;--gap:8px}
-  .grid{left:20px;right:20px;width:auto}
+  .grid-wrap{height:64svh;--pitch:244px;--r:16px;--gap:10px}
+  .grid{left:22px;right:22px;width:auto}
   .col{flex:1 1 0;width:auto;min-width:0}
   .f-visit::before,.f-sil::before{background-size:cover;width:100%;height:100%;left:0;top:0}
   .f-visit::after{display:none}
-  .entry{min-height:150px;padding:14px 12px 12px}
-  .entry h3{font-size:15px}
-  .entry .e-date{font-size:10px;letter-spacing:.12em}
-  .entry .e-photo{height:90px;margin:-4px -2px 10px;border-radius:10px}
-  .entry .e-hint{font-size:8.5px;margin-top:10px}
+  .entry{min-height:195px;padding:20px 18px 16px}
+  .entry h3{font-size:19px}
+  .entry .e-date{font-size:11px;letter-spacing:.14em}
+  .entry .e-photo{height:120px;margin:-6px -4px 12px;border-radius:12px}
+  .entry .e-hint{font-size:9.5px;margin-top:12px}
   .reader-card{padding:24px 22px 36px}
 }
 @media(min-width:560px) and (min-aspect-ratio:1/1) and (max-width:899px){
@@ -414,20 +414,26 @@ var pos = [0,0,0], cycles = [0,0,0];
 var dirs = [-1,1,-1]; // alternating drift, like the original
 var autoCol = [true,true,true];
 var userHold = false, readerOpen = false, idleTimer = null;
-var LOOP_SECS = 14.6, RESUME_MS = 3500;
+var LOOP_SECS = 28, RESUME_MS = 3500; // slow, calm drift
+var NC = 3; // visible columns: 3 desktop, 2 mobile (bigger cards)
 
 function buildColumns(){
-  cols.forEach(function(c){ c.innerHTML=""; });
-  var perCol = [[],[],[]];
-  entries.forEach(function(e,i){ perCol[i%3].push({e:e,idx:i}); });
+  NC = window.innerWidth <= 899 ? 2 : 3;
+  var perCol = [];
+  for(var k=0;k<NC;k++) perCol.push([]);
+  cols.forEach(function(c,i){
+    c.style.display = i < NC ? "" : "none";
+    c.innerHTML="";
+  });
+  entries.forEach(function(e,i){ perCol[i%NC].push({e:e,idx:i}); });
   perCol.forEach(function(list,ci){
     var onlyEntries = list.map(function(item){ return entryCell(item.e,item.idx); });
     var onlyFillers = [];
     var fi=0, guard=0;
     while(onlyEntries.length + onlyFillers.length < 7 && guard < 40){
-      onlyFillers.push(fillerCell(FILLERS[ci][fi % FILLERS[ci].length]));
+      onlyFillers.push(fillerCell(FILLERS[ci % FILLERS.length][fi % FILLERS[ci % FILLERS.length].length]));
       fi++; guard++;
-    }
+    };
     var woven=[], f2=0;
     onlyEntries.forEach(function(en){
       woven.push(en);
@@ -438,11 +444,21 @@ function buildColumns(){
     cols[ci].innerHTML += cols[ci].innerHTML; // duplicate once: seamless loop
   });
   requestAnimationFrame(function(){
-    cols.forEach(function(c,i){ cycles[i] = c.scrollHeight/2 || 1; });
-    pos = [0, -cycles[1]*0.35, -cycles[2]*0.55];
+    for(var i=0;i<NC;i++){ cycles[i] = cols[i].scrollHeight/2 || 1; }
+    pos = [0];
+    for(var j=1;j<NC;j++){ pos.push(-cycles[j]*0.35*j); }
+    while(pos.length<3) pos.push(0);
   });
   bindEntryEvents();
 }
+var rzT=null;
+window.addEventListener("resize", function(){
+  clearTimeout(rzT);
+  rzT=setTimeout(function(){
+    var n = window.innerWidth <= 899 ? 2 : 3;
+    if(n!==NC){ buildColumns(); }
+  }, 300);
+});
 
 /* ---------- tap vs drag (drag follows the finger 1:1) ---------- */
 var gridWrap = document.getElementById("gridWrap");
@@ -463,7 +479,7 @@ gridWrap.addEventListener("pointermove", function(ev){
   var dy = ev.clientY - pStart.y;
   if(Math.abs(dy) > 10) pStart.moved = true;
   if(pStart.moved){
-    for(var i=0;i<3;i++){
+    for(var i=0;i<NC;i++){
       var cyc = cycles[i] || 1;
       var raw = pStart.pos[i] + dy;
       pos[i] = raw - cyc*Math.ceil(raw/cyc); // wrap into (-cyc,0], exact 1:1
@@ -534,7 +550,7 @@ var lastT = 0;
 function tick(t){
   var dt = lastT ? Math.min(0.05,(t-lastT)/1000) : 0;
   lastT = t;
-  for(var i=0;i<3;i++){
+  for(var i=0;i<NC;i++){
     if(!reduced && dt > 0 && autoCol[i] && !userHold && !readerOpen && cycles[i] > 0){
       pos[i] += dirs[i]*(cycles[i]/LOOP_SECS)*dt;
       if(pos[i] <= -cycles[i]) pos[i] += cycles[i];
