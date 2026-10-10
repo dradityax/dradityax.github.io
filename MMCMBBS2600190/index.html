@@ -2,70 +2,443 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Journal — Aditya X</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Inter:wght@400;500;600&family=Parisienne&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="stack.css">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: #070b16; color: #eef1ff;
-    font-family: Inter, system-ui, sans-serif;
-    min-height: 100vh;
-  }
-  #intro { text-align: center; padding: 64px 20px 8px; }
-  #intro .signature {
-    font-family: Parisienne, cursive;
-    font-size: clamp(38px, 8vw, 56px);
-    color: #f4f6ff;
-  }
-  #intro .sub {
-    margin-top: 6px; font-size: 12px; letter-spacing: .22em;
-    text-transform: uppercase; color: #7a86b8;
-  }
-  header.hero { text-align: center; padding: 26px 20px 6px; }
-  header.hero h1 {
-    font-family: Fraunces, Georgia, serif; font-weight: 500;
-    font-size: clamp(30px, 6vw, 44px); margin: 0 0 8px; color: #f4f6ff;
-  }
-  header.hero .lede { color: #8b93b8; margin: 0; font-size: 15px; }
-  footer {
-    text-align: center; color: #5d6690; font-size: 13px;
-    padding: 28px 16px 40px;
-  }
+/* ============ TOKENS ============ */
+:root{
+  --paper:#f5f4ef;
+  --ink:#0f0f0e;
+  --card-dark:#151515;
+  --card-cream:#f9f6f1;
+  --red:#ef5d44;
+  --yellow:#fcdd71;
+  --blue:#9fd5f7;
+  --nav-bg:#ffffff;
+  --nav-fg:var(--ink);
+  --nav-muted:#62615d;
+  --nav-line:rgba(15,15,14,.08);
+  --nav-rule:rgba(15,15,14,.16);
+  --col:205.33px;
+  --gap:13px;
+  --pitch:282.5px;
+  --r:22px;
+  --display:"Archivo","Arial Black",Impact,system-ui,sans-serif;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --img-sculpt:url(https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/fc524fc3-03c3-40a1-9954-22eab1322592.webp);
+  --img-man:url(https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/1d56967e-0ed5-40f8-812d-9360e5ec1780.webp);
+  --img-visit:url(https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/5f3f6135-26b9-4c48-92ad-105161327cbc.webp);
+  --img-sil:url(https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/e7b68ae9-9240-4f52-a0a2-89082df4b8d0.webp);
+  --grain:url(https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/40b7fef3-410d-4ef3-bd67-0a2fc7ee5a1d.svg);
+  --mode:mob;
+}
+@media (min-width:560px) and (min-aspect-ratio:1/1){ :root{ --mode:mob-l; } }
+@media (min-width:600px) and (min-height:820px) and (max-aspect-ratio:21/20){ :root{ --mode:tab-p; } }
+@media (min-width:900px) and (min-height:540px) and (min-aspect-ratio:21/20){ :root{ --mode:tab-l; } }
+@media (min-width:1097px) and (min-aspect-ratio:27/25){ :root{ --mode:desk; } }
+
+/* ============ BASE ============ */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+  overflow-x:hidden;
+}
+::selection{background:var(--ink);color:var(--paper)}
+a{color:inherit}
+:focus-visible{outline:2px solid #3b82f6;outline-offset:3px}
+
+/* ============ STAGE ============ */
+.stage{position:relative;min-height:100svh}
+
+/* ============ HEADER (floating white card) ============ */
+.hdr{
+  position:fixed;top:0;left:24px;right:24px;z-index:50;
+  background:var(--nav-bg);color:var(--nav-fg);
+  border-radius:0 0 var(--r) var(--r);
+  box-shadow:0 0 0 1px var(--nav-line),0 16px 36px -24px rgba(15,15,14,.30);
+}
+.hdr-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 28px;
+}
+.brand{display:flex;flex-direction:column;line-height:1;text-decoration:none}
+.brand b{
+  font-family:var(--display);font-weight:900;font-size:24px;
+  font-stretch:85%;letter-spacing:.01em;
+  -webkit-text-stroke:.35px var(--ink);
+}
+.brand span{
+  margin-top:5px;font-size:8.6px;letter-spacing:.28em;
+  color:var(--nav-muted);font-weight:600;
+}
+.hdr-link{
+  font-size:14px;font-weight:600;text-decoration:none;
+  border-bottom:2px solid var(--ink);padding-bottom:2px;
+}
+@media(min-width:1097px){ .hdr{left:40px;right:40px} }
+
+/* ============ HERO ============ */
+.hero{
+  position:relative;min-height:100svh;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  align-items:center;gap:24px;
+  padding:150px 48px 48px;max-width:1440px;margin:0 auto;
+  overflow:hidden;
+}
+.hero-copy{position:relative;z-index:2;max-width:520px}
+.eyebrow{
+  display:inline-block;font-size:11px;font-weight:700;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--nav-muted);
+  margin-bottom:22px;
+}
+h1{
+  font-family:var(--display);font-weight:900;text-transform:uppercase;
+  font-size:clamp(52px,7.2vw,96px);line-height:.94;letter-spacing:-.055em;
+  -webkit-text-stroke:1px var(--ink);
+}
+h1 .ln{display:block;overflow:hidden}
+h1 .ln>span{display:inline-block;will-change:transform}
+.hero p{
+  margin-top:28px;font-size:17px;line-height:1.65;color:#3a3936;max-width:44ch;
+}
+.hero p strong{color:var(--ink)}
+.acts{margin-top:34px;display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.btn-pill{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--ink);color:#fff;text-decoration:none;
+  font-weight:600;font-size:15px;
+  padding:18px 30px;border-radius:999px;
+  transition:transform .25s cubic-bezier(.2,.7,.3,1.2);
+}
+.btn-pill:hover{transform:translateY(-2px)}
+.link-bold{
+  font-weight:700;font-size:15px;text-decoration:none;
+  border-bottom:2px solid var(--ink);padding-bottom:3px;
+}
+
+/* ============ MOSAIC GRID ============ */
+.grid-wrap{
+  position:relative;height:min(78svh,720px);
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent);
+  mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent);
+}
+.grid{
+  position:absolute;top:0;bottom:0;right:0;
+  width:calc(3*var(--col) + 2*var(--gap));
+  display:flex;gap:var(--gap);
+}
+.col{position:relative;width:var(--col);flex:none;will-change:transform;animation:colDown 14.6s linear infinite}
+.col.c2{animation-name:colUp}
+.c1{margin-top:60px}.c2{margin-top:-30px}.c3{margin-top:64px}
+.x1,.x2,.x3{display:none}
+@keyframes colDown{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-50%,0)}}
+@keyframes colUp{from{transform:translate3d(0,-50%,0)}to{transform:translate3d(0,0,0)}}
+@media(prefers-reduced-motion:reduce){.col{animation:none}}
+.cell{
+  position:relative;height:var(--pitch);margin-bottom:var(--gap);
+  border-radius:var(--r);overflow:hidden;flex:none;
+}
+/* photo cells */
+.ph{--pic:var(--img-sculpt);background:#d8d5cf}
+.ph.i-man{--pic:var(--img-man)}
+.ph.i-visit{--pic:var(--img-visit)}
+.ph.i-sil{--pic:var(--img-sil)}
+.ph::before{
+  content:"";position:absolute;background-image:var(--pic);
+  background-repeat:no-repeat;background-size:cover;background-position:center;
+  width:100%;height:100%;left:0;top:0;
+}
+.f-sculpt::before{width:124.19%;height:112.57%;left:-16.07%;top:-8.5%;background-size:100% 100%}
+.f-man::before{width:113.48%;height:103.36%;left:-5.36%;top:-3.54%;background-size:100% 100%}
+.f-visit::before{width:110.07%;height:100%;left:-3.9%;top:8.5%;background-size:100% 100%}
+.f-visit{background:linear-gradient(90deg,#c6c5c3,#9b9a98 55%,#7a7977)}
+.f-visit::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.26),rgba(0,0,0,0) 13%);
+}
+.f-sil::before{width:139.29%;height:126.37%;left:-8.77%;top:-56.64%;background-size:100% 100%}
+/* solid cells */
+.red{background:var(--red)}.yellow{background:var(--yellow)}.blue{background:var(--blue)}
+.cream{background:var(--card-cream);box-shadow:inset 0 0 0 1px #e9e6df}
+.dark{background:var(--card-dark);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.red::after,.yellow::after,.blue::after,.cream::after{
+  content:"";position:absolute;inset:0;
+  background-image:var(--grain);opacity:.13;mix-blend-mode:multiply;pointer-events:none;
+}
+.dark::after{
+  content:"";position:absolute;inset:0;
+  background-image:var(--grain);opacity:.035;mix-blend-mode:screen;pointer-events:none;
+}
+
+/* ============ ENTRIES ============ */
+.entries{
+  position:relative;z-index:2;
+  max-width:880px;margin:0 auto;padding:72px 28px 120px;
+}
+.entries-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:8px;
+}
+.entries-head h2{
+  font-family:var(--display);font-weight:900;text-transform:uppercase;
+  font-size:clamp(30px,4.5vw,46px);letter-spacing:-.04em;
+}
+.entries-head .count{font-size:13px;font-weight:600;color:var(--nav-muted);letter-spacing:.14em}
+.entry{
+  background:var(--card-cream);
+  border:1px solid rgba(15,15,14,.10);border-radius:20px;
+  padding:30px 30px 26px;margin-top:26px;cursor:pointer;
+  box-shadow:0 18px 40px -28px rgba(15,15,14,.35);
+  transition:transform .3s cubic-bezier(.2,.7,.3,1.15),box-shadow .3s;
+}
+.entry:hover{transform:translateY(-3px);box-shadow:0 26px 48px -26px rgba(15,15,14,.4)}
+.entry .e-date{
+  font-family:var(--display);font-weight:700;font-size:13px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--red);
+}
+.entry h3{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(22px,3.4vw,32px);letter-spacing:-.02em;
+  margin:10px 0 12px;line-height:1.15;
+}
+.entry .e-excerpt{color:#4a4945;line-height:1.7;font-size:15.5px}
+.entry .e-full{display:none;color:#2b2a27;line-height:1.85;font-size:15.5px;white-space:pre-line;margin-top:6px}
+.entry.open .e-full{display:block}
+.entry.open .e-excerpt{display:none}
+.entry .e-hint{
+  display:inline-block;margin-top:18px;font-size:11px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--nav-muted);
+}
+.entry.open .e-hint{color:var(--red)}
+.e-empty{color:var(--nav-muted);padding:40px 0;text-align:center}
+
+/* ============ FOOTER ============ */
+.foot{
+  text-align:center;padding:34px 20px 46px;color:var(--nav-muted);
+  font-size:12.5px;letter-spacing:.06em;
+}
+
+/* ============ INTRO / ENTRANCE ============ */
+html.intro .hdr{transform:translateY(calc(-100% - 48px))}
+html.intro .hero-copy>*{opacity:0}
+html.intro h1 .ln>span{transform:translateY(110%)}
+html.intro .grid{opacity:0}
+html.intro .col{animation-play-state:paused}
+
+/* ============ RESPONSIVE ============ */
+/* mobile portrait (default mob) */
+@media(max-width:899px),(max-aspect-ratio:21/20) and (max-width:1096px){
+  .hero{grid-template-columns:1fr;padding:120px 22px 30px;min-height:100svh;align-content:start}
+  .grid-wrap{height:44svh;margin-top:26px;--col:150px;--pitch:210px;--r:16px;--gap:10px}
+  .grid{width:calc(3*var(--col) + 2*var(--gap));right:0}
+  h1{font-size:clamp(46px,13.5vw,72px)}
+  .f-visit::before,.f-sil::before{background-size:cover;width:100%;height:100%;left:0;top:0}
+  .f-visit::after{display:none}
+}
+/* landscape phone */
+@media(min-width:560px) and (min-aspect-ratio:1/1) and (max-width:1096px){
+  .hero{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:center}
+  .grid-wrap{height:72svh;margin-top:0}
+}
+/* tablet portrait */
+@media(min-width:600px) and (min-height:820px) and (max-aspect-ratio:21/20){
+  .hero{padding-top:150px}
+  .grid-wrap{height:40svh}
+}
+/* small screens: hide grain for perf */
+@media(max-width:600px){
+  .red::after,.yellow::after,.blue::after,.cream::after,.dark::after{display:none}
+}
 </style>
 </head>
 <body>
+<div class="stage">
 
-<div id="intro">
-  <div class="signature">Aditya X</div>
-  <div class="sub">Private Journal</div>
+  <header class="hdr">
+    <div class="hdr-row">
+      <a class="brand" href="#" aria-label="Aditya X — private journal">
+        <b>ADITYA X</b>
+        <span>A PRIVATE JOURNAL</span>
+      </a>
+      <a class="hdr-link" href="#entries">Entries</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">A private journal</span>
+      <h1 aria-label="An archive of days cast in memory">
+        <span class="ln"><span>An archive</span></span>
+        <span class="ln"><span>of days</span></span>
+        <span class="ln"><span>cast in</span></span>
+        <span class="ln"><span>memory</span></span>
+      </h1>
+      <p>Days from the climb — MBBS, and everything after — kept one card at a time, newest on top. This page isn&rsquo;t listed anywhere; it&rsquo;s a quiet corner of the site.</p>
+      <div class="acts">
+        <a class="btn-pill" href="#entries">Read the first entry</a>
+        <a class="link-bold" href="#entries">Latest</a>
+      </div>
+    </div>
+    <div class="grid-wrap">
+      <div class="grid" aria-hidden="true">
+        <div class="col c1">
+          <div class="cell red"></div>
+          <div class="cell ph i-sculpt f-sculpt"></div>
+          <div class="cell ph i-man f-man"></div>
+          <div class="cell blue"></div>
+          <div class="cell ph i-visit"></div>
+        </div>
+        <div class="col c2">
+          <div class="cell yellow"></div>
+          <div class="cell ph i-visit f-visit visit"></div>
+          <div class="cell dark"></div>
+          <div class="cell ph i-sil"></div>
+          <div class="cell red"></div>
+        </div>
+        <div class="col c3">
+          <div class="cell blue"></div>
+          <div class="cell cream"></div>
+          <div class="cell ph i-sil f-sil"></div>
+          <div class="cell yellow"></div>
+          <div class="cell ph i-sculpt"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="entries" id="entries">
+    <div class="entries-head">
+      <h2>Entries</h2>
+      <span class="count" id="entry-count"></span>
+    </div>
+    <div id="entry-list"></div>
+  </section>
+
+  <footer class="foot">&copy; <span id="year"></span> Aditya X · A private journal</footer>
+
 </div>
 
-<div id="app">
-<header class="hero">
-  <h1>Journal</h1>
-  <p class="lede">One card per day, newest on top. Tap a card to read it fully.</p>
-</header>
+<script>
+(function(){
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-<div class="stk-toolbar">
-  <label for="stk-date">Jump to date</label>
-  <input type="date" id="stk-date">
-  <button type="button" id="stk-today">Latest</button>
-</div>
+  /* ---------- entrance ---------- */
+  var html = document.documentElement;
+  if(!reduced){
+    html.classList.add("intro");
+    setTimeout(function(){ html.classList.remove("intro"); }, 4000); // safety
+  }
+  function expoOut(t){ return 1 - Math.pow(2, -10 * t); }
 
-<section class="stk-wrap">
-  <div id="stk-stack" class="stk-stack"></div>
-  <p class="stk-note" id="stk-note"></p>
-</section>
+  function runEntrance(){
+    if(reduced){ html.classList.remove("intro"); return; }
+    var T0 = performance.now();
+    // header slides down
+    var hdr = document.querySelector(".hdr");
+    hdr.animate(
+      [{ transform: "translateY(calc(-100% - 48px))" }, { transform: "translateY(0)" }],
+      { duration: 950, easing: "cubic-bezier(0.16,1,0.3,1)", fill: "forwards" }
+    );
+    // hero copy rises
+    var items = document.querySelectorAll(".hero-copy > *");
+    items.forEach(function(el, i){
+      el.animate(
+        [{ opacity: 0, transform: "translateY(14px)" }, { opacity: 1, transform: "translateY(0)" }],
+        { duration: 800, delay: 320 + i * 90, easing: "cubic-bezier(0.16,1,0.3,1)", fill: "forwards" }
+      );
+    });
+    // h1 lines rise from 110%
+    var lines = document.querySelectorAll("h1 .ln > span");
+    lines.forEach(function(sp, i){
+      sp.animate(
+        [{ transform: "translateY(110%)" }, { transform: "translateY(0)" }],
+        { duration: 1000, delay: 300 + i * 85, easing: "cubic-bezier(0.16,1,0.3,1)", fill: "forwards" }
+      );
+    });
+    // grid fades in, marquee starts after handoff
+    var grid = document.querySelector(".grid");
+    grid.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: 1200, delay: 500, easing: "cubic-bezier(0.25,1,0.5,1)", fill: "forwards" }
+    );
+    setTimeout(function(){
+      document.querySelectorAll(".col").forEach(function(c){
+        c.style.animationPlayState = "running";
+      });
+      html.classList.remove("intro");
+      html.setAttribute("data-entrance", "done");
+    }, 2100);
+  }
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", runEntrance);
+  } else { runEntrance(); }
 
-<footer>&copy; <span id="year"></span> Aditya X.</footer>
-</div>
+  /* ---------- seamless marquee: duplicate each column's cells once ---------- */
+  document.querySelectorAll(".col").forEach(function(col){
+    var cells = Array.prototype.slice.call(col.children);
+    cells.forEach(function(cell){
+      col.appendChild(cell.cloneNode(true));
+    });
+  });
 
-<script src="journal.js"></script>
-<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  /* ---------- entries from journal-posts.json ---------- */
+  function escapeHtml(s){
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+  function formatDate(iso){
+    var d = new Date(iso + "T00:00:00");
+    if(isNaN(d)) return iso;
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  }
+  function excerptOf(body){
+    var t = body.replace(/\s+/g, " ").trim();
+    return t.length > 170 ? t.slice(0, 170).trimEnd() + "…" : t;
+  }
+  var listEl = document.getElementById("entry-list");
+  var countEl = document.getElementById("entry-count");
+  fetch("journal-posts.json", { cache: "no-store" })
+    .then(function(r){ return r.json(); })
+    .then(function(posts){
+      posts = posts.slice().sort(function(a, b){ return new Date(b.date) - new Date(a.date); });
+      countEl.textContent = posts.length + (posts.length === 1 ? " entry" : " entries");
+      if(!posts.length){
+        listEl.innerHTML = '<p class="e-empty">No entries yet.</p>';
+        return;
+      }
+      posts.forEach(function(post){
+        var card = document.createElement("article");
+        card.className = "entry";
+        card.innerHTML =
+          '<div class="e-date">' + escapeHtml(formatDate(post.date)) + "</div>" +
+          "<h3>" + escapeHtml(post.title) + "</h3>" +
+          '<p class="e-excerpt">' + escapeHtml(excerptOf(post.body)) + "</p>" +
+          '<div class="e-full">' + escapeHtml(post.body) + "</div>" +
+          '<span class="e-hint">Tap to read</span>';
+        card.addEventListener("click", function(){
+          var open = card.classList.toggle("open");
+          card.querySelector(".e-hint").textContent = open ? "Tap to collapse" : "Tap to read";
+        });
+        listEl.appendChild(card);
+      });
+    })
+    .catch(function(){
+      listEl.innerHTML = '<p class="e-empty">Couldn&rsquo;t load entries.</p>';
+    });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+})();
+</script>
 </body>
 </html>
