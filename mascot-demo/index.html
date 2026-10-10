@@ -3,17 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mascot Demo — Aditya X</title>
-<meta name="description" content="Demo: the living X mascot from the Aditya X homepage. Trigger every activity on demand.">
+<title>Mascot — Aditya X</title>
 <meta name="robots" content="noindex, nofollow">
 <style>
-  @font-face{font-family:'Quicksand';src:url('../assets/quicksand.woff2') format('woff2');font-weight:400 700;font-display:swap}
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%;background:#000;color:#fff;font-family:'Quicksand',system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
-  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;padding:24px;text-align:center}
-  .kick{font-size:.68rem;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.5)}
-  h1.title{font-size:clamp(1.4rem,5vw,2rem);font-weight:700;letter-spacing:.04em}
-  .stage{font-size:clamp(120px,32vw,210px);line-height:1;padding:.4em 0 .1em}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:#000;overflow:hidden}
+  body{display:flex;align-items:center;justify-content:center}
+  .stage{font-size:clamp(140px,34vw,240px);line-height:1}
   /* ---- cute X : copied from homepage ---- */
   .xslot{position:relative;display:inline-block;width:.78em;height:.72em;vertical-align:baseline}
   .dx{position:absolute;inset:0}
@@ -39,56 +35,32 @@
    box-shadow:0 2px 8px rgba(0,0,0,.4)}
   .dx .p1{left:0;transform:skewY(-7deg);transform-origin:right center;border-radius:.02em 0 0 .05em}
   .dx .p2{right:0;transform:skewY(7deg);transform-origin:left center;border-radius:0 .02em .05em 0}
-  /* ---- caption + controls ---- */
-  #caption{min-height:3.2em;max-width:34ch;font-size:.95rem;line-height:1.6;color:rgba(255,255,255,.72)}
-  .controls{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;max-width:560px}
-  .controls button{font-family:inherit;font-size:.82rem;font-weight:700;letter-spacing:.08em;
-   padding:.85rem 1.4rem;border-radius:999px;cursor:pointer;color:#fff;
-   border:1px solid rgba(255,255,255,.24);
-   background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.16),rgba(255,255,255,.05));
-   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-   transition:transform .15s ease,box-shadow .3s ease,opacity .3s}
-  .controls button:hover{box-shadow:0 0 22px rgba(255,255,255,.22)}
-  .controls button:active{transform:scale(.93)}
-  .controls button:disabled{opacity:.35;cursor:default;box-shadow:none}
-  .home{margin-top:.4rem;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;
-   color:rgba(255,255,255,.45);text-decoration:none}
+  @media (prefers-reduced-motion:reduce){
+   .dx .l1{transform:translateX(-50%) rotate(40deg) scaleY(1)}
+   .dx .l2{transform:translateX(-50%) rotate(-40deg) scaleY(1)}
+  }
 </style>
 </head>
 <body>
-  <div class="kick">Aditya X · mascot demo</div>
-  <h1 class="title">The living X</h1>
   <div class="stage" aria-hidden="true">
     <span class="xslot"><span class="dx"><span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span><span class="glasses" id="dxg"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span><span class="book" id="dxb"><span class="page p1"></span><span class="page p2"></span></span></span></span>
   </div>
-  <p id="caption">Tap an activity below — the X performs it on demand.</p>
-  <div class="controls">
-    <button data-act="blink">👁&nbsp; Blink</button>
-    <button data-act="glasses">🤓&nbsp; Glasses</button>
-    <button data-act="read">📖&nbsp; Read</button>
-    <button data-act="morph">✖&nbsp; Morph to X</button>
-  </div>
-  <a class="home" href="../">← home</a>
-
 <script>
 (function(){
 "use strict";
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var dx1=document.getElementById('dx1'), dx2=document.getElementById('dx2');
 var dxg=document.getElementById('dxg'), dxb=document.getElementById('dxb');
-var caption=document.getElementById('caption');
-var btns=Array.prototype.slice.call(document.querySelectorAll('.controls button'));
-var busy=false;
 
 var DX_DOT1="translateX(-.20em) scaleY(.236)", DX_DOT2="translateX(.20em) scaleY(.236)";
 var DX_BLINK1="translateX(-.20em) scaleY(.02)", DX_BLINK2="translateX(.20em) scaleY(.02)";
 var DX_LINE1="translateX(-.20em) scaleY(1)", DX_LINE2="translateX(.20em) scaleY(1)";
 var DX_X1="translateX(-50%) rotate(40deg) scaleY(1)", DX_X2="translateX(-50%) rotate(-40deg) scaleY(1)";
 
-function wait(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
 function dxSet(el,tf,ms,ease){
   el.style.transition="transform "+ms+"ms "+(ease||"ease-in-out");
   el.style.transform=tf;
-  return wait(ms);
+  return new Promise(function(r){ setTimeout(r, reduce?0:ms); });
 }
 function dxBlink(){
   return Promise.all([dxSet(dx1,DX_BLINK1,150,"ease-in"),dxSet(dx2,DX_BLINK2,150,"ease-in")])
@@ -96,13 +68,14 @@ function dxBlink(){
 }
 function dxGlasses(){
   dxg.classList.add("show");
-  return wait(700).then(dxBlink)
-    .then(function(){ return wait(2200); })
-    .then(function(){ dxg.classList.remove("show"); return wait(450); });
+  return new Promise(function(r){ setTimeout(r, 700); })
+    .then(dxBlink)
+    .then(function(){ return new Promise(function(r){ setTimeout(r, 2200); }); })
+    .then(function(){ dxg.classList.remove("show"); return new Promise(function(r){ setTimeout(r, 450); }); });
 }
 function dxRead(){
   dxb.classList.add("open");
-  return wait(550).then(function(){
+  return new Promise(function(r){ setTimeout(r, 550); }).then(function(){
     var p=Promise.resolve();
     for(var i=0;i<3;i++){
       p=p.then(function(){
@@ -114,43 +87,32 @@ function dxRead(){
     return p;
   }).then(function(){
     return Promise.all([dxSet(dx1,DX_DOT1,320),dxSet(dx2,DX_DOT2,320)]);
-  }).then(function(){ return wait(350); })
-    .then(function(){ dxb.classList.remove("open"); return wait(500); });
+  }).then(function(){ return new Promise(function(r){ setTimeout(r, 350); }); })
+    .then(function(){ dxb.classList.remove("open"); return new Promise(function(r){ setTimeout(r, 500); }); });
 }
-function dxMorph(){
-  return Promise.all([dxSet(dx1,DX_LINE1,1100),dxSet(dx2,DX_LINE2,1100)])
-    .then(function(){ return wait(600); })
-    .then(function(){
-      return Promise.all([dxSet(dx1,DX_X1,1500,"cubic-bezier(.3,1.2,.4,1)"),dxSet(dx2,DX_X2,1500,"cubic-bezier(.3,1.2,.4,1)")]);
-    })
-    .then(function(){ return wait(2500); })
-    .then(function(){ return Promise.all([dxSet(dx1,DX_LINE1,1300),dxSet(dx2,DX_LINE2,1300)]); })
-    .then(function(){ return wait(500); })
-    .then(function(){ return Promise.all([dxSet(dx1,DX_DOT1,1100),dxSet(dx2,DX_DOT2,1100)]); });
+/* fully automatic loop — exactly like the homepage */
+var dxN=0;
+async function dxLoop(){
+  while(true){
+    dxN++;
+    await new Promise(function(r){ setTimeout(r, 2800); });
+    for(var i=0;i<2;i++){ await dxBlink(); await new Promise(function(r){ setTimeout(r, i<1?1200:2200); }); }
+    if(dxN%4===2){ await dxGlasses(); }
+    else if(dxN%4===0){ await dxRead(); }
+    await new Promise(function(r){ setTimeout(r, 1500); });
+    await Promise.all([ dxSet(dx1, DX_LINE1, 1100), dxSet(dx2, DX_LINE2, 1100) ]);
+    await new Promise(function(r){ setTimeout(r, 900); });
+    await Promise.all([
+      dxSet(dx1, DX_X1, 1500, "cubic-bezier(.3,1.2,.4,1)"),
+      dxSet(dx2, DX_X2, 1500, "cubic-bezier(.3,1.2,.4,1)")
+    ]);
+    await new Promise(function(r){ setTimeout(r, 8000); });
+    await Promise.all([ dxSet(dx1, DX_LINE1, 1300), dxSet(dx2, DX_LINE2, 1300) ]);
+    await new Promise(function(r){ setTimeout(r, 700); });
+    await Promise.all([ dxSet(dx1, DX_DOT1, 1100), dxSet(dx2, DX_DOT2, 1100) ]);
+  }
 }
-
-var CAPTIONS={
-  blink:"The X blinks — its two dots are living eyes.",
-  glasses:"It pops on its round reading glasses, blinks behind them, and takes them off.",
-  read:"It opens a tiny book and reads — watch the eyes dart side to side.",
-  morph:"The dots stretch into parallel lines, cross into the X, hold it… then relax back."
-};
-var ACTS={blink:dxBlink,glasses:dxGlasses,read:dxRead,morph:dxMorph};
-
-function setBusy(b){ busy=b; btns.forEach(function(x){ x.disabled=b; }); }
-btns.forEach(function(b){
-  b.addEventListener('click',function(){
-    if(busy) return;
-    var act=b.getAttribute('data-act');
-    caption.textContent=CAPTIONS[act];
-    setBusy(true);
-    ACTS[act]().then(function(){ setBusy(false); });
-  });
-});
-
-/* gentle idle life: blink now and then, like the homepage */
-setInterval(function(){ if(!busy) dxBlink(); },4500);
-setTimeout(dxBlink,1200);
+setTimeout(function(){ if(!reduce) dxLoop(); }, 1500);
 })();
 </script>
 </body>
