@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
 <style>
-/* ============ TOKENS (palette untouched; images now self-hosted) ============ */
+/* ============ TOKENS (palette untouched; images self-hosted) ============ */
 :root{
   --paper:#f5f4ef;
   --ink:#0f0f0e;
@@ -48,14 +48,30 @@ button{font:inherit;cursor:pointer}
 /* ============ STAGE ============ */
 .stage{position:relative;height:100svh;overflow:hidden}
 
-/* ============ X MASCOT (gentle float, like home) ============ */
-.xmascot{position:relative;display:inline-block;width:46px;height:42px;flex:none;
-  animation:xfloat 5s ease-in-out infinite}
-.xb{position:absolute;top:0;left:50%;width:10px;height:100%;background:var(--ink);border-radius:6px}
-.xb.b1{transform:translateX(-50%) rotate(40deg)}
-.xb.b2{transform:translateX(-50%) rotate(-40deg)}
-@keyframes xfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-@media(prefers-reduced-motion:reduce){.xmascot{animation:none}}
+/* ============ X MASCOT — exact homepage .dx port, ink on paper ============ */
+.jdx{position:relative;display:inline-block;width:.78em;height:.72em;font-size:46px;flex:none}
+.jdx .ln{position:absolute;top:0;left:50%;width:.17em;height:100%;background:var(--ink);
+ border-radius:50%;transform-origin:center}
+.jdx .l1{transform:translateX(-.20em) scaleY(.236)}
+.jdx .l2{transform:translateX(.20em) scaleY(.236)}
+.jdx .glasses{position:absolute;inset:0;opacity:0;transform:scale(.6);transform-origin:center;
+ transition:opacity .35s ease,transform .45s cubic-bezier(.2,1.6,.4,1);pointer-events:none}
+.jdx .glasses.show{opacity:1;transform:scale(1)}
+.jdx .rim{position:absolute;top:50%;left:50%;width:.26em;height:.26em;border:.04em solid var(--ink);
+ border-radius:50%}
+.jdx .r1{transform:translate(-50%,-50%) translateX(-.20em)}
+.jdx .r2{transform:translate(-50%,-50%) translateX(.20em)}
+.jdx .bridge{position:absolute;top:50%;left:50%;width:.18em;height:.04em;background:var(--ink);
+ border-radius:.02em;transform:translate(-50%,-50%)}
+.jdx .book{position:absolute;left:50%;bottom:-4%;width:.48em;height:.26em;
+ transform:translateX(-50%) scale(0);transform-origin:center bottom;
+ transition:transform .45s cubic-bezier(.2,1.5,.4,1);pointer-events:none}
+.jdx .book.open{transform:translateX(-50%) scale(1)}
+.jdx .page{position:absolute;top:0;width:50%;height:100%;
+ background:repeating-linear-gradient(to bottom,#f7f2e7 0 .045em,#d9d4c4 .045em .06em);
+ box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.jdx .p1{left:0;transform:skewY(-7deg);transform-origin:right center;border-radius:.02em 0 0 .05em}
+.jdx .p2{right:0;transform:skewY(7deg);transform-origin:left center;border-radius:0 .02em .05em 0}
 
 /* ============ TOP-RIGHT subtle controls ============ */
 .topbtns{position:fixed;top:18px;right:18px;z-index:60;display:flex;gap:10px}
@@ -109,7 +125,7 @@ button{font:inherit;cursor:pointer}
   padding:48px;max-width:1440px;margin:0 auto;
 }
 .hero-copy{position:relative;z-index:2;max-width:520px}
-.hero-copy .xmascot{margin-bottom:26px}
+.hero-copy .jdx{margin-bottom:26px}
 .eyebrow{
   display:block;font-size:11px;font-weight:700;
   letter-spacing:.24em;text-transform:uppercase;color:var(--nav-muted);
@@ -139,7 +155,7 @@ h1 .ln>span{display:inline-block;will-change:transform}
   border-bottom:2px solid var(--ink);padding-bottom:3px;color:var(--ink);
 }
 
-/* ============ MOSAIC GRID (the journal itself) ============ */
+/* ============ MOSAIC GRID (the journal covers) ============ */
 .grid-wrap{
   position:relative;height:min(86svh,760px);
   overflow:hidden;touch-action:none;cursor:grab;
@@ -190,7 +206,7 @@ h1 .ln>span{display:inline-block;will-change:transform}
   content:"";position:absolute;inset:0;
   background-image:var(--grain);opacity:.035;mix-blend-mode:screen;pointer-events:none;
 }
-/* ---- entry blocks: heading + date only, tap to expand ---- */
+/* ---- entry covers: date + heading only, tap opens reader ---- */
 .entry{
   background:var(--card-cream);
   border:1px solid rgba(15,15,14,.10);
@@ -212,22 +228,47 @@ h1 .ln>span{display:inline-block;will-change:transform}
   font-size:21px;letter-spacing:-.015em;line-height:1.2;
   margin:9px 0 0;color:var(--ink);
 }
-.entry .e-full{
-  display:none;color:#2b2a27;line-height:1.8;font-size:14.5px;
-  white-space:pre-line;margin-top:14px;
-}
 .entry .e-hint{
   display:inline-block;margin-top:16px;font-size:10px;font-weight:700;
   letter-spacing:.18em;text-transform:uppercase;color:var(--nav-muted);
 }
-.entry.open .e-full{display:block}
-.entry.open .e-hint{color:var(--red)}
 .entry.dim{opacity:.12;pointer-events:none}
 .entry.hit{box-shadow:0 0 0 2px var(--red),0 18px 40px -28px rgba(15,15,14,.35)}
-.entry.flash{animation:eflash 2.4s ease}
-@keyframes eflash{
-  0%,100%{box-shadow:0 18px 40px -28px rgba(15,15,14,.35)}
-  20%,60%{box-shadow:0 0 0 3px var(--red),0 18px 44px -20px rgba(239,93,68,.55)}
+
+/* ============ READER overlay — full entry, readable ============ */
+#reader{position:fixed;inset:0;z-index:80;display:none}
+#reader.show{display:block}
+.reader-backdrop{position:absolute;inset:0;background:rgba(15,15,14,.55);backdrop-filter:blur(6px)}
+.reader-card{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(620px,calc(100vw - 44px));max-height:84svh;overflow:auto;
+  background:var(--card-cream);border-radius:24px;
+  padding:30px 34px 44px;
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.5);
+}
+#reader.show .reader-card{animation:readerIn .38s cubic-bezier(.2,1.2,.3,1)}
+@keyframes readerIn{from{opacity:0;transform:translate(-50%,-46%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.reader-close{
+  position:sticky;top:0;float:right;
+  width:38px;height:38px;border-radius:50%;
+  border:1px solid rgba(15,15,14,.16);background:#fff;
+  font-size:20px;line-height:1;color:var(--ink);z-index:2;
+}
+.reader-photo{
+  height:220px;border-radius:16px;background-size:cover;background-position:center;
+  background-color:#d8d5cf;margin:6px 0 22px;display:none;
+}
+.reader-card .e-date{
+  font-family:var(--display);font-weight:700;font-size:12px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--red);
+}
+.reader-card h2{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(24px,5vw,34px);letter-spacing:-.02em;line-height:1.15;
+  margin:10px 0 4px;color:var(--ink);
+}
+.reader-body{
+  white-space:pre-line;line-height:1.85;font-size:16px;color:#2b2a27;margin-top:16px;
 }
 
 /* ============ INTRO ============ */
@@ -239,20 +280,24 @@ html.intro .topbtns{opacity:0}
 /* ============ RESPONSIVE ============ */
 @media(max-width:899px){
   .hero{grid-template-columns:1fr;padding:76px 22px 12px;align-content:start;gap:6px}
-  .hero-copy .xmascot{width:38px;height:35px;margin-bottom:14px}
-  .hero-copy .xmascot .xb{width:8px}
+  .hero-copy .jdx{font-size:36px;margin-bottom:14px}
   .eyebrow{margin-bottom:14px}
   h1{font-size:clamp(38px,11.5vw,58px)}
   .hero-copy p{display:none}
   .acts{margin-top:18px}
   .btn-pill{padding:13px 22px;font-size:13.5px}
   .link-bold{font-size:13.5px}
-  .grid-wrap{height:64svh;--col:150px;--pitch:210px;--r:16px;--gap:10px}
-  .grid{width:calc(3*var(--col) + 2*var(--gap))}
+  .grid-wrap{height:64svh;--pitch:190px;--r:14px;--gap:8px}
+  .grid{left:20px;right:20px;width:auto}
+  .col{flex:1 1 0;width:auto;min-width:0}
   .f-visit::before,.f-sil::before{background-size:cover;width:100%;height:100%;left:0;top:0}
   .f-visit::after{display:none}
-  .entry{min-height:170px;padding:20px 18px 16px}
-  .entry h3{font-size:18px}
+  .entry{min-height:150px;padding:14px 12px 12px}
+  .entry h3{font-size:15px}
+  .entry .e-date{font-size:10px;letter-spacing:.12em}
+  .entry .e-photo{height:90px;margin:-4px -2px 10px;border-radius:10px}
+  .entry .e-hint{font-size:8.5px;margin-top:10px}
+  .reader-card{padding:24px 22px 36px}
 }
 @media(min-width:560px) and (min-aspect-ratio:1/1) and (max-width:899px){
   .hero{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:center}
@@ -267,7 +312,7 @@ html.intro .topbtns{opacity:0}
   html.intro h1 .ln>span{transform:none}
   html.intro .grid{opacity:1}
   html.intro .topbtns{opacity:1}
-  .xmascot{animation:none}
+  #reader.show .reader-card{animation:none}
 }
 </style>
 </head>
@@ -296,7 +341,7 @@ html.intro .topbtns{opacity:0}
 
   <section class="hero">
     <div class="hero-copy">
-      <span class="xmascot" role="img" aria-label="Aditya X mascot"><span class="xb b1"></span><span class="xb b2"></span></span>
+      <span class="jdx" id="jdx" role="img" aria-label="Aditya X mascot"><span class="ln l1" id="jdx1"></span><span class="ln l2" id="jdx2"></span><span class="glasses" id="jdxg" aria-hidden="true"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span><span class="book" id="jdxb" aria-hidden="true"><span class="page p1"></span><span class="page p2"></span></span></span>
       <span class="eyebrow">A private journal</span>
       <h1 aria-label="An archive of days cast in memory">
         <span class="ln"><span>An archive</span></span>
@@ -319,6 +364,17 @@ html.intro .topbtns{opacity:0}
     </div>
   </section>
 
+</div>
+
+<div id="reader" aria-hidden="true">
+  <div class="reader-backdrop" id="readerBackdrop"></div>
+  <article class="reader-card" role="dialog" aria-modal="true" aria-labelledby="readerTitle">
+    <button class="reader-close" id="readerClose" aria-label="Close entry">×</button>
+    <div class="reader-photo" id="readerPhoto"></div>
+    <div class="e-date" id="readerDate"></div>
+    <h2 id="readerTitle"></h2>
+    <div class="reader-body" id="readerBody"></div>
+  </article>
 </div>
 
 <script>
@@ -344,11 +400,10 @@ function fillerCell(kind){ return '<div class="cell '+kind+'"></div>'; }
 function entryCell(e, idx){
   var photo = (e.photos && e.photos.length)
     ? '<div class="e-photo" style="background-image:url('+escapeHtml(e.photos[0])+')"></div>' : "";
-  return '<article class="cell entry" data-idx="'+idx+'" data-date="'+escapeHtml(e.date)+'" tabindex="0" role="button" aria-expanded="false" aria-label="'+escapeHtml(e.title)+", "+escapeHtml(formatDate(e.date))+'">'+
+  return '<article class="cell entry" data-idx="'+idx+'" data-date="'+escapeHtml(e.date)+'" tabindex="0" role="button" aria-label="Read: '+escapeHtml(e.title)+", "+escapeHtml(formatDate(e.date))+'">'+
     photo +
     '<div class="e-date">'+escapeHtml(formatDate(e.date))+'</div>'+
     "<h3>"+escapeHtml(e.title)+"</h3>"+
-    '<div class="e-full">'+escapeHtml(e.body)+"</div>"+
     '<span class="e-hint">Tap to read</span>'+
   "</article>";
 }
@@ -356,14 +411,13 @@ function entryCell(e, idx){
 /* ---------- build columns ---------- */
 var cols = Array.prototype.slice.call(document.querySelectorAll(".col"));
 var pos = [0,0,0], cycles = [0,0,0];
-var dirs = [-1,-1,-1]; // all drift upward, like a feed
-var autoCol = [true,true,true], expandPause = [false,false,false];
-var userHold = false, idleTimer = null;
+var dirs = [-1,1,-1]; // alternating drift, like the original
+var autoCol = [true,true,true];
+var userHold = false, readerOpen = false, idleTimer = null;
 var LOOP_SECS = 14.6, RESUME_MS = 3500;
 
 function buildColumns(){
   cols.forEach(function(c){ c.innerHTML=""; });
-  expandPause = [false,false,false];
   var perCol = [[],[],[]];
   entries.forEach(function(e,i){ perCol[i%3].push({e:e,idx:i}); });
   perCol.forEach(function(list,ci){
@@ -387,10 +441,10 @@ function buildColumns(){
     cols.forEach(function(c,i){ cycles[i] = c.scrollHeight/2 || 1; });
     pos = [0, -cycles[1]*0.35, -cycles[2]*0.55];
   });
-  bindKeys();
+  bindEntryEvents();
 }
 
-/* ---------- tap vs drag + expand ---------- */
+/* ---------- tap vs drag (drag follows the finger 1:1) ---------- */
 var gridWrap = document.getElementById("gridWrap");
 var pStart = null;
 
@@ -399,7 +453,7 @@ gridWrap.addEventListener("pointerdown", function(ev){
     y: ev.clientY, t: Date.now(), pos: pos.slice(), moved: false,
     tapCard: (ev.target && ev.target.closest) ? ev.target.closest(".entry") : null
   };
-  userHold = true; // pause auto-scroll the moment a finger lands
+  userHold = true;
   clearTimeout(idleTimer);
   gridWrap.classList.add("dragging");
   if(gridWrap.setPointerCapture){ try{ gridWrap.setPointerCapture(ev.pointerId); }catch(_){} }
@@ -411,9 +465,8 @@ gridWrap.addEventListener("pointermove", function(ev){
   if(pStart.moved){
     for(var i=0;i<3;i++){
       var cyc = cycles[i] || 1;
-      var raw = pStart.pos[i] + dy; // content follows the finger 1:1
-      pos[i] = -((((raw % cyc) + cyc) % cyc) || 0);
-      if(pos[i] <= -cyc) pos[i] = 0;
+      var raw = pStart.pos[i] + dy;
+      pos[i] = raw - cyc*Math.ceil(raw/cyc); // wrap into (-cyc,0], exact 1:1
     }
   }
 });
@@ -425,62 +478,56 @@ function endPointer(){
   gridWrap.classList.remove("dragging");
   clearTimeout(idleTimer);
   idleTimer = setTimeout(function(){ userHold = false; }, RESUME_MS);
-  if(wasTap && target && document.contains(target)) toggleEntry(target);
+  if(wasTap && target && document.contains(target)){
+    openReader(+target.getAttribute("data-idx"));
+  }
 }
 gridWrap.addEventListener("pointerup", endPointer);
 gridWrap.addEventListener("pointercancel", function(){
   pStart=null; gridWrap.classList.remove("dragging");
   clearTimeout(idleTimer); idleTimer=setTimeout(function(){userHold=false;},RESUME_MS);
 });
-
-function setOpen(card, open){
-  var colEl = card.closest(".col");
-  var ci = cols.indexOf(colEl);
-  var idx = card.getAttribute("data-idx");
-  colEl.querySelectorAll('.entry[data-idx="'+idx+'"]').forEach(function(c){
-    c.classList.toggle("open", open);
-    c.setAttribute("aria-expanded", open ? "true" : "false");
-    c.querySelector(".e-hint").textContent = open ? "Tap to collapse" : "Tap to read";
-  });
-  expandPause[ci] = open;
-  requestAnimationFrame(function(){
-    requestAnimationFrame(function(){ cycles[ci] = colEl.scrollHeight/2 || 1; });
-  });
-}
-function toggleEntry(card){ setOpen(card, !card.classList.contains("open")); }
-function flashCard(card){
-  var colEl = card.closest(".col");
-  var idx = card.getAttribute("data-idx");
-  colEl.querySelectorAll('.entry[data-idx="'+idx+'"]').forEach(function(c){
-    c.classList.remove("flash");
-    void c.offsetWidth;
-    c.classList.add("flash");
-    setTimeout(function(){ c.classList.remove("flash"); }, 2500);
-  });
-}
-function bindKeys(){
+function bindEntryEvents(){
   cols.forEach(function(c){
     c.querySelectorAll(".entry").forEach(function(card){
       card.addEventListener("keydown", function(ev){
-        if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); toggleEntry(card); }
+        if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); openReader(+card.getAttribute("data-idx")); }
       });
     });
   });
 }
 
-/* ---------- jump to a specific entry ---------- */
-function jumpToEntry(idx){
-  if(idx < 0 || idx >= entries.length) return;
-  entries = entries.slice(idx).concat(entries.slice(0,idx)); // rotate: target first
-  buildColumns();
+/* ---------- reader overlay ---------- */
+var reader=document.getElementById("reader"),
+    readerDate=document.getElementById("readerDate"),
+    readerTitle=document.getElementById("readerTitle"),
+    readerBody=document.getElementById("readerBody"),
+    readerPhoto=document.getElementById("readerPhoto");
+function openReader(idx){
+  var e = entries[idx];
+  if(!e) return;
+  readerDate.textContent = formatDate(e.date);
+  readerTitle.textContent = e.title;
+  readerBody.textContent = e.body;
+  if(e.photos && e.photos.length){
+    readerPhoto.style.display = "block";
+    readerPhoto.style.backgroundImage = "url("+e.photos[0]+")";
+  } else {
+    readerPhoto.style.display = "none";
+  }
   closePops(); clearSearch();
-  requestAnimationFrame(function(){
-    requestAnimationFrame(function(){
-      var card = document.querySelector('.col[data-col="0"] .entry');
-      if(card){ setOpen(card, true); flashCard(card); }
-    });
-  });
+  reader.classList.add("show");
+  reader.setAttribute("aria-hidden","false");
+  readerOpen = true;
+  document.getElementById("readerClose").focus();
 }
+function closeReader(){
+  reader.classList.remove("show");
+  reader.setAttribute("aria-hidden","true");
+  readerOpen = false;
+}
+document.getElementById("readerClose").addEventListener("click", closeReader);
+document.getElementById("readerBackdrop").addEventListener("click", closeReader);
 
 /* ---------- rAF marquee ---------- */
 var lastT = 0;
@@ -488,7 +535,7 @@ function tick(t){
   var dt = lastT ? Math.min(0.05,(t-lastT)/1000) : 0;
   lastT = t;
   for(var i=0;i<3;i++){
-    if(!reduced && dt > 0 && autoCol[i] && !expandPause[i] && !userHold && cycles[i] > 0){
+    if(!reduced && dt > 0 && autoCol[i] && !userHold && !readerOpen && cycles[i] > 0){
       pos[i] += dirs[i]*(cycles[i]/LOOP_SECS)*dt;
       if(pos[i] <= -cycles[i]) pos[i] += cycles[i];
       if(pos[i] > 0) pos[i] -= cycles[i];
@@ -519,7 +566,7 @@ document.getElementById("dateInput").addEventListener("change", function(){
     var d = Math.abs(new Date(e.date+"T00:00:00").getTime()-t);
     if(d<bestD){ bestD=d; best=i; }
   });
-  jumpToEntry(best);
+  openReader(best);
 });
 
 /* ---------- search with tappable results ---------- */
@@ -565,26 +612,93 @@ searchInput.addEventListener("input", function(){
     var b = document.createElement("button");
     b.className = "sres-item"; b.type = "button";
     b.innerHTML = "<b>"+escapeHtml(e.title)+"</b><span>"+escapeHtml(formatDate(e.date))+"</span>";
-    b.addEventListener("click", function(){ jumpToEntry(idx); });
+    b.addEventListener("click", function(){ openReader(idx); });
     searchResults.appendChild(b);
   });
 });
 document.addEventListener("keydown", function(ev){
-  if(ev.key==="Escape"){ closePops(); clearSearch(); }
+  if(ev.key==="Escape"){ if(readerOpen){ closeReader(); } closePops(); clearSearch(); }
 });
 document.addEventListener("pointerdown", function(ev){
   if(!ev.target.closest(".pop") && !ev.target.closest(".tbtn")) closePops();
 });
 
 /* ---------- hero CTAs ---------- */
-document.getElementById("readFirst").addEventListener("click", function(){
-  var card = document.querySelector('.col[data-col="0"] .entry');
-  if(card) setOpen(card, true);
-});
+document.getElementById("readFirst").addEventListener("click", function(){ openReader(0); });
 document.getElementById("goLatest").addEventListener("click", function(){
   entries.sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
   buildColumns();
+  openReader(0);
 });
+
+/* ---------- X mascot: exact homepage activity loop ---------- */
+function jdxSet(el, tf, ms, ease){
+  el.style.transition = "transform "+ms+"ms "+(ease||"ease-in-out");
+  el.style.transform = tf;
+  return new Promise(function(r){ setTimeout(r, reduced?0:ms); });
+}
+var jdx1=document.getElementById("jdx1"), jdx2=document.getElementById("jdx2");
+var jdxg=document.getElementById("jdxg"), jdxb=document.getElementById("jdxb");
+var JDX_DOT1="translateX(-.20em) scaleY(.236)", JDX_DOT2="translateX(.20em) scaleY(.236)";
+var JDX_BLINK1="translateX(-.20em) scaleY(.02)", JDX_BLINK2="translateX(.20em) scaleY(.02)";
+var JDX_LINE1="translateX(-.20em) scaleY(1)", JDX_LINE2="translateX(.20em) scaleY(1)";
+var JDX_X1="translateX(-50%) rotate(40deg) scaleY(1)", JDX_X2="translateX(-50%) rotate(-40deg) scaleY(1)";
+function jdxBlink(){
+  return Promise.all([
+    jdxSet(jdx1, JDX_BLINK1, 150, "ease-in"), jdxSet(jdx2, JDX_BLINK2, 150, "ease-in")
+  ]).then(function(){
+    return Promise.all([
+      jdxSet(jdx1, JDX_DOT1, 200, "ease-out"), jdxSet(jdx2, JDX_DOT2, 200, "ease-out")
+    ]);
+  });
+}
+function jdxGlasses(){
+  jdxg.classList.add("show");
+  return new Promise(function(r){ setTimeout(r, 700); })
+    .then(jdxBlink)
+    .then(function(){ return new Promise(function(r){ setTimeout(r, 2200); }); })
+    .then(function(){ jdxg.classList.remove("show"); return new Promise(function(r){ setTimeout(r, 450); }); });
+}
+async function jdxRead(){
+  jdxb.classList.add("open");
+  await new Promise(function(r){ setTimeout(r, 550); });
+  for(var i=0;i<3;i++){
+    await Promise.all([
+      jdxSet(jdx1, "translateX(-.14em) scaleY(.236)", 380),
+      jdxSet(jdx2, "translateX(.26em) scaleY(.236)", 380)
+    ]);
+    await Promise.all([
+      jdxSet(jdx1, "translateX(-.26em) scaleY(.236)", 380),
+      jdxSet(jdx2, "translateX(.14em) scaleY(.236)", 380)
+    ]);
+  }
+  await Promise.all([ jdxSet(jdx1, JDX_DOT1, 320), jdxSet(jdx2, JDX_DOT2, 320) ]);
+  await new Promise(function(r){ setTimeout(r, 350); });
+  jdxb.classList.remove("open");
+  await new Promise(function(r){ setTimeout(r, 500); });
+}
+var jdxN=0;
+async function jdxLoop(){
+  while(true){
+    jdxN++;
+    await new Promise(function(r){ setTimeout(r, 2800); });
+    for(var i=0;i<2;i++){ await jdxBlink(); await new Promise(function(r){ setTimeout(r, i<1?1200:2200); }); }
+    if(jdxN%4===2){ await jdxGlasses(); }
+    else if(jdxN%4===0){ await jdxRead(); }
+    await new Promise(function(r){ setTimeout(r, 1500); });
+    await Promise.all([ jdxSet(jdx1, JDX_LINE1, 1100), jdxSet(jdx2, JDX_LINE2, 1100) ]);
+    await new Promise(function(r){ setTimeout(r, 900); });
+    await Promise.all([
+      jdxSet(jdx1, JDX_X1, 1500, "cubic-bezier(.3,1.2,.4,1)"),
+      jdxSet(jdx2, JDX_X2, 1500, "cubic-bezier(.3,1.2,.4,1)")
+    ]);
+    await new Promise(function(r){ setTimeout(r, 8000); });
+    await Promise.all([ jdxSet(jdx1, JDX_LINE1, 1300), jdxSet(jdx2, JDX_LINE2, 1300) ]);
+    await new Promise(function(r){ setTimeout(r, 700); });
+    await Promise.all([ jdxSet(jdx1, JDX_DOT1, 1100), jdxSet(jdx2, JDX_DOT2, 1100) ]);
+  }
+}
+setTimeout(function(){ if(!reduced) jdxLoop(); }, 1500);
 
 /* ---------- entrance ---------- */
 function runEntrance(){
