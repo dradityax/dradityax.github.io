@@ -1,9 +1,20 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<title>Aditya X — Demo v2</title>
-<meta name="description" content="Aditya X — MBBS Student. Demo v2: the scroll vision.">
+<meta name="robots" content="index, follow">
+<title>ADITYA X</title>
+<meta name="description" content="Aditya X — Medicinae Studiosus | Mortui vivos docent. First-year MBBS student at Madhubani Medical College, building small corners of the internet as dradityax.">
+<link rel="canonical" href="https://dradityax.pages.dev/">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Aditya X">
+<meta property="og:title" content="ADITYA X — Medicinae Studiosus">
+<meta property="og:description" content="Mortui vivos docent. First-year MBBS student at Madhubani Medical College, building small corners of the internet as dradityax.">
+<meta property="og:url" content="https://dradityax.pages.dev/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ADITYA X — Medicinae Studiosus">
+<meta name="twitter:description" content="Mortui vivos docent. First-year MBBS student at Madhubani Medical College, building small corners of the internet as dradityax.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -69,16 +80,7 @@ body.playing #hud{color:rgba(255,255,255,.8);font-size:.8rem}
 
 /* merge particles across sections */
 #merge{position:fixed;inset:0;z-index:5;pointer-events:none;mix-blend-mode:difference;opacity:.8}
-/* follower mini-X */
-#follower{position:fixed;right:20px;bottom:20px;z-index:35;width:36px;height:36px;pointer-events:none;
-  mix-blend-mode:difference;animation:fxfloat 5s ease-in-out infinite;transition:opacity .4s}
-#follower .fx{position:absolute;inset:0}
-#follower .fx::before,#follower .fx::after{content:"";position:absolute;top:50%;left:50%;width:5px;height:32px;
-  background:#fff;border-radius:4px}
-#follower .fx::before{transform:translate(-50%,-50%) rotate(38deg)}
-#follower .fx::after{transform:translate(-50%,-50%) rotate(-38deg)}
 @keyframes fxfloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-10px) rotate(6deg)}}
-body.playing #follower{opacity:0}
 section{position:relative;z-index:10}
 /* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px}
@@ -146,15 +148,23 @@ body.playing .scrollhint{opacity:0}
 footer{font-size:.7rem;letter-spacing:.3em;opacity:.4}
 .rv{opacity:0;transform:translateY(36px);transition:opacity .9s ease,transform .9s ease}
 .rv.in{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}.scrollhint{animation:none}#follower{animation:none}}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}.scrollhint{animation:none}}
+
+/* hero text fades when playing or scrolled; mascot glides to top-left */
+.aname,.hero .tag,.hero .who{transition:opacity .5s ease}
+body.playing .aname,body.scrolled .aname,
+body.playing .hero .tag,body.scrolled .hero .tag,
+body.playing .hero .who,body.scrolled .hero .who{opacity:0}
+.xslot{transform-origin:top left}
+.xslot.corner{position:fixed;top:calc(max(3.5vh,18px) + env(safe-area-inset-top,0px));left:calc(max(3vw,14px) + env(safe-area-inset-left,0px));z-index:45;font-size:30px;margin:0;mix-blend-mode:difference}
 </style></head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
 <canvas id="merge" aria-hidden="true"></canvas>
-<div id="follower" aria-hidden="true"><span class="fx"></span></div>
+
 
 <section class="hero">
-  <h1>ADITYA&nbsp;<span class="xslot" aria-hidden="true"><span class="dx"><span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span><span class="glasses" id="dxg"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span><span class="book" id="dxb"><span class="page p1"></span><span class="page p2"></span></span></span></span></h1>
+  <h1><span class="aname">ADITYA</span>&nbsp;<span class="xslot" id="mascotX" aria-hidden="true"><span class="dx"><span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span><span class="glasses" id="dxg"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span><span class="book" id="dxb"><span class="page p1"></span><span class="page p2"></span></span></span></span></h1>
   <div class="tag">Mortui vivos docent.</div>
   <div><span class="who">MBBS&nbsp;STUDENT</span></div>
   <div class="scrollhint">SCROLL&nbsp;&nbsp;↓</div>
@@ -515,7 +525,7 @@ setTimeout(function(){hud.classList.add("show");},1200);
 
 </script>
 <script>
-/* demo v2 : merge particles, horizontal, reveal, follower, parallax, playbtn visibility */
+/* demo v2 : merge particles, reveal, playbtn visibility */
 (function(){
 "use strict";
 document.getElementById("bg").classList.add("show");
@@ -580,5 +590,50 @@ document.getElementById("bg").classList.add("show");
   addEventListener('scroll',upd,{passive:true});upd();
 })();
 })();
+</script>
+<script>
+
+/* mascot: hero text fades + mascot FLIPs to top-left corner on play/scroll */
+(function(){
+"use strict";
+var x=document.getElementById('mascotX');
+if(!x)return;
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var cornered=false,ver=0;
+function anim(dx,dy,s,done){
+  x.style.transition='none';
+  x.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px) scale('+s.toFixed(3)+')';
+  void x.offsetWidth;
+  x.style.transition='transform .9s cubic-bezier(.22,1,.36,1)';
+  x.style.transform='translate(0px,0px) scale(1)';
+  var v=ver;
+  setTimeout(function(){if(v===ver){x.style.transition='';x.style.transform='';if(done)done();}},950);
+}
+function toCorner(){
+  if(cornered)return;cornered=true;ver++;
+  var r1=x.getBoundingClientRect();
+  x.classList.add('corner');
+  var r2=x.getBoundingClientRect();
+  if(reduce||!r1.width||!r2.width)return;
+  anim(r1.left-r2.left,r1.top-r2.top,r1.width/r2.width);
+}
+function toCenter(){
+  if(!cornered)return;cornered=false;ver++;
+  var r1=x.getBoundingClientRect();
+  x.classList.remove('corner');
+  x.style.transition='none';
+  var r2=x.getBoundingClientRect();
+  if(reduce||!r1.width||!r2.width){x.style.transition='';x.style.transform='';return;}
+  anim(r1.left-r2.left,r1.top-r2.top,r1.width/r2.width);
+}
+function sync(){
+  var active=document.body.classList.contains('playing')||document.body.classList.contains('scrolled');
+  if(active)toCorner();else toCenter();
+}
+new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});
+window.addEventListener('scroll',sync,{passive:true});
+sync();
+})();
+
 </script>
 </body></html>
