@@ -157,6 +157,36 @@ body.playing .hero .tag,body.scrolled .hero .tag,
 body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 .xslot{transform-origin:top left}
 .xslot.corner{position:fixed;top:calc(max(3.5vh,18px) + env(safe-area-inset-top,0px));left:calc(max(3vw,14px) + env(safe-area-inset-left,0px));z-index:45;font-size:44px;margin:0;mix-blend-mode:difference;opacity:.75}
+
+/* projects in section B */
+.proj{max-width:1020px;margin:64px auto 0;padding:0 4px}
+.pkick{font-size:.68rem;letter-spacing:.34em;opacity:.45;margin-bottom:10px}
+.ptitle{font-size:clamp(1.3rem,5vw,1.9rem);letter-spacing:.3em;font-weight:600;margin-bottom:26px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;text-align:left}
+.pcard{background:#fff;border:1px solid #e9e6e0;border-radius:18px;padding:28px 24px;color:#111;text-decoration:none;display:block;transition:transform .35s ease,box-shadow .35s ease}
+.pcard:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,.10)}
+.pnum{font-size:.68rem;letter-spacing:.3em;opacity:.4}
+.pcard h4{font-size:1.25rem;margin:12px 0 8px;letter-spacing:.02em}
+.pcard p{font-size:.92rem;line-height:1.65;opacity:.65}
+.pmore{display:inline-block;margin-top:14px;font-size:.82rem;font-weight:600;letter-spacing:.12em}
+/* new section C : soon + drifting columns */
+.sec-cx{background:#0b0b0e;color:#fff;padding:110px 0 90px;overflow:hidden;position:relative;z-index:10}
+.cx-head{text-align:center;padding:0 20px;margin-bottom:48px}
+.cx-kick{font-size:.68rem;letter-spacing:.34em;opacity:.45;margin-bottom:12px}
+.sec-cx h2{font-size:clamp(1.8rem,7vw,3rem);letter-spacing:.18em;font-weight:600;margin-bottom:12px}
+.cx-sub{opacity:.55;font-size:.95rem;letter-spacing:.04em}
+.cx-wrap{position:relative;height:min(78svh,620px);overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent)}
+.cx-grid{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);display:flex;gap:16px}
+.cx-col{width:200px;flex:none;will-change:transform}
+.cx-col.up{animation:cxUp 26s linear infinite}
+.cx-col.down{animation:cxDown 34s linear infinite}
+@keyframes cxUp{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+@keyframes cxDown{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+.cx-cell{background:#14141b;border:1px solid rgba(255,255,255,.08);border-radius:16px;min-height:148px;margin-bottom:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.cx-soon{font-size:.66rem;letter-spacing:.32em;opacity:.38}
+.cx-dots{font-size:1.3rem;opacity:.22;letter-spacing:.2em}
+@media(max-width:640px){.cx-col{width:44vw}.cx-col:nth-child(3){display:none}}
+@media(prefers-reduced-motion:reduce){.cx-col{animation:none}}
 </style></head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -192,10 +222,93 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
     <span>HIPPOCAMPUS — mother's words</span>
     <span>MOTOR — build daily</span>
   </div>
+
+  <div class="proj">
+    <div class="pkick rv">Selected work</div>
+    <h3 class="ptitle rv">PROJECTS</h3>
+    <div class="pgrid">
+      <a class="pcard rv" href="/project-1/">
+        <span class="pnum">01</span>
+        <h4>Project One</h4>
+        <p>Bihar&rsquo;s NEET counselling, rebuilt &mdash; personal guidance, an honest college predictor, zero &#8377;50,000 fee trauma.</p>
+        <span class="pmore">Explore &rarr;</span>
+      </a>
+      <a class="pcard rv" href="/project-2/">
+        <span class="pnum">02</span>
+        <h4>Project Two</h4>
+        <p>Interactive anatomy blocks &mdash; starting with the complete human skeleton system.</p>
+        <span class="pmore">Explore &rarr;</span>
+      </a>
+    </div>
+  </div>
 </section>
 
 <div class="mergeback" aria-hidden="true"></div>
 
+<section class="sec-cx">
+  <div class="cx-head">
+    <div class="cx-kick rv">Next chapter</div>
+    <h2 class="rv">More soon.</h2>
+    <p class="cx-sub rv">This space is still being built &mdash; something new is on its way.</p>
+  </div>
+  <div class="cx-wrap rv" aria-hidden="true">
+    <div class="cx-grid">
+      <div class="cx-col up">
+<div class="cx-set">
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+</div>
+<div class="cx-set">
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+</div>
+</div>
+      <div class="cx-col down">
+<div class="cx-set">
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+</div>
+<div class="cx-set">
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+</div>
+</div>
+      <div class="cx-col up">
+<div class="cx-set">
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+</div>
+<div class="cx-set">
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+</div>
+</div>
+    </div>
+  </div>
+</section>
+
+<div class="mergezone" aria-hidden="true"></div>
+
+
+
+<section class="sec-d">
+  <h2 class="rv">SECTION D</h2>
+  <p class="rv shimmer">Something lives here.</p>
+  <p class="rv soon"><span class="pulse-dot"></span>SOON</p>
+</section>
+<div class="mergeback" aria-hidden="true"></div>
 <section class="hwrap" id="hwrap">
   <div class="hsticky">
     <div class="hlabel">AMBITIONS →</div>
@@ -218,14 +331,6 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
     <div class="hdrag">KEEP&nbsp;SCROLLING&nbsp;→</div>
     <div class="hprog"><span id="hprogfill"></span></div>
   </div>
-</section>
-
-<div class="mergezone" aria-hidden="true"></div>
-
-<section class="sec-d">
-  <h2 class="rv">SECTION D</h2>
-  <p class="rv shimmer">Something lives here.</p>
-  <p class="rv soon"><span class="pulse-dot"></span>SOON</p>
 </section>
 
 <section class="sec-e">
