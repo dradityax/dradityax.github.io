@@ -156,7 +156,7 @@ body.playing .aname,body.scrolled .aname,
 body.playing .hero .tag,body.scrolled .hero .tag,
 body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 .xslot{transform-origin:top left}
-.xslot.corner{position:fixed;top:calc(max(3.5vh,18px) + env(safe-area-inset-top,0px));left:calc(max(3vw,14px) + env(safe-area-inset-left,0px));z-index:45;font-size:36px;margin:0;mix-blend-mode:difference;opacity:.75}
+.xslot.corner{position:fixed;top:calc(max(3.5vh,18px) + env(safe-area-inset-top,0px));left:calc(max(3vw,14px) + env(safe-area-inset-left,0px));z-index:45;font-size:44px;margin:0;mix-blend-mode:difference;opacity:.75}
 </style></head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -592,26 +592,27 @@ document.getElementById("bg").classList.add("show");
 })();
 </script>
 <script>
-
-/* mascot: hero text fades + mascot FLIPs to top-left corner on play/scroll */
+/* mascot: hero text fades + mascot moves to body-level fixed corner on play/scroll */
 (function(){
 "use strict";
 var x=document.getElementById('mascotX');
 if(!x)return;
+var h1=x.parentNode,homeNext=x.nextSibling;
 var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var cornered=false,ver=0;
-function anim(dx,dy,s,done){
+function anim(dx,dy,s){
   x.style.transition='none';
   x.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px) scale('+s.toFixed(3)+')';
   void x.offsetWidth;
   x.style.transition='transform .9s cubic-bezier(.22,1,.36,1)';
   x.style.transform='translate(0px,0px) scale(1)';
   var v=ver;
-  setTimeout(function(){if(v===ver){x.style.transition='';x.style.transform='';if(done)done();}},950);
+  setTimeout(function(){if(v===ver){x.style.transition='';x.style.transform='';}},950);
 }
 function toCorner(){
   if(cornered)return;cornered=true;ver++;
   var r1=x.getBoundingClientRect();
+  document.body.appendChild(x);
   x.classList.add('corner');
   var r2=x.getBoundingClientRect();
   if(reduce||!r1.width||!r2.width)return;
@@ -620,6 +621,7 @@ function toCorner(){
 function toCenter(){
   if(!cornered)return;cornered=false;ver++;
   var r1=x.getBoundingClientRect();
+  h1.insertBefore(x,homeNext);
   x.classList.remove('corner');
   x.style.transition='none';
   var r2=x.getBoundingClientRect();
@@ -634,6 +636,5 @@ new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilte
 window.addEventListener('scroll',sync,{passive:true});
 sync();
 })();
-
 </script>
 </body></html>
