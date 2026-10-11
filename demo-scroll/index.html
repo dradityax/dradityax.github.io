@@ -94,8 +94,8 @@ section{position:relative;z-index:10}
 @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,10px)}}
 body.playing .scrollhint{opacity:0}
 /* merge zones */
-.mergezone{position:relative;z-index:10;height:44vh;background:linear-gradient(to bottom,var(--blk) 0%,#3a3a40 45%,#c9c9ce 70%,var(--wht) 100%)}
-.mergeback{position:relative;z-index:10;height:44vh;background:linear-gradient(to bottom,var(--wht) 0%,#c9c9ce 30%,#3a3a40 55%,var(--blk) 100%)}
+.mergezone{position:relative;z-index:10;height:72vh;background:linear-gradient(to bottom,var(--blk) 0%,#17171c 28%,#4c4c55 50%,#a9a9b0 72%,var(--wht) 100%)}
+.mergeback{position:relative;z-index:10;height:72vh;background:linear-gradient(to bottom,var(--wht) 0%,#c9c9ce 28%,#6e6e77 50%,#232329 72%,var(--blk) 100%)}
 /* SECTION B : white */
 .sec-b{background:var(--wht);color:#111;padding:110px 20px 90px;text-align:center;overflow:hidden}
 .sec-b h2{font-size:clamp(1.5rem,6vw,2.4rem);letter-spacing:.3em;font-weight:600;margin-bottom:14px}
@@ -178,6 +178,30 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 .cx-dots{font-size:1.3rem;opacity:.22;letter-spacing:.2em}
 @media(max-width:640px){.cx-col{width:44vw}.cx-col:nth-child(3){display:none}}
 @media(prefers-reduced-motion:reduce){.cx-col{animation:none}}
+
+/* desktop: stop AMBITIONS heading overflowing into next panel */
+@media(min-width:900px){
+  .hintro h3{font-size:clamp(2.4rem,4.5vw,3.6rem);letter-spacing:.06em}
+  .hintro{overflow:hidden}
+}
+
+/* section D : instagram-style swipe */
+.sec-d{background:var(--wht);color:#111;padding:130px 0 110px;text-align:center;overflow:hidden;position:relative;z-index:10}
+.sw-kick{font-size:.68rem;letter-spacing:.34em;opacity:.45;margin-bottom:12px}
+.sec-d h2{font-size:clamp(1.8rem,7vw,2.8rem);letter-spacing:.14em;font-weight:600;margin-bottom:10px;padding:0 20px}
+.sw-sub{opacity:.55;font-size:.95rem;margin-bottom:44px;padding:0 20px}
+.swipe{overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab;touch-action:pan-x pan-y}
+.swipe::-webkit-scrollbar{display:none}
+.swipe.dragging{cursor:grabbing;scroll-snap-type:none}
+.sw-track{display:flex;gap:16px;padding:6px 8vw 22px;width:max-content}
+.sw-card{scroll-snap-align:center;flex:none;width:min(78vw,340px);background:#fff;border:1px solid #e9e6e0;border-radius:22px;padding:46px 32px;text-align:left;box-shadow:0 18px 50px rgba(0,0,0,.06);user-select:none;-webkit-user-select:none}
+.sw-n{font-size:.7rem;letter-spacing:.3em;opacity:.4}
+.sw-card h3{font-size:1.7rem;margin:16px 0 10px;letter-spacing:.02em}
+.sw-card p{font-size:.95rem;line-height:1.65;opacity:.6}
+.sw-tag{display:inline-block;margin-top:18px;font-size:1.1rem;letter-spacing:.3em;opacity:.3}
+.sw-dots{display:flex;gap:8px;justify-content:center;margin-top:6px}
+.sw-dots span{width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.16);transition:background .3s}
+.sw-dots span.on{background:#111}
 </style></head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -275,9 +299,18 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 
 
 <section class="sec-d">
-  <h2 class="rv">SECTION D</h2>
-  <p class="rv shimmer">Something lives here.</p>
-  <p class="rv soon"><span class="pulse-dot"></span>SOON</p>
+  <div class="sw-kick rv">On the horizon</div>
+  <h2 class="rv">What&rsquo;s brewing.</h2>
+  <p class="sw-sub rv">Swipe through &mdash; a few things are on their way.</p>
+  <div class="swipe rv" id="swipe">
+    <div class="sw-track">
+      <article class="sw-card"><span class="sw-n">01</span><h3>Soon</h3><p>Something is brewing here.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
+      <article class="sw-card"><span class="sw-n">02</span><h3>Soon</h3><p>Something is brewing here.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
+      <article class="sw-card"><span class="sw-n">03</span><h3>Soon</h3><p>Something is brewing here.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
+      <article class="sw-card"><span class="sw-n">04</span><h3>Soon</h3><p>Something is brewing here.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
+    </div>
+  </div>
+  <div class="sw-dots" id="swdots" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span></div>
 </section>
 <div class="mergeback" aria-hidden="true"></div>
 <section class="hwrap" id="hwrap">
@@ -712,5 +745,41 @@ new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilte
 window.addEventListener('scroll',sync,{passive:true});
 sync();
 })();
+</script>
+<script>
+
+/* section D swipe: dots + desktop drag */
+(function(){
+"use strict";
+var sw=document.getElementById('swipe'),dots=document.getElementById('swdots');
+if(!sw)return;
+var dotEls=dots?dots.querySelectorAll('span'):[];
+function cardStep(){
+  var c=sw.querySelector('.sw-card');
+  return c?c.getBoundingClientRect().width+16:320;
+}
+var tick=false;
+sw.addEventListener('scroll',function(){
+  if(tick)return;tick=true;
+  requestAnimationFrame(function(){
+    var idx=Math.round(sw.scrollLeft/cardStep());
+    for(var i=0;i<dotEls.length;i++)dotEls[i].classList.toggle('on',i===idx);
+    tick=false;
+  });
+},{passive:true});
+/* mouse drag for desktop */
+var down=false,sx=0,sl=0;
+sw.addEventListener('pointerdown',function(e){
+  if(e.pointerType!=='mouse')return;
+  down=true;sx=e.clientX;sl=sw.scrollLeft;sw.classList.add('dragging');
+});
+window.addEventListener('pointermove',function(e){
+  if(!down)return;sw.scrollLeft=sl-(e.clientX-sx);
+});
+window.addEventListener('pointerup',function(){
+  if(!down)return;down=false;sw.classList.remove('dragging');
+});
+})();
+
 </script>
 </body></html>
