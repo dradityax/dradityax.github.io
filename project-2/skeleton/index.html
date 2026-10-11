@@ -171,6 +171,7 @@ catch(_){document.documentElement.classList.add('dark');}
 </div>
 
 <script type="module">
+const $ = id => document.getElementById(id);
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -312,7 +313,6 @@ let activeRegion = 'All';
 let isolated = null;
 
 /* ---------- UI refs ---------- */
-const $ = id => document.getElementById(id);
 const card=$('card'), cardName=$('cardName'), cardFact=$('cardFact'), cardRegion=$('cardRegion');
 const hint=$('hint'), results=$('results'), searchInput=$('searchInput'), searchPanel=$('searchPanel');
 
