@@ -9,22 +9,50 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ===== AX theme tokens (shared) ===== */
+body{--pbg:#050508;--pink:#f0ede6;--pmut:#9a958a;--pfine:#6f6a5e;--pcard:#141414;--pline:#2a2a2a;--pinput:#0a0a0a;--pacc:#f2f0ea;--wtr:255,255,255;}
+body.light{--pbg:#faf9f7;--pink:#1b1b19;--pmut:#6f695d;--pfine:#a39c8d;--pcard:#ffffff;--pline:#e4dfd3;--pinput:#ffffff;--pacc:#1b1b19;--wtr:26,26,24;}
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Quicksand', system-ui, sans-serif; background: #0a0a0f; color: #e8e8ec; line-height: 1.7; padding: 24px 18px 64px; }
+  body { font-family: 'Quicksand', system-ui, sans-serif; background: var(--pbg); color: var(--pink); line-height: 1.7; padding: 24px 18px 64px; }
   main { max-width: 720px; margin: 0 auto; }
   h1 { font-size: 1.9rem; font-weight: 700; margin: 12px 0 4px; }
-  .updated { color: #9a9aa5; font-size: 0.9rem; margin-bottom: 28px; }
-  h2 { font-size: 1.15rem; font-weight: 600; margin: 28px 0 8px; color: #fff; }
-  p, li { color: #c9c9d4; font-size: 1rem; }
+  .updated { color: var(--pmut); font-size: 0.9rem; margin-bottom: 28px; }
+  h2 { font-size: 1.15rem; font-weight: 600; margin: 28px 0 8px; color: var(--pink); }
+  p, li { color: var(--pink); font-size: 1rem; }
   ul { padding-left: 22px; margin: 8px 0; }
   li { margin-bottom: 6px; }
   a { color: #8ab4ff; }
   .back { display: inline-block; margin-bottom: 18px; color: #8ab4ff; text-decoration: none; font-weight: 600; }
-  .note { background: #14141c; border: 1px solid #26262f; border-radius: 12px; padding: 14px 18px; margin-top: 28px; }
+  .note { background: var(--pcard); border: 1px solid var(--pline); border-radius: 12px; padding: 14px 18px; margin-top: 28px; }
   .note p { font-size: 0.92rem; }
+
+/* ===== AX theme toggle + ink wipe (shared) ===== */
+#axTheme{position:fixed;top:15px;right:15px;z-index:200;width:42px;height:42px;border-radius:50%;border:1px solid rgba(140,140,140,.45);cursor:pointer;background:#faf9f7;box-shadow:0 2px 12px rgba(0,0,0,.28);transition:transform .18s ease,background .4s ease;padding:0;-webkit-tap-highlight-color:transparent;}
+#axTheme:active{transform:scale(.88);}
+body.light #axTheme{background:#111114;}
+#axInk{position:fixed;inset:0;z-index:190;pointer-events:none;opacity:0;background:#050508;clip-path:circle(0px at calc(100vw - 36px) 36px);-webkit-clip-path:circle(0px at calc(100vw - 36px) 36px);}
+#axInk.go{opacity:1;transition:clip-path 1.6s cubic-bezier(.72,0,.28,1),-webkit-clip-path 1.6s cubic-bezier(.72,0,.28,1);clip-path:circle(142vmax at calc(100vw - 36px) 36px);-webkit-clip-path:circle(142vmax at calc(100vw - 36px) 36px);}
+.topbar{padding-right:70px !important;}
+/* ===== snake orbit glow (shared) ===== */
+@property --sang{syntax:'<angle>';initial-value:0deg;inherits:false;}
+.snake{position:relative;}
+.snake::after{content:"";position:absolute;inset:-7px;border-radius:50%;pointer-events:none;background:conic-gradient(from var(--sang),transparent 0 60%,var(--acc,#f2f0ea) 78%,transparent 95%);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));animation:snakerot 6.5s linear infinite;}
+@keyframes snakerot{to{--sang:360deg;}}
+/* ===== light-theme component overrides (shared) ===== */
+body.light .dx .ln{background:#1b1b19 !important;box-shadow:0 0 2px rgba(26,26,24,.3) !important;}
+body.light .dx .rim{border-color:#1b1b19 !important;box-shadow:0 0 2px rgba(26,26,24,.3) !important;}
+body.light .dx .bridge{background:#1b1b19 !important;}
+body.light .dot.on{border-color:#1b1b19 !important;}
+body.light #screenNeet{background:radial-gradient(120% 90% at 50% 0%,#ffffff 0%,#faf9f7 62%) !important;}
+body.light button.go{color:#faf9f7 !important;}
+body.light .steps div.on{color:#faf9f7 !important;}
+body.light a{color:#174ea6;}
 </style>
 </head>
-<body>
+<body data-tdef="dark" data-bgdark="#050508" data-bglight="#faf9f7"><div id="axInk"></div><button id="axTheme" aria-label="Toggle black / white theme"></button>
+<script>window.axL=function(){return document.body.classList.contains('light');};</script>
+
 <main>
   <a class="back" href="/project-1/">← Back to Project One</a>
   <h1>Privacy Policy</h1>
@@ -58,5 +86,28 @@
   <p>Questions about this policy? Reach out at <a href="mailto:dradityax@gmail.com">dradityax@gmail.com</a>.</p>
 
 </main>
+
+<script>
+/* AX theme toggle */
+(function(){
+  var KEY='axThemeV1',btn=document.getElementById('axTheme'),ink=document.getElementById('axInk');
+  if(!btn||!ink||window.__axThemeOn)return;window.__axThemeOn=true;
+  function apply(v,save){document.body.classList.toggle('light',v==='light');if(save!==false){try{localStorage.setItem(KEY,v);}catch(e){}}}
+  var sv=null;try{sv=localStorage.getItem(KEY);}catch(e){}
+  apply(sv||document.body.getAttribute('data-tdef')||'dark',false);
+  var busy=false,rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  btn.addEventListener('click',function(){
+    if(busy)return;
+    var to=axL()?'dark':'light';
+    if(rm){apply(to);return;}
+    busy=true;
+    var bg=to==='light'?document.body.getAttribute('data-bglight'):document.body.getAttribute('data-bgdark');
+    ink.style.background=bg||(to==='light'?'#faf9f7':'#050508');
+    ink.classList.remove('go');void ink.offsetWidth;ink.classList.add('go');
+    setTimeout(function(){apply(to);},720);
+    setTimeout(function(){ink.classList.remove('go');busy=false;},1850);
+  });
+})();
+</script>
 </body>
 </html>
