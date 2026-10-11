@@ -176,7 +176,6 @@ function setTheme(mode){
   try{ localStorage.setItem('p2-theme', mode); }catch(_){}
 }
 $('themeBtn').onclick = ()=> setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
-setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
 
 /* ---------- descriptions (standard anatomy) ---------- */
 const DESC = {
@@ -251,6 +250,8 @@ container.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xedf0f4);
+/* init theme AFTER scene exists (was crashing before: setTheme ran pre-scene) */
+(function(){var m='light';try{m=localStorage.getItem('p2-theme')||'light';}catch(_){}setTheme(m);})();
 
 const camera = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, 1, 30000);
 const HOME_POS = new THREE.Vector3(750, 1050, 3050);
