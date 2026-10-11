@@ -200,6 +200,11 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 .sw-dots{display:flex;gap:8px;justify-content:center;margin-top:6px}
 .sw-dots span{width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.16);transition:background .3s}
 .sw-dots span.on{background:#111}
+
+.footline{font-size:.72rem;letter-spacing:.18em;opacity:.8;font-style:italic;margin:10px 0 0;}
+.sheen{background:linear-gradient(100deg,rgba(255,255,255,.42) 42%,#ffffff 50%,rgba(255,255,255,.42) 58%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#fff;animation:sheenmove 4.5s ease-in-out infinite;}
+@keyframes sheenmove{0%,100%{background-position:110% 0;}50%{background-position:-10% 0;}}
+@media (prefers-reduced-motion:reduce){.sheen{animation:none;}}
 </style></head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -227,7 +232,7 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 <div class="mergezone" aria-hidden="true"></div>
 
 <section class="sec-b">
-  <h2 class="rv">OUR PROJECTS</h2>
+  <h2 class="rv">OUR PROJECT&#8217;S</h2>
   <p class="sub rv">Things I&rsquo;m building, one by one.</p>
   <div class="brainchips rv">
     <a href="/project-1/">PROJECT ONE &mdash; specially for UG aspirants</a>
@@ -346,6 +351,7 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
     <a href="mailto:dradityax@gmail.com">Email</a>
   </div>
   <footer>© 2026 ADITYA X</footer>
+  <p class="footline">First-year <span class="sheen">MBBS student</span> building tools for the <span class="sheen">journey</span> I&rsquo;m on.</p>
 </section>
 
 <script>
