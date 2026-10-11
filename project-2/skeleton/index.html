@@ -37,10 +37,10 @@
   /* region chips */
   #chips{position:fixed;top:4.6rem;left:0;right:0;display:flex;gap:.5rem;justify-content:flex-start;padding:.4rem 1rem;overflow-x:auto;z-index:10;pointer-events:none;scrollbar-width:none}
   #chips::-webkit-scrollbar{display:none}
-  .chip{pointer-events:auto;flex:0 0 auto;padding:.45rem 1rem;border-radius:999px;border:1px solid rgba(27,36,48,.14);background:rgba(255,255,255,.85);color:rgba(27,36,48,.75);font-family:inherit;font-size:.76rem;letter-spacing:.08em;cursor:pointer;font-weight:600;box-shadow:0 2px 8px rgba(27,36,48,.06)}
+  .chip{pointer-events:auto;flex:0 0 auto;padding:.45rem 1rem;min-height:44px;display:flex;align-items:center;border-radius:999px;border:1px solid rgba(27,36,48,.14);background:rgba(255,255,255,.85);color:rgba(27,36,48,.75);font-family:inherit;font-size:.76rem;letter-spacing:.08em;cursor:pointer;font-weight:600;box-shadow:0 2px 8px rgba(27,36,48,.06)}
   .chip.on{background:#1b2430;color:#fff;border-color:#1b2430}
   /* info card */
-  #card{position:fixed;left:50%;transform:translate(-50%,130%);bottom:1.2rem;width:min(500px,calc(100vw - 2rem));background:rgba(255,255,255,.97);border:1px solid rgba(27,36,48,.1);border-radius:18px;padding:1.15rem 1.3rem 1.1rem;z-index:20;transition:transform .38s cubic-bezier(.2,.9,.25,1.08);box-shadow:0 18px 50px rgba(27,36,48,.18)}
+  #card{position:fixed;left:50%;transform:translate(-50%,130%);bottom:calc(1.2rem + env(safe-area-inset-bottom));width:min(500px,calc(100vw - 2rem));max-height:46vh;overflow-y:auto;background:rgba(255,255,255,.97);border:1px solid rgba(27,36,48,.1);border-radius:18px;padding:1.15rem 1.3rem calc(1.1rem + env(safe-area-inset-bottom));z-index:20;transition:transform .38s cubic-bezier(.2,.9,.25,1.08);box-shadow:0 18px 50px rgba(27,36,48,.18)}
   #card.show{transform:translate(-50%,0)}
   #card .rg{display:inline-block;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:#fff;background:#0f766e;border-radius:999px;padding:.24rem .75rem;font-weight:700;margin-bottom:.55rem}
   #card h2{font-size:1.3rem;font-weight:700;letter-spacing:.01em;color:#1b2430}
@@ -48,14 +48,32 @@
   #cardClose{position:absolute;top:.55rem;right:.8rem;background:none;border:none;color:rgba(27,36,48,.4);font-size:1.3rem;cursor:pointer;padding:.3rem}
   #cardClose:hover{color:#1b2430}
   /* hint */
-  #hint{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);font-size:.68rem;letter-spacing:.13em;color:rgba(27,36,48,.42);z-index:5;pointer-events:none;text-transform:uppercase;transition:opacity .6s;white-space:nowrap;font-weight:600}
+  #hint{position:fixed;bottom:calc(1.2rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font-size:.68rem;letter-spacing:.13em;color:rgba(27,36,48,.42);z-index:5;pointer-events:none;text-transform:uppercase;transition:opacity .6s;white-space:nowrap;font-weight:600}
   #hint.gone{opacity:0}
   /* locator */
-  #locator{position:fixed;right:1rem;bottom:3.4rem;width:54px;height:54px;border-radius:50%;border:1px solid rgba(27,36,48,.14);background:rgba(255,255,255,.92);color:#1b2430;font-size:1.45rem;cursor:pointer;z-index:15;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(27,36,48,.12)}
+  #locator{position:fixed;right:1rem;bottom:calc(3.4rem + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:50%;border:1px solid rgba(27,36,48,.14);background:rgba(255,255,255,.92);color:#1b2430;font-size:1.45rem;cursor:pointer;z-index:15;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(27,36,48,.12)}
   #locator:hover{border-color:#0f766e;color:#0f766e;transform:scale(1.06)}
   #locator:active{transform:scale(.96)}
   /* attribution */
   #attr{position:fixed;bottom:.55rem;right:.8rem;font-size:.58rem;color:rgba(27,36,48,.34);z-index:5;letter-spacing:.03em;text-align:right;line-height:1.5}
+  #card .rg{margin-bottom:0}
+  #isoRow{display:flex;align-items:center;gap:.6rem;margin-bottom:.55rem}
+  #isolateBtn{border:1.5px solid #0f766e;background:transparent;color:#0f766e;border-radius:999px;padding:.32rem .95rem;min-height:36px;font-family:inherit;font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+  #isolateBtn.on{background:#0f766e;color:#fff}
+  #isoPill{position:fixed;top:8.4rem;left:50%;transform:translateX(-50%);background:#1b2430;color:#fff;border-radius:999px;padding:.5rem .55rem .5rem 1.05rem;font-size:.78rem;font-weight:600;display:none;align-items:center;gap:.65rem;z-index:18;box-shadow:0 8px 24px rgba(27,36,48,.28);white-space:nowrap;max-width:calc(100vw - 2rem)}
+  #isoPill.show{display:flex}
+  #isoPill span{overflow:hidden;text-overflow:ellipsis}
+  #isoExit{background:rgba(255,255,255,.16);border:none;color:#fff;min-width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+  @media (max-width:480px){
+    .title h1{font-size:.8rem;letter-spacing:.16em}
+    .title p{font-size:.54rem;letter-spacing:.12em}
+    #card h2{font-size:1.12rem}
+    #card p{font-size:.84rem}
+    #top{padding:.7rem .9rem}
+    #chips{top:4.2rem}
+    #searchPanel{top:4rem}
+    #isoPill{top:7.6rem}
+  }
   /* loader */
   #loader{position:fixed;inset:0;background:#edf0f4;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;transition:opacity .7s}
   #loader.done{opacity:0;pointer-events:none}
@@ -101,12 +119,13 @@
 
 <div id="card">
   <button id="cardClose" aria-label="Close">&times;</button>
-  <span class="rg" id="cardRegion">Skull</span>
+  <div id="isoRow"><span class="rg" id="cardRegion">Skull</span><button id="isolateBtn">Isolate</button></div>
   <h2 id="cardName">Femur</h2>
   <p id="cardFact"></p>
 </div>
 
 <div id="hint">Drag to rotate &middot; Scroll to zoom &middot; Tap a bone</div>
+<div id="isoPill"><span id="isoName"></span><button id="isoExit" aria-label="Exit isolate">&times;</button></div>
 <button id="locator" aria-label="Reset view" title="Back to original view">&#8982;</button>
 <div id="attr">3D bones: BodyParts3D &copy; The Database Center for Life Science<br>licensed under CC BY-SA 2.1 Japan</div>
 
@@ -262,6 +281,7 @@ function select(bone, focus){
   } else {
     card.classList.remove('show');
   }
+  if (bone && isolated) setIsolated(bone); else syncIsoBtn();
 }
 $('cardClose').onclick = () => select(null);
 
@@ -286,6 +306,32 @@ $('locator').onclick = ()=>{
   controls.autoRotate = true;
   flyTo(HOME_TGT, HOME_POS);
 };
+
+/* isolate — show one bone alone */
+let isolated = null;
+function syncIsoBtn(){
+  const on = !!(isolated && selected && isolated===selected);
+  $('isolateBtn').textContent = on ? 'Show all' : 'Isolate';
+  $('isolateBtn').classList.toggle('on', on);
+}
+function setIsolated(bone){
+  isolated = bone;
+  bones.forEach(b=>{ b.mesh.visible = !bone || b===bone; });
+  labelSprites.forEach(s=>{ s.visible = labelsOn && (!bone || s.userData.boneName===bone.name); });
+  if (bone){
+    $('isoName').textContent = 'Isolated: ' + titleCase(bone.name);
+    $('isoPill').classList.add('show');
+  } else {
+    $('isoPill').classList.remove('show');
+    applyRegion();
+  }
+  syncIsoBtn();
+}
+$('isolateBtn').onclick = ()=>{
+  if (!selected) return;
+  setIsolated(isolated===selected ? null : selected);
+};
+$('isoExit').onclick = ()=> setIsolated(null);
 
 const ray = new THREE.Raycaster();
 const ptr = new THREE.Vector2();
@@ -322,6 +368,7 @@ document.querySelectorAll('.chip').forEach(ch=>{
   ch.onclick = ()=>{
     document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
     ch.classList.add('on');
+    if (isolated) setIsolated(null);
     activeRegion = ch.dataset.r;
     applyRegion();
   };
@@ -360,6 +407,7 @@ function buildLabels(){
     const sp = makeLabelSprite(titleCase(name));
     sp.position.copy(v);
     sp.userData.region = regionOf(name);
+    sp.userData.boneName = name;
     sp.visible = labelsOn;
     scene.add(sp);
     labelSprites.push(sp);
