@@ -12,13 +12,13 @@
 <meta property="og:title" content="ADITYA X — Medicinae Studiosus">
 <meta property="og:description" content="Mortui vivos docent. First-year MBBS student at Madhubani Medical College, building small corners of the internet as dradityax.">
 <meta property="og:url" content="https://dradityax.pages.dev/">
-<meta property="og:image" content="https://dradityax.pages.dev/assets/og.jpg">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ADITYA X — Medicinae Studiosus">
 <meta name="twitter:description" content="Mortui vivos docent. First-year MBBS student at Madhubani Medical College, building small corners of the internet as dradityax.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--blk:#050508;--wht:#faf9f7}
@@ -163,7 +163,7 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 
 /* new section C : soon + drifting columns */
 .sec-cx{background:#0b0b0e;color:#fff;padding:110px 0 90px;overflow:hidden;position:relative;z-index:10}
-.cx-head{text-align:center;padding:0 20px;margin-bottom:48px} .cx-port{width:76px;height:76px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.22);margin:26px auto 0;display:block;filter:saturate(.85)} .cx-now{font-size:.92rem;letter-spacing:.1em;opacity:.85;line-height:1.6;padding:0 12px;text-align:center}
+.cx-head{text-align:center;padding:0 20px;margin-bottom:48px}
 .cx-kick{font-size:.68rem;letter-spacing:.34em;opacity:.45;margin-bottom:12px}
 .sec-cx h2{font-size:clamp(1.8rem,7vw,3rem);letter-spacing:.18em;font-weight:600;margin-bottom:12px}
 .cx-sub{opacity:.55;font-size:.95rem;letter-spacing:.04em}
@@ -193,7 +193,7 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 .swipe::-webkit-scrollbar{display:none}
 .swipe.dragging{cursor:grabbing;scroll-snap-type:none}
 .sw-track{display:flex;gap:16px;padding:6px 8vw 22px;width:max-content}
-a.sw-card{text-decoration:none;color:inherit;cursor:pointer;transition:opacity .3s}a.sw-card:hover{opacity:.75}.sw-card{scroll-snap-align:center;flex:none;width:min(80vw,420px);background:transparent;border:none;border-radius:0;padding:24px 12px;text-align:left;user-select:none;-webkit-user-select:none}
+.sw-card{scroll-snap-align:center;flex:none;width:min(80vw,420px);background:transparent;border:none;border-radius:0;padding:24px 12px;text-align:left;user-select:none;-webkit-user-select:none}
 .sw-n{font-size:clamp(3.6rem,17vw,6.2rem);font-weight:700;line-height:1;letter-spacing:0;opacity:.10}
 .sw-card h3{font-size:1.35rem;margin:4px 0 8px;letter-spacing:.02em}
 .sw-card p{font-size:.95rem;line-height:1.65;opacity:.6}
@@ -247,53 +247,52 @@ a.sw-card{text-decoration:none;color:inherit;cursor:pointer;transition:opacity .
 
 <section class="sec-cx">
   <div class="cx-head">
-    <div class="cx-kick rv">At the moment</div>
-    <h2 class="rv">Now.</h2>
-    <img class="cx-port rv" src="/assets/portrait.jpg" alt="Aditya X" loading="lazy">
-    <p class="cx-sub rv">A few honest lines on where I stand today.</p>
+    <div class="cx-kick rv">Next chapter</div>
+    <h2 class="rv">More soon.</h2>
+    <p class="cx-sub rv">This space is still being built &mdash; something new is on its way.</p>
   </div>
   <div class="cx-wrap rv" aria-hidden="true">
     <div class="cx-grid">
       <div class="cx-col up">
 <div class="cx-set">
-<div class="cx-cell"><span class="cx-now">First-year MBBS &middot; MMC</span></div>
-<div class="cx-cell"><span class="cx-now">Building Project One</span></div>
-<div class="cx-cell"><span class="cx-now">Learning German</span></div>
-<div class="cx-cell"><span class="cx-now">Anatomy by day, ideas by night</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
 </div>
 <div class="cx-set">
-<div class="cx-cell"><span class="cx-now">First-year MBBS &middot; MMC</span></div>
-<div class="cx-cell"><span class="cx-now">Building Project One</span></div>
-<div class="cx-cell"><span class="cx-now">Learning German</span></div>
-<div class="cx-cell"><span class="cx-now">Anatomy by day, ideas by night</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
 </div>
 </div>
       <div class="cx-col down">
 <div class="cx-set">
-<div class="cx-cell"><span class="cx-now">First-year MBBS &middot; MMC</span></div>
-<div class="cx-cell"><span class="cx-now">Building Project One</span></div>
-<div class="cx-cell"><span class="cx-now">Learning German</span></div>
-<div class="cx-cell"><span class="cx-now">Anatomy by day, ideas by night</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
 </div>
 <div class="cx-set">
-<div class="cx-cell"><span class="cx-now">First-year MBBS &middot; MMC</span></div>
-<div class="cx-cell"><span class="cx-now">Building Project One</span></div>
-<div class="cx-cell"><span class="cx-now">Learning German</span></div>
-<div class="cx-cell"><span class="cx-now">Anatomy by day, ideas by night</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
 </div>
 </div>
       <div class="cx-col up">
 <div class="cx-set">
-<div class="cx-cell"><span class="cx-now">First-year MBBS &middot; MMC</span></div>
-<div class="cx-cell"><span class="cx-now">Building Project One</span></div>
-<div class="cx-cell"><span class="cx-now">Learning German</span></div>
-<div class="cx-cell"><span class="cx-now">Anatomy by day, ideas by night</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
 </div>
 <div class="cx-set">
-<div class="cx-cell"><span class="cx-now">First-year MBBS &middot; MMC</span></div>
-<div class="cx-cell"><span class="cx-now">Building Project One</span></div>
-<div class="cx-cell"><span class="cx-now">Learning German</span></div>
-<div class="cx-cell"><span class="cx-now">Anatomy by day, ideas by night</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
+<div class="cx-cell"><span class="cx-soon">SOON</span><span class="cx-dots">&middot;&middot;&middot;</span></div>
 </div>
 </div>
     </div>
@@ -307,13 +306,13 @@ a.sw-card{text-decoration:none;color:inherit;cursor:pointer;transition:opacity .
 <section class="sec-d">
   <div class="sw-kick rv">On the horizon</div>
   <h2 class="rv">What&rsquo;s brewing.</h2>
-  <p class="sw-sub rv">Swipe through &mdash; what&rsquo;s on the bench right now.</p>
+  <p class="sw-sub rv">Swipe through &mdash; a few things are on their way.</p>
   <div class="swipe rv" id="swipe">
     <div class="sw-track">
-      <a class="sw-card" href="/project-1/"><span class="sw-n">01</span><h3>PROJECT ONE</h3><p>&#8377;50,000 for one phone call. I&rsquo;m building the counselor I never had.</p><span class="sw-tag">&rarr;</span></a>
-      <a class="sw-card" href="/project-2/"><span class="sw-n">02</span><h3>PROJECT TWO</h3><p>Anatomy you can touch &mdash; 201 bones in interactive 3D.</p><span class="sw-tag">&rarr;</span></a>
-      <article class="sw-card"><span class="sw-n">03</span><h3>THE METHOD</h3><p>Learn first, certify second. Nothing unearned goes on the wall.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
-      <article class="sw-card"><span class="sw-n">04</span><h3>THE DIRECTION</h3><p>MBBS student today, builder alongside &mdash; doctor in 2031.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
+      <article class="sw-card"><span class="sw-n">01</span><h3>Soon</h3><p>Something is brewing here.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
+      <article class="sw-card"><span class="sw-n">02</span><h3>Soon</h3><p>Something is brewing here.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
+      <article class="sw-card"><span class="sw-n">03</span><h3>Soon</h3><p>Something is brewing here.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
+      <article class="sw-card"><span class="sw-n">04</span><h3>Soon</h3><p>Something is brewing here.</p><span class="sw-tag">&middot;&middot;&middot;</span></article>
     </div>
   </div>
   <div class="sw-dots" id="swdots" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span></div>
