@@ -101,7 +101,8 @@ body.playing .scrollhint{opacity:0}
 .sec-b h2{font-size:clamp(1.5rem,6vw,2.4rem);letter-spacing:.3em;font-weight:600;margin-bottom:14px}
 .sec-b .sub{opacity:.6;letter-spacing:.12em;margin-bottom:8px;font-size:.95rem}
 .brainchips{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:44px 20px 60px;max-width:760px;margin:0 auto;background:var(--wht)}
-.brainchips span{font-size:.78rem;letter-spacing:.18em;border:1px solid rgba(0,0,0,.22);border-radius:999px;padding:9px 20px;opacity:.7}
+.brainchips span,.brainchips a{font-size:.78rem;letter-spacing:.18em;border:1px solid rgba(0,0,0,.22);border-radius:999px;padding:9px 20px;opacity:.7;color:#111;text-decoration:none;transition:background .3s,opacity .3s}
+.brainchips a:hover{background:#111;color:#fff;opacity:1}
 /* SECTION C : black, ambitions horizontal */
 .hwrap{height:420vh;background:var(--blk)}
 .hsticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
@@ -158,17 +159,7 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 .xslot{transform-origin:top left}
 .xslot.corner{position:fixed;top:calc(max(3.5vh,18px) + env(safe-area-inset-top,0px));left:calc(max(3vw,14px) + env(safe-area-inset-left,0px));z-index:45;font-size:44px;margin:0;mix-blend-mode:difference;opacity:.75}
 
-/* projects in section B */
-.proj{max-width:1020px;margin:64px auto 0;padding:0 4px}
-.pkick{font-size:.68rem;letter-spacing:.34em;opacity:.45;margin-bottom:10px}
-.ptitle{font-size:clamp(1.3rem,5vw,1.9rem);letter-spacing:.3em;font-weight:600;margin-bottom:26px}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;text-align:left}
-.pcard{background:#fff;border:1px solid #e9e6e0;border-radius:18px;padding:28px 24px;color:#111;text-decoration:none;display:block;transition:transform .35s ease,box-shadow .35s ease}
-.pcard:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,.10)}
-.pnum{font-size:.68rem;letter-spacing:.3em;opacity:.4}
-.pcard h4{font-size:1.25rem;margin:12px 0 8px;letter-spacing:.02em}
-.pcard p{font-size:.92rem;line-height:1.65;opacity:.65}
-.pmore{display:inline-block;margin-top:14px;font-size:.82rem;font-weight:600;letter-spacing:.12em}
+
 /* new section C : soon + drifting columns */
 .sec-cx{background:#0b0b0e;color:#fff;padding:110px 0 90px;overflow:hidden;position:relative;z-index:10}
 .cx-head{text-align:center;padding:0 20px;margin-bottom:48px}
@@ -214,34 +205,14 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 <div class="mergezone" aria-hidden="true"></div>
 
 <section class="sec-b">
-  <h2 class="rv">INSIDE THE MACHINE</h2>
-  <p class="sub rv">Half human. Half skeleton. Every part thinks.</p>
+  <h2 class="rv">OUR PROJECT&#8217;S</h2>
+  <p class="sub rv">Things I&rsquo;m building, one by one.</p>
   <div class="brainchips rv">
-    <span>PREFRONTAL — the empire plan</span>
-    <span>AMYGDALA — never bow</span>
-    <span>HIPPOCAMPUS — mother's words</span>
-    <span>MOTOR — build daily</span>
+    <a href="/project-1/">PROJECT ONE &mdash; specially for UG aspirants</a>
+    <a href="/project-2/">PROJECT TWO &mdash; interactive human anatomy</a>
   </div>
 
-  <div class="proj">
-    <div class="pkick rv">Selected work</div>
-    <h3 class="ptitle rv">PROJECTS</h3>
-    <div class="pgrid">
-      <a class="pcard rv" href="/project-1/">
-        <span class="pnum">01</span>
-        <h4>Project One</h4>
-        <p>Bihar&rsquo;s NEET counselling, rebuilt &mdash; personal guidance, an honest college predictor, zero &#8377;50,000 fee trauma.</p>
-        <span class="pmore">Explore &rarr;</span>
-      </a>
-      <a class="pcard rv" href="/project-2/">
-        <span class="pnum">02</span>
-        <h4>Project Two</h4>
-        <p>Interactive anatomy blocks &mdash; starting with the complete human skeleton system.</p>
-        <span class="pmore">Explore &rarr;</span>
-      </a>
-    </div>
-  </div>
-</section>
+  </section>
 
 <div class="mergeback" aria-hidden="true"></div>
 
