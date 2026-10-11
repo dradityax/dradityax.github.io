@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Gyro 3D Demo — Aditya X</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{background:#050508;color:#f0ede6;font-family:'Quicksand',system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    -webkit-user-select:none;user-select:none}
+  .stage{text-align:center;padding:24px}
+  .tilt{width:min(72vw,300px);height:min(72vw,300px);margin:0 auto;position:relative;
+    border-radius:28px;transform-style:preserve-3d;will-change:transform;
+    box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .tilt img{width:100%;height:100%;object-fit:cover;border-radius:28px;display:block;
+    border:1px solid rgba(255,255,255,.16)}
+  .shine{position:absolute;inset:0;border-radius:28px;pointer-events:none;
+    background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.22),transparent 60%);
+    mix-blend-mode:screen;will-change:background}
+  .hint{margin-top:34px;font-size:.68rem;letter-spacing:.42em;opacity:.45}
+  .sub{margin-top:10px;font-size:.8rem;letter-spacing:.08em;opacity:.35}
+  #iosBtn{margin-top:26px;background:transparent;color:#f0ede6;border:1px solid rgba(255,255,255,.35);
+    border-radius:999px;padding:12px 30px;font-size:.72rem;letter-spacing:.3em;cursor:pointer}
+  #iosBtn:active{transform:scale(.96)}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="tilt" id="tilt">
+      <img src="/assets/portrait.jpg" alt="Aditya X">
+      <div class="shine" id="shine"></div>
+    </div>
+    <p class="hint">TILT YOUR PHONE</p>
+    <p class="sub">demo — gyro 3D</p>
+    <button id="iosBtn" hidden>ENABLE MOTION</button>
+  </div>
+<script>
+(function(){
+  "use strict";
+  var tilt = document.getElementById('tilt'),
+      shine = document.getElementById('shine'),
+      iosBtn = document.getElementById('iosBtn'),
+      tRX = 0, tRY = 0, rX = 0, rY = 0,
+      gyroOn = false;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  // --- gyroscope ---
+  function onOrient(e){
+    if(e.beta===null || e.gamma===null) return;
+    gyroOn = true;
+    // beta: front-back tilt, gamma: left-right
+    tRY = clamp(e.gamma, -40, 40) * 0.38;          // left-right -> rotateY
+    tRX = clamp(e.beta - 50, -40, 40) * -0.34;     // holding angle ~50deg -> rotateX
+  }
+
+  // iOS 13+ needs explicit permission
+  if(typeof DeviceOrientationEvent !== 'undefined' &&
+     typeof DeviceOrientationEvent.requestPermission === 'function'){
+    iosBtn.hidden = false;
+    iosBtn.addEventListener('click', function(){
+      DeviceOrientationEvent.requestPermission().then(function(res){
+        if(res === 'granted'){
+          window.addEventListener('deviceorientation', onOrient);
+          iosBtn.hidden = true;
+        }
+      }).catch(function(){});
+    });
+  } else if('DeviceOrientationEvent' in window){
+    window.addEventListener('deviceorientation', onOrient);
+  }
+
+  // --- mouse fallback (desktop preview) ---
+  window.addEventListener('mousemove', function(e){
+    if(gyroOn) return;
+    var x = (e.clientX / window.innerWidth - 0.5),
+        y = (e.clientY / window.innerHeight - 0.5);
+    tRY = x * 26;
+    tRX = y * -20;
+  });
+
+  // --- smooth render loop ---
+  function frame(){
+    rX += (tRX - rX) * 0.075;
+    rY += (tRY - rY) * 0.075;
+    tilt.style.transform =
+      'perspective(900px) rotateX(' + rX.toFixed(2) + 'deg) rotateY(' + rY.toFixed(2) + 'deg)';
+    var sx = 50 + rY * 2.2, sy = 50 + rX * 2.2;
+    shine.style.background =
+      'radial-gradient(circle at ' + sx.toFixed(1) + '% ' + sy.toFixed(1) + '%,rgba(255,255,255,.22),transparent 60%)';
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>
