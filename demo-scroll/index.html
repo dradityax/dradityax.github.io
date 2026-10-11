@@ -201,10 +201,11 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 .sw-dots span{width:6px;height:6px;border-radius:50%;background:rgba(0,0,0,.16);transition:background .3s}
 .sw-dots span.on{background:#111}
 
-.footline{font-size:.72rem;letter-spacing:.18em;opacity:.8;font-style:italic;margin:10px 0 0;}
+.footline{font-size:.72rem;letter-spacing:.18em;opacity:.8;font-style:italic;margin:22px 0 0;}
 .sheen{background:linear-gradient(100deg,rgba(255,255,255,.42) 42%,#ffffff 50%,rgba(255,255,255,.42) 58%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#fff;animation:sheenmove 4.5s ease-in-out infinite;}
 @keyframes sheenmove{0%,100%{background-position:110% 0;}50%{background-position:-10% 0;}}
 @media (prefers-reduced-motion:reduce){.sheen{animation:none;}}
+.sheen-slow{animation-duration:7s;}
 </style></head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -213,7 +214,7 @@ body.playing .hero .who,body.scrolled .hero .who{opacity:0}
 
 <section class="hero">
   <h1><span class="aname">ADITYA</span>&nbsp;<span class="xslot" id="mascotX" aria-hidden="true"><span class="dx"><span class="ln l1" id="dx1"></span><span class="ln l2" id="dx2"></span><span class="glasses" id="dxg"><span class="rim r1"></span><span class="rim r2"></span><span class="bridge"></span></span><span class="book" id="dxb"><span class="page p1"></span><span class="page p2"></span></span></span></span></h1>
-  <div class="tag">Mortui vivos docent.</div>
+  <div class="tag"><span class="sheen sheen-slow">Mortui vivos docent.</span></div>
   <div><span class="who">MBBS&nbsp;STUDENT</span></div>
   <div class="scrollhint">SCROLL&nbsp;&nbsp;↓</div>
 </section>
