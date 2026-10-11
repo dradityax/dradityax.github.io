@@ -38,7 +38,7 @@ body.light{--pbg:#faf9f7;--pink:#1b1b19;--pmut:#6f695d;--pfine:#a39c8d;--pcard:#
   .wrap { position: relative; z-index: 2; max-width: 560px; margin: 0 auto; padding: 8px 18px 60px; }
   h1 { font-size: 1.5rem; letter-spacing: 3px; text-align: center; margin: 10px 0 4px; }
   .sub { text-align: center; color: rgba(var(--wtr),.55); font-size: .92rem; margin-bottom: 18px; }
-  .card { background: rgba(var(--wtr),.045); border: 1px solid rgba(var(--wtr),.1); border-radius: 16px;
+  .card { background: transparent; border: 1px solid rgba(var(--wtr),.1); border-radius: 16px;
           padding: 22px; margin-bottom: 16px; display: none; }
   .card.on { display: block; }
   label { display: block; font-size: .78rem; letter-spacing: 1.5px; color: rgba(var(--wtr),.6); margin: 14px 0 6px; }
@@ -75,8 +75,8 @@ body.light #axTheme{background:#111114;}
 .topbar{padding-right:70px !important;}
 /* ===== snake orbit glow (shared) ===== */
 @property --sang{syntax:'<angle>';initial-value:0deg;inherits:false;}
-.snake{position:relative;}
-.snake::after{content:"";position:absolute;inset:-7px;border-radius:50%;pointer-events:none;background:conic-gradient(from var(--sang),transparent 0 60%,var(--acc,#f2f0ea) 78%,transparent 95%);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));animation:snakerot 6.5s linear infinite;}
+.sk{position:relative;}
+.sk::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--sang),transparent 0 68%,var(--acc) 82%,transparent 96%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;animation:snakerot 7s linear infinite;opacity:.5;pointer-events:none;}
 @keyframes snakerot{to{--sang:360deg;}}
 /* ===== light-theme component overrides (shared) ===== */
 body.light .dx .ln{background:#1b1b19 !important;box-shadow:0 0 2px rgba(26,26,24,.3) !important;}
@@ -86,6 +86,15 @@ body.light .dot.on{border-color:#1b1b19 !important;}
 body.light #screenNeet{background:radial-gradient(120% 90% at 50% 0%,#ffffff 0%,#faf9f7 62%) !important;}
 body.light button.go{color:#faf9f7 !important;}
 body.light .steps div.on{color:#faf9f7 !important;}
+
+/* ===== AX v3: app-type premium ===== */
+#axTheme{background:linear-gradient(135deg,#faf9f7 0 49%,#131316 51% 100%) !important;transition:transform .32s cubic-bezier(.3,1.5,.4,1) !important;}
+#axTheme:active{transform:rotate(180deg) scale(.9) !important;}
+#axInk{filter:blur(2px);}
+.backarrow{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;margin-left:-8px;font-size:1.4rem;line-height:1;color:var(--pink);background:none;border:none;cursor:pointer;text-decoration:none;border-radius:50%;transition:transform .28s cubic-bezier(.3,1.6,.4,1),background .2s;-webkit-tap-highlight-color:transparent;font-family:inherit;padding:0;}
+.backarrow:hover{background:rgba(var(--wtr),.07);}
+.backarrow:active{transform:translateX(-6px) scale(.9);}
+.wrap{padding-bottom:calc(48px + env(safe-area-inset-bottom));}
 </style>
 </head>
 <body data-tdef="dark" data-bgdark="#050508" data-bglight="#faf9f7"><div id="axInk"></div><button id="axTheme" aria-label="Toggle black / white theme"></button>
@@ -93,7 +102,7 @@ body.light .steps div.on{color:#faf9f7 !important;}
 
 <canvas id="stars"></canvas>
 <div class="topbar">
-  <a class="backbtn" href="../">&larr; PROJECT ONE</a>
+  <a class="backarrow" href="../" aria-label="Back">&larr;</a>
   <a class="backbtn" href="../signup/" id="acctBtn" style="display:none">SIGN IN</a>
 </div>
 <div class="mini-x"><span class="xslot"><span class="dx"><span class="ln l1"></span><span class="ln l2"></span></span></span></div>
@@ -268,6 +277,11 @@ sb.auth.onAuthStateChange(async (event, session) => {
     setTimeout(function(){ink.classList.remove('go');busy=false;},1850);
   });
 })();
+</script>
+
+<script>
+/* AX buttery scroll (wheel only, desktop) */
+(function(){if(!matchMedia('(hover:hover) and (pointer:fine)').matches)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var t=scrollY,c=scrollY,r=null;function tick(){c+=(t-c)*.12;if(Math.abs(t-c)<.6){c=t;r=null;}scrollTo(0,c);if(r!==null||c!==t)r=requestAnimationFrame(tick);}addEventListener('wheel',function(e){if(e.ctrlKey||e.metaKey||e.altKey)return;if(Math.abs(e.deltaX)>Math.abs(e.deltaY))return;var el=e.target;if(el){var tn=el.tagName;if(tn==='INPUT'||tn==='SELECT'||tn==='TEXTAREA')return;if(el.closest&&el.closest('#screenNeet'))return;}var d=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);if(!d)return;e.preventDefault();t=Math.max(0,Math.min(document.documentElement.scrollHeight-innerHeight,t+d));if(r===null)r=requestAnimationFrame(tick);},{passive:false});addEventListener('keydown',function(){t=scrollY;c=scrollY;if(r){cancelAnimationFrame(r);r=null;}});})();
 </script>
 </body>
 </html>
