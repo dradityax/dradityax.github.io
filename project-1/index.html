@@ -56,6 +56,7 @@ body.light{--pbg:#faf9f7;--pink:#1b1b19;--pmut:#6f695d;--pfine:#a39c8d;--pcard:#
   .tag { text-align: center; color: rgba(var(--wtr),.6); font-size: .85rem; margin: 10px 0 32px; letter-spacing: 1px; }
   .sec { font-size: .75rem; letter-spacing: 3px; color: rgba(var(--wtr),.5); margin: 32px 0 14px; }
   .sw { text-align: center; margin-bottom: 26px; }
+  .acclab { text-align: center; font-size: .62rem; letter-spacing: 3px; color: rgba(var(--wtr),.38); margin: 2px 0 10px; }
   .dots { display: flex; gap: 12px; justify-content: center; }
   .dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
          transition: transform .2s; opacity: .8; }
@@ -120,7 +121,7 @@ body.light #axTheme{background:#111114;}
 @property --sang{syntax:'<angle>';initial-value:0deg;inherits:false;}
 .sk{position:relative;}
 .sk{position:relative;}
-.sk::before{content:"";position:absolute;inset:-2px;border-radius:inherit;background:conic-gradient(from var(--sang),transparent 0 74%,var(--acc) 86%,#ffffff 90%,transparent 96%);animation:snakerot 4.5s linear infinite;opacity:.85;pointer-events:none;}
+.sk::before{content:"";position:absolute;inset:-1px;border-radius:inherit;background:conic-gradient(from var(--sang),transparent 0 74%,var(--acc) 86%,#ffffff 90%,transparent 96%);animation:snakerot 4.5s linear infinite;opacity:.85;pointer-events:none;}
 .sk::after{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--pbg);pointer-events:none;}
 .sk>*{position:relative;z-index:1;}
 @keyframes snakerot{to{--sang:360deg;}}
@@ -167,6 +168,7 @@ window.__axMoon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
   </span></span></div>
   <h1>PROJECT <span class="xcol">ONE</span></h1>
   <p class="tag">practice everything &middot; fear nothing</p>
+  <div class="acclab">ACCENT</div>
   <div class="sw"><div class="dots" id="dots"></div></div>
   <div class="acctwrap"><a class="acctbtn" href="signup/">SIGN IN / CREATE ACCOUNT</a></div>
   <div class="sec">CHOOSE YOUR EXAM</div>
