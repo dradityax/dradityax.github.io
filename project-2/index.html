@@ -6,28 +6,27 @@
 <title>Project Two — Aditya X</title>
 <meta name="description" content="Project Two by Aditya X — interactive anatomy blocks. Start with the human skeleton system.">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%}
-  body{background:#000;color:rgba(255,255,255,.88);font-family:'Quicksand',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 1.5rem 3rem}
-  .back{align-self:flex-start;margin-top:1.5rem;color:rgba(255,255,255,.5);text-decoration:none;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;font-weight:500}
-  .back:hover{color:#fff}
-  header{text-align:center;margin:3.2rem 0 2.6rem}
-  header h1{font-size:clamp(2rem,7vw,3.2rem);font-weight:300;letter-spacing:.3em;margin-bottom:.8rem}
-  header p{color:rgba(255,255,255,.5);font-size:.85rem;letter-spacing:.2em;text-transform:uppercase}
-  .rule{width:60px;height:1px;background:rgba(255,255,255,.28);margin:0 auto 2.6rem}
+  body{background:#edf0f4;color:#1b2430;font-family:'Quicksand',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 1.5rem 3rem}
+  .back{align-self:flex-start;margin-top:1.5rem;color:rgba(27,36,48,.55);text-decoration:none;font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600}
+  .back:hover{color:#0f766e}
+  header{text-align:center;margin:3.2rem 0 2.4rem}
+  header h1{font-size:clamp(2rem,7vw,3.2rem);font-weight:300;letter-spacing:.3em;margin-bottom:.8rem;color:#1b2430}
+  header p{color:rgba(27,36,48,.5);font-size:.82rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600}
+  .rule{width:60px;height:2px;background:#0f766e;margin:0 auto 2.6rem;border-radius:2px}
   .blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;width:min(860px,100%)}
-  .block{border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:1.8rem 1.6rem;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:.7rem;transition:border-color .25s,transform .25s,box-shadow .25s;background:rgba(255,255,255,.02)}
-  a.block:hover{border-color:rgba(255,255,255,.55);transform:translateY(-3px);box-shadow:0 12px 40px rgba(255,255,255,.06)}
-  .block .tag{align-self:flex-start;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;border-radius:999px;padding:.28rem .8rem}
-  .tag.live{background:#fff;color:#000}
-  .tag.soon{background:transparent;color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.25)}
-  .block h2{font-size:1.35rem;font-weight:600;letter-spacing:.04em}
-  .block p{font-size:.88rem;line-height:1.7;color:rgba(255,255,255,.58)}
-  .block .go{margin-top:.4rem;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.75)}
-  a.block:hover .go{color:#fff}
-  .block.dim{opacity:.55}
-  footer{margin-top:auto;padding-top:3rem;font-size:.62rem;color:rgba(255,255,255,.28);letter-spacing:.05em;text-align:center;line-height:1.7}
+  .block{border:1px solid rgba(27,36,48,.1);border-radius:18px;padding:1.8rem 1.6rem;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:.7rem;transition:border-color .25s,transform .25s,box-shadow .25s;background:#fff;box-shadow:0 4px 18px rgba(27,36,48,.05)}
+  a.block:hover{border-color:#0f766e;transform:translateY(-3px);box-shadow:0 14px 40px rgba(15,118,110,.12)}
+  .block .tag{align-self:flex-start;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;border-radius:999px;padding:.3rem .8rem}
+  .tag.live{background:#0f766e;color:#fff}
+  .tag.soon{background:transparent;color:rgba(27,36,48,.45);border:1px solid rgba(27,36,48,.25)}
+  .block h2{font-size:1.35rem;font-weight:700;letter-spacing:.02em;color:#1b2430}
+  .block p{font-size:.88rem;line-height:1.7;color:rgba(27,36,48,.62)}
+  .block .go{margin-top:.4rem;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:#0f766e;font-weight:700}
+  .block.dim{opacity:.6}
+  footer{margin-top:auto;padding-top:3rem;font-size:.6rem;color:rgba(27,36,48,.36);letter-spacing:.04em;text-align:center;line-height:1.7}
 </style>
 </head>
 <body>
@@ -41,7 +40,7 @@
   <a class="block" href="skeleton/">
     <span class="tag live">Live</span>
     <h2>Human Skeleton System</h2>
-    <p>Full adult-male skeleton in interactive 3D. Drag to rotate, scroll to zoom, tap any of the 201 bones to identify it.</p>
+    <p>Full adult-male skeleton in interactive 3D — 201 bones. Drag to rotate, scroll to zoom, tap any bone to identify it.</p>
     <span class="go">Open &rarr;</span>
   </a>
   <div class="block dim">
