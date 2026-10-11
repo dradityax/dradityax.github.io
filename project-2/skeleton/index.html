@@ -20,29 +20,35 @@
   .title{text-align:center}
   .title h1{font-size:1rem;font-weight:700;letter-spacing:.26em;color:#1b2430}
   .title p{font-size:.64rem;letter-spacing:.16em;color:rgba(27,36,48,.5);margin-top:.22rem;text-transform:uppercase;font-weight:500}
-  .topbtns{display:flex;gap:.5rem}
-  .iconbtn{width:42px;height:42px;border-radius:50%;border:1px solid rgba(27,36,48,.16);background:rgba(255,255,255,.85);color:#1b2430;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(27,36,48,.08)}
+  .iconbtn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(27,36,48,.16);background:rgba(255,255,255,.85);color:#1b2430;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(27,36,48,.08)}
   .iconbtn:hover{border-color:#0f766e;color:#0f766e}
-  .iconbtn.off{opacity:.4}
   .iconbtn svg{width:20px;height:20px}
   /* search panel */
   #searchPanel{position:fixed;top:4.4rem;right:1rem;width:min(320px,calc(100vw - 2rem));background:rgba(255,255,255,.96);border:1px solid rgba(27,36,48,.1);border-radius:14px;z-index:20;display:none;overflow:hidden;box-shadow:0 12px 40px rgba(27,36,48,.14)}
   #searchPanel.open{display:block}
   #searchInput{width:100%;padding:.85rem 1rem;background:transparent;border:none;border-bottom:1px solid rgba(27,36,48,.1);color:#1b2430;font-family:inherit;font-size:.95rem;outline:none}
   #results{max-height:46vh;overflow-y:auto}
-  .res{padding:.7rem 1rem;font-size:.88rem;cursor:pointer;border-bottom:1px solid rgba(27,36,48,.05);display:flex;justify-content:space-between;align-items:center;gap:.6rem;color:#1b2430}
+  .res{padding:.8rem 1rem;min-height:48px;font-size:.88rem;cursor:pointer;border-bottom:1px solid rgba(27,36,48,.05);display:flex;justify-content:space-between;align-items:center;gap:.6rem;color:#1b2430}
   .res:hover{background:rgba(15,118,110,.07)}
   .res .rg{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(27,36,48,.45);white-space:nowrap;font-weight:600}
   .nores{padding:1rem;color:rgba(27,36,48,.45);font-size:.85rem;text-align:center}
-  /* region chips */
-  #chips{position:fixed;top:4.6rem;left:0;right:0;display:flex;gap:.5rem;justify-content:flex-start;padding:.4rem 1rem;overflow-x:auto;z-index:10;pointer-events:none;scrollbar-width:none}
-  #chips::-webkit-scrollbar{display:none}
-  .chip{pointer-events:auto;flex:0 0 auto;padding:.45rem 1rem;min-height:44px;display:flex;align-items:center;border-radius:999px;border:1px solid rgba(27,36,48,.14);background:rgba(255,255,255,.85);color:rgba(27,36,48,.75);font-family:inherit;font-size:.76rem;letter-spacing:.08em;cursor:pointer;font-weight:600;box-shadow:0 2px 8px rgba(27,36,48,.06)}
-  .chip.on{background:#1b2430;color:#fff;border-color:#1b2430}
+  /* region dropdown */
+  #regionWrap{position:fixed;top:4.6rem;left:1rem;z-index:12}
+  #regionBtn{display:flex;align-items:center;gap:.55rem;padding:.55rem 1.1rem;min-height:44px;border-radius:999px;border:1px solid rgba(27,36,48,.14);background:rgba(255,255,255,.92);color:#1b2430;font-family:inherit;font-size:.8rem;font-weight:700;letter-spacing:.05em;cursor:pointer;box-shadow:0 2px 10px rgba(27,36,48,.08)}
+  #regionBtn .caret{font-size:.68rem;color:#0f766e}
+  #regionMenu{position:absolute;top:calc(100% + .45rem);left:0;min-width:200px;background:#fff;border:1px solid rgba(27,36,48,.1);border-radius:14px;box-shadow:0 14px 40px rgba(27,36,48,.16);overflow:hidden;display:none}
+  #regionMenu.open{display:block}
+  #regionMenu button{display:flex;width:100%;padding:.85rem 1.15rem;min-height:50px;background:none;border:none;border-bottom:1px solid rgba(27,36,48,.06);font-family:inherit;font-size:.88rem;font-weight:600;color:#1b2430;cursor:pointer;text-align:left;align-items:center}
+  #regionMenu button:last-child{border-bottom:none}
+  #regionMenu button.on{color:#0f766e}
+  #regionMenu button.on::after{content:'✓';margin-left:auto;font-weight:700}
   /* info card */
   #card{position:fixed;left:50%;transform:translate(-50%,130%);bottom:calc(1.2rem + env(safe-area-inset-bottom));width:min(500px,calc(100vw - 2rem));max-height:46vh;overflow-y:auto;background:rgba(255,255,255,.97);border:1px solid rgba(27,36,48,.1);border-radius:18px;padding:1.15rem 1.3rem calc(1.1rem + env(safe-area-inset-bottom));z-index:20;transition:transform .38s cubic-bezier(.2,.9,.25,1.08);box-shadow:0 18px 50px rgba(27,36,48,.18)}
   #card.show{transform:translate(-50%,0)}
-  #card .rg{display:inline-block;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:#fff;background:#0f766e;border-radius:999px;padding:.24rem .75rem;font-weight:700;margin-bottom:.55rem}
+  #isoRow{display:flex;align-items:center;gap:.6rem;margin-bottom:.55rem}
+  #card .rg{display:inline-block;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:#fff;background:#0f766e;border-radius:999px;padding:.24rem .75rem;font-weight:700}
+  #isolateBtn{border:1.5px solid #0f766e;background:transparent;color:#0f766e;border-radius:999px;padding:.32rem .95rem;min-height:36px;font-family:inherit;font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+  #isolateBtn.on{background:#0f766e;color:#fff}
   #card h2{font-size:1.3rem;font-weight:700;letter-spacing:.01em;color:#1b2430}
   #card p{margin-top:.5rem;font-size:.9rem;line-height:1.7;color:rgba(27,36,48,.72)}
   #cardClose{position:absolute;top:.55rem;right:.8rem;background:none;border:none;color:rgba(27,36,48,.4);font-size:1.3rem;cursor:pointer;padding:.3rem}
@@ -54,26 +60,13 @@
   #locator{position:fixed;right:1rem;bottom:calc(3.4rem + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:50%;border:1px solid rgba(27,36,48,.14);background:rgba(255,255,255,.92);color:#1b2430;font-size:1.45rem;cursor:pointer;z-index:15;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(27,36,48,.12)}
   #locator:hover{border-color:#0f766e;color:#0f766e;transform:scale(1.06)}
   #locator:active{transform:scale(.96)}
-  /* attribution */
-  #attr{position:fixed;bottom:.55rem;right:.8rem;font-size:.58rem;color:rgba(27,36,48,.34);z-index:5;letter-spacing:.03em;text-align:right;line-height:1.5}
-  #card .rg{margin-bottom:0}
-  #isoRow{display:flex;align-items:center;gap:.6rem;margin-bottom:.55rem}
-  #isolateBtn{border:1.5px solid #0f766e;background:transparent;color:#0f766e;border-radius:999px;padding:.32rem .95rem;min-height:36px;font-family:inherit;font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
-  #isolateBtn.on{background:#0f766e;color:#fff}
-  #isoPill{position:fixed;top:8.4rem;left:50%;transform:translateX(-50%);background:#1b2430;color:#fff;border-radius:999px;padding:.5rem .55rem .5rem 1.05rem;font-size:.78rem;font-weight:600;display:none;align-items:center;gap:.65rem;z-index:18;box-shadow:0 8px 24px rgba(27,36,48,.28);white-space:nowrap;max-width:calc(100vw - 2rem)}
+  /* isolate pill */
+  #isoPill{position:fixed;top:8.2rem;left:50%;transform:translateX(-50%);background:#1b2430;color:#fff;border-radius:999px;padding:.5rem .55rem .5rem 1.05rem;font-size:.78rem;font-weight:600;display:none;align-items:center;gap:.65rem;z-index:18;box-shadow:0 8px 24px rgba(27,36,48,.28);white-space:nowrap;max-width:calc(100vw - 2rem)}
   #isoPill.show{display:flex}
   #isoPill span{overflow:hidden;text-overflow:ellipsis}
   #isoExit{background:rgba(255,255,255,.16);border:none;color:#fff;min-width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center}
-  @media (max-width:480px){
-    .title h1{font-size:.8rem;letter-spacing:.16em}
-    .title p{font-size:.54rem;letter-spacing:.12em}
-    #card h2{font-size:1.12rem}
-    #card p{font-size:.84rem}
-    #top{padding:.7rem .9rem}
-    #chips{top:4.2rem}
-    #searchPanel{top:4rem}
-    #isoPill{top:7.6rem}
-  }
+  /* attribution */
+  #attr{position:fixed;bottom:.55rem;right:.8rem;font-size:.58rem;color:rgba(27,36,48,.34);z-index:5;letter-spacing:.03em;text-align:right;line-height:1.5}
   /* loader */
   #loader{position:fixed;inset:0;background:#edf0f4;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;transition:opacity .7s}
   #loader.done{opacity:0;pointer-events:none}
@@ -83,6 +76,16 @@
   #bar{height:100%;width:0%;background:#0f766e;transition:width .2s}
   #pct{font-size:.72rem;letter-spacing:.2em;color:rgba(27,36,48,.5);font-weight:600}
   #err{display:none;max-width:80vw;text-align:center;color:#b33737;font-size:.85rem;line-height:1.6}
+  @media (max-width:480px){
+    .title h1{font-size:.8rem;letter-spacing:.16em}
+    .title p{font-size:.54rem;letter-spacing:.12em}
+    #top{padding:.7rem .9rem}
+    #regionWrap{top:4.2rem}
+    #searchPanel{top:4rem}
+    #isoPill{top:7.8rem;font-size:.72rem}
+    #card h2{font-size:1.12rem}
+    #card p{font-size:.84rem}
+  }
 </style>
 <script type="importmap">
 {"imports":{
@@ -97,10 +100,7 @@
 <div id="top">
   <a class="back" href="../">&larr; Project Two</a>
   <div class="title"><h1>SKELETON</h1><p>Adult Male &middot; 201 Bones &middot; 3D</p></div>
-  <div class="topbtns">
-    <button class="iconbtn" id="labelBtn" aria-label="Toggle labels" title="Labels"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/></svg></button>
-    <button class="iconbtn" id="searchBtn" aria-label="Search bones" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
-  </div>
+  <button class="iconbtn" id="searchBtn" aria-label="Search bones" title="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
 </div>
 
 <div id="searchPanel">
@@ -108,13 +108,16 @@
   <div id="results"></div>
 </div>
 
-<div id="chips">
-  <button class="chip on" data-r="All">All</button>
-  <button class="chip" data-r="Skull">Skull</button>
-  <button class="chip" data-r="Spine">Spine</button>
-  <button class="chip" data-r="Thorax">Thorax</button>
-  <button class="chip" data-r="Arm">Arms</button>
-  <button class="chip" data-r="Leg">Legs</button>
+<div id="regionWrap">
+  <button id="regionBtn"><span id="regionName">All</span><span class="caret">▾</span></button>
+  <div id="regionMenu">
+    <button data-r="All" class="on">All</button>
+    <button data-r="Skull">Skull</button>
+    <button data-r="Spine">Spine</button>
+    <button data-r="Thorax">Thorax</button>
+    <button data-r="Arm">Arms</button>
+    <button data-r="Leg">Legs</button>
+  </div>
 </div>
 
 <div id="card">
@@ -144,54 +147,54 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 /* ---------- descriptions (standard anatomy) ---------- */
 const DESC = {
-  "atlas":"The first cervical vertebra (C1). It has no body or spinous process — just a bony ring that cradles the skull. The nodding 'yes' joint sits between the atlas and the occipital bone.",
-  "axis":"The second cervical vertebra (C2). Its peg-like dens (odontoid process) pivots inside the atlas, letting the head turn side to side — the shaking-'no' joint.",
-  "frontal bone":"Forms the forehead and the roofs of the eye sockets. Its air-filled frontal sinuses lighten the skull and add resonance to the voice.",
-  "occipital bone":"Forms the back and base of the skull. The spinal cord passes through its large opening, the foramen magnum, and the skull rocks on its two occipital condyles.",
-  "sphenoid bone":"The butterfly-shaped keystone at the base of the skull. It cradles the pituitary gland in a little saddle called the sella turcica.",
-  "ethmoid":"A light, spongy cube of bone between the eyes. It forms the roof of the nasal cavity and the inner walls of the eye sockets.",
-  "mandible":"The largest and strongest facial bone — and the only movable bone of the skull. It carries the lower teeth and anchors the powerful chewing muscles.",
-  "vomer":"The thin, plough-shaped bone forming the lower part of the nasal septum.",
-  "hyoid bone":"A U-shaped bone in the neck that touches no other bone — it floats, slung by muscles, and supports the tongue.",
-  "manubrium":"The broad top plate of the breastbone. Both collarbones and the first pair of ribs meet it here.",
-  "body of sternum":"The long middle plate of the breastbone. Ribs 2 to 7 anchor to it through their cartilages.",
-  "xiphoid process":"The small, cartilaginous tip of the breastbone. It slowly hardens into bone with age.",
-  "clavicle":"The collarbone — a slender S-shaped strut between breastbone and shoulder. It is the most commonly fractured bone in the body.",
-  "scapula":"The flat, triangular shoulder blade gliding over the ribcage. It anchors 17 muscles and its shallow socket holds the arm bone.",
-  "humerus":"The long bone of the upper arm. Its rounded head fits the shoulder socket; its pulley-shaped lower end forms the elbow with the forearm bones.",
-  "radius":"The outer forearm bone (thumb side). It rolls around the ulna when you turn your palm up or down.",
-  "ulna":"The inner forearm bone (little-finger side). Its hooked upper end forms the point of the elbow.",
-  "hip bone":"The large fused bone of the pelvis — ilium, ischium and pubis joined into one. Its deep socket (acetabulum) cradles the head of the femur.",
-  "femur":"The thigh bone — the longest and strongest bone in the human body, carrying the body's weight down to the knee.",
-  "patella":"The kneecap — a sesamoid bone floating inside the quadriceps tendon. It shields the knee joint and boosts the leverage of the thigh muscle.",
-  "tibia":"The shinbone — the thick inner bone of the lower leg that carries nearly all of its weight.",
-  "fibula":"The slender outer bone of the lower leg. It bears little weight but steadies the ankle and anchors leg muscles.",
-  "talus":"The ankle bone that receives the body's full weight from the tibia and passes it down into the foot.",
-  "calcaneus":"The heel bone — the largest bone of the foot, striking the ground with every step you take."
+  "atlas":"The first cervical vertebra (C1). It has no body or spinous process — just a bony ring that cradles the skull. The nodding 'yes' joint sits between the atlas and the occipital bone. Injury here is dangerous, because the spinal cord passes straight through its ring.",
+  "axis":"The second cervical vertebra (C2). Its peg-like dens (odontoid process) pivots inside the atlas, letting the head turn side to side — the shaking-'no' joint. A broken dens can threaten the spinal cord, which is why neck injuries are always immobilized.",
+  "frontal bone":"Forms the forehead and the roofs of the eye sockets. Its air-filled frontal sinuses lighten the skull and add resonance to the voice. It also forms the front wall of the cranial cavity holding the frontal lobes.",
+  "occipital bone":"Forms the back and base of the skull. The spinal cord passes through its large opening, the foramen magnum, and the skull rocks on its two occipital condyles. The bump you feel at the back of your head is its external occipital protuberance.",
+  "sphenoid bone":"The butterfly-shaped keystone at the base of the skull. It cradles the pituitary gland in a little saddle called the sella turcica. Almost every other skull bone touches the sphenoid — it is the true keystone of the cranium.",
+  "ethmoid":"A light, spongy cube of bone between the eyes. It forms the roof of the nasal cavity and the inner walls of the eye sockets. Its tiny holes let the smell nerves pass from the nose up to the brain.",
+  "mandible":"The largest and strongest facial bone — and the only movable bone of the skull. It carries the lower teeth and anchors the powerful chewing muscles, which exert the strongest bite force in the body.",
+  "vomer":"The thin, plough-shaped bone forming the lower part of the nasal septum. A bent or deviated vomer is a common cause of a chronically blocked nose.",
+  "hyoid bone":"A U-shaped bone in the neck that touches no other bone — it floats, slung by muscles, and supports the tongue. It glides upward with every swallow; you can feel it move if you touch your throat while swallowing.",
+  "manubrium":"The broad top plate of the breastbone. Both collarbones and the first pair of ribs meet it here, and doctors use it as a landmark when placing a stethoscope.",
+  "body of sternum":"The long middle plate of the breastbone. Ribs 2 to 7 anchor to it through their cartilages. Its marrow-rich interior is one of the sites where bone-marrow samples are taken.",
+  "xiphoid process":"The small, cartilaginous tip of the breastbone. It slowly hardens into bone with age. Rescuers are trained to avoid pressing on it during CPR, since the liver sits just beneath.",
+  "clavicle":"The collarbone — a slender S-shaped strut between breastbone and shoulder. It is the most commonly fractured bone in the body, and the first bone to harden in a fetus, finishing growth only around age 25.",
+  "scapula":"The flat, triangular shoulder blade gliding over the ribcage. It anchors 17 muscles and its shallow socket holds the arm bone. Its flat shape lets it slide smoothly as the arm moves.",
+  "humerus":"The long bone of the upper arm. Its rounded head fits the shoulder socket; its pulley-shaped lower end forms the elbow with the forearm bones. The 'funny bone' tingle is actually the ulnar nerve getting pinched behind it.",
+  "radius":"The outer forearm bone (thumb side). It rolls around the ulna when you turn your palm up or down. It is the most commonly broken arm bone — typically from falling on an outstretched hand.",
+  "ulna":"The inner forearm bone (little-finger side). Its hooked upper end forms the point of the elbow, making a strong hinge with the humerus that bends only one way.",
+  "hip bone":"The large fused bone of the pelvis — ilium, ischium and pubis joined into one. Its deep socket (acetabulum) cradles the head of the femur, and its wide flare is built for upright walking.",
+  "femur":"The thigh bone — the longest and strongest bone in the human body, carrying the body's weight down to the knee. It can bear many times the body weight; engineers study its structure to design stronger materials.",
+  "patella":"The kneecap — a sesamoid bone floating inside the quadriceps tendon. It shields the knee joint and boosts the thigh muscle's pulling power by up to fifty percent.",
+  "tibia":"The shinbone — the thick inner bone of the lower leg that carries nearly all of its weight. Its sharp front edge is the shin you bang against furniture.",
+  "fibula":"The slender outer bone of the lower leg. It bears little weight but steadies the ankle and anchors leg muscles. Surgeons sometimes use a piece of it to rebuild jaws after injury.",
+  "talus":"The ankle bone that receives the body's full weight from the tibia and passes it down into the foot. Unusually, no muscles attach to it — it is steered entirely by surrounding bones and ligaments.",
+  "calcaneus":"The heel bone — the largest bone of the foot, striking the ground with every step you take. The Achilles tendon, the strongest tendon in the body, anchors into it."
 };
 function describe(name){
   const n = name.toLowerCase().replace(/ \(2\)$/,'');
   const base = n.replace(/^(left|right) /,'');
   if (DESC[n]) return DESC[n];
   if (DESC[base]) return DESC[base];
-  if (/parietal bone/.test(n)) return "Paired bones forming the sides and roof of the cranium. They meet along the sagittal suture at the very top of the skull.";
-  if (/temporal bone/.test(n)) return "Forms the sides and base of the skull. It houses the delicate middle and inner ear, and its mastoid process anchors neck muscles.";
-  if (/maxilla/.test(n)) return "Forms the upper jaw and holds the upper teeth. Its hollow maxillary sinus is the largest of the facial air sinuses.";
-  if (/zygomatic bone/.test(n)) return "The cheekbone — forms the prominence of the cheek and the outer rim of the eye socket.";
-  if (/nasal bone/.test(n)) return "Paired small bones forming the bridge of the nose.";
-  if (/lacrimal bone/.test(n)) return "The smallest bone of the skull, at the inner corner of each eye socket. Tears drain through a tiny groove in it.";
-  if (/palatine bone/.test(n)) return "L-shaped bones forming the back of the hard palate — the roof of the mouth.";
-  if (/rib/.test(n)) return "One of 12 pairs of curved bones guarding the chest. The upper 7 join the breastbone directly; ribs 8–10 join the cartilage above; 11–12 float free.";
-  if (/cervical vertebra/.test(n)) return "One of the 7 neck vertebrae (C1–C7) — the smallest and most mobile vertebrae of the whole spine.";
-  if (/thoracic vertebra/.test(n)) return "One of the 12 chest vertebrae (T1–T12). Each carries small facets where a pair of ribs attaches — the only vertebrae that join ribs.";
-  if (/lumbar vertebra/.test(n)) return "One of the 5 lower-back vertebrae (L1–L5) — the largest vertebrae in the spine, built to carry the body's weight.";
-  if (/scaphoid|lunate|pisiform|trapezium|trapezoid|capitate|hamate/.test(n)) return "One of the 8 small carpal bones of the wrist, packed in two rows of four between the forearm and the hand.";
-  if (/metacarpal/.test(n)) return "One of the 5 long bones of the palm, numbered 1 to 5 from thumb to little finger.";
-  if (/metatarsal/.test(n)) return "One of the 5 long bones of the forefoot, between the ankle and the toes.";
-  if (/navicular|cuboid|cuneiform/.test(n)) return "One of the 7 tarsal bones of the ankle, interlocking to form the arch of the foot.";
+  if (/parietal bone/.test(n)) return "Paired bones forming the sides and roof of the cranium. They meet along the sagittal suture at the very top of the skull — the soft spot on a baby's head sits where they meet the frontal bone.";
+  if (/temporal bone/.test(n)) return "Forms the sides and base of the skull. It houses the delicate middle and inner ear, and its bony mastoid process behind the ear anchors neck muscles.";
+  if (/maxilla/.test(n)) return "Forms the upper jaw and holds the upper teeth. Its hollow maxillary sinus is the largest of the facial air sinuses — the one that aches during sinus infections.";
+  if (/zygomatic bone/.test(n)) return "The cheekbone — forms the prominence of the cheek and the outer rim of the eye socket. Its arch is a favorite fracture site in facial injuries.";
+  if (/nasal bone/.test(n)) return "Paired small bones forming the bridge of the nose — and the most commonly broken bones of the face.";
+  if (/lacrimal bone/.test(n)) return "The smallest bone of the skull, at the inner corner of each eye socket. Tears drain through a tiny groove in it into the nose — which is why crying gives you a runny nose.";
+  if (/palatine bone/.test(n)) return "L-shaped bones forming the back of the hard palate — the roof of the mouth — and part of the nasal cavity wall.";
+  if (/rib/.test(n)) return "One of 12 pairs of curved bones guarding the chest. The upper 7 join the breastbone directly; ribs 8–10 join the cartilage above; 11–12 float free. They rise and fall with every breath.";
+  if (/cervical vertebra/.test(n)) return "One of the 7 neck vertebrae (C1–C7) — the smallest and most mobile vertebrae of the whole spine, built for the head's wide range of motion.";
+  if (/thoracic vertebra/.test(n)) return "One of the 12 chest vertebrae (T1–T12). Each carries small facets where a pair of ribs attaches — the only vertebrae that join ribs directly.";
+  if (/lumbar vertebra/.test(n)) return "One of the 5 lower-back vertebrae (L1–L5) — the largest vertebrae in the spine, built to carry the body's weight. Most slipped discs happen here.";
+  if (/scaphoid|lunate|pisiform|trapezium|trapezoid|capitate|hamate/.test(n)) return "One of the 8 small carpal bones of the wrist, packed in two rows of four between the forearm and the hand. The scaphoid is the most commonly fractured wrist bone.";
+  if (/metacarpal/.test(n)) return "One of the 5 long bones of the palm, numbered 1 to 5 from thumb to little finger. The fifth metacarpal is the classic 'boxer's fracture' bone.";
+  if (/metatarsal/.test(n)) return "One of the 5 long bones of the forefoot, between the ankle and the toes. They take a pounding with every step — stress fractures here are common in runners.";
+  if (/navicular|cuboid|cuneiform/.test(n)) return "One of the 7 tarsal bones of the ankle, interlocking to form the arch of the foot — the spring that absorbs each step.";
   if (/phalanx/.test(n)) return /finger|thumb/.test(n)
-    ? "A finger bone. Each finger has three phalanges (proximal, middle, distal); the thumb has only two."
-    : "A toe bone. Each toe has three phalanges (proximal, middle, distal); the big toe has only two.";
+    ? "A finger bone. Each finger has three phalanges (proximal, middle, distal); the thumb has only two — a trade-off for its powerful grip."
+    : "A toe bone. Each toe has three phalanges (proximal, middle, distal); the big toe has only two, built sturdier for push-off.";
   if (/sesamoid/.test(n)) return "A small bone embedded inside a tendon — like a miniature kneecap protecting a high-stress joint.";
   return "Part of the human skeleton — " + regionOf(name) + " region.";
 }
@@ -205,19 +208,6 @@ function regionOf(name){
   return 'Other';
 }
 const titleCase = s => s.replace(/ \(2\)$/,'').replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.slice(1));
-
-/* label anchors (model coords, viewer applies rotation.x=-PI/2) */
-const LABELS = {
-  "frontal bone":[0.2,1564.1,136.5],"left parietal bone":[22.1,1594.6,49.7],"occipital bone":[0.4,1527.3,23.1],
-  "mandible":[-0.7,1461.2,133.3],"left maxilla":[17.0,1482.8,156.5],"left zygomatic bone":[45.4,1506.7,143.5],
-  "left clavicle":[76.1,1334.9,101.3],"manubrium":[0.1,1298.9,154.2],"body of sternum":[0.8,1223.9,193.6],
-  "left first rib":[40.8,1345.0,90.2],"left scapula":[118.5,1302.0,45.6],"left humerus":[186.3,1190.2,73.3],
-  "left radius":[246.7,917.1,94.2],"left ulna":[220.3,959.6,81.2],"atlas":[-0.9,1471.3,68.5],
-  "seventh cervical vertebra":[-0.1,1378.8,66.5],"twelfth thoracic vertebra":[-1.2,1078.5,55.0],
-  "first lumbar vertebra":[-0.9,1046.4,63.1],"left hip bone":[68.7,844.1,71.9],"left femur":[91.4,611.5,76.6],
-  "left patella":[83.0,382.4,111.5],"left tibia":[72.5,220.1,79.0],"left fibula":[100.5,162.4,61.2],
-  "left talus":[70.8,-16.6,79.5],"left calcaneus":[75.7,-37.5,65.5]
-};
 
 /* ---------- scene ---------- */
 const container = document.getElementById('scene');
@@ -244,11 +234,11 @@ controls.autoRotate = true;
 controls.autoRotateSpeed = 0.9;
 
 scene.add(new THREE.HemisphereLight(0xffffff, 0xcfd6df, 0.9));
-const key = new THREE.DirectionalLight(0xffffff, 1.15); key.position.set(1400, 2400, 2000); scene.add(key);
+const key = new THREE.DirectionalLight(0xffffff, 1.3); key.position.set(1400, 2400, 2000); scene.add(key);
 const rim = new THREE.DirectionalLight(0xbfd4ff, 0.55); rim.position.set(-1600, 900, -2000); scene.add(rim);
 const fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(0, 500, 2600); scene.add(fill);
 
-const boneMat = new THREE.MeshStandardMaterial({color:0xc9c2b1, roughness:0.55, metalness:0.05});
+const boneMat = new THREE.MeshStandardMaterial({color:0xf6f6f6, roughness:0.5, metalness:0.04});
 const dimMat  = new THREE.MeshStandardMaterial({color:0x9aa0a8, roughness:0.8, metalness:0, transparent:true, opacity:0.06, depthWrite:false});
 const selMat  = new THREE.MeshStandardMaterial({color:0x0f766e, roughness:0.4, metalness:0.1, emissive:0x0f766e, emissiveIntensity:0.35});
 
@@ -256,11 +246,25 @@ const skel = new THREE.Group();
 skel.rotation.x = -Math.PI/2;
 scene.add(skel);
 
+/* soft ground shadow */
+(function(){
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const g = c.getContext('2d');
+  const gr = g.createRadialGradient(128,128,8,128,128,122);
+  gr.addColorStop(0,'rgba(27,36,48,0.30)'); gr.addColorStop(1,'rgba(27,36,48,0)');
+  g.fillStyle = gr; g.fillRect(0,0,256,256);
+  const sh = new THREE.Mesh(
+    new THREE.PlaneGeometry(1150,1150),
+    new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c), transparent:true, depthWrite:false})
+  );
+  sh.rotation.x = -Math.PI/2; sh.position.y = -80;
+  scene.add(sh);
+})();
+
 const bones = [];
 let selected = null;
 let activeRegion = 'All';
-let labelsOn = true;
-const labelSprites = [];
+let isolated = null;
 
 /* ---------- UI refs ---------- */
 const $ = id => document.getElementById(id);
@@ -303,12 +307,12 @@ function focusBone(bone){
 /* locator — back to the original view */
 $('locator').onclick = ()=>{
   select(null);
+  if (isolated) setIsolated(null);
   controls.autoRotate = true;
   flyTo(HOME_TGT, HOME_POS);
 };
 
-/* isolate — show one bone alone */
-let isolated = null;
+/* isolate — show one bone alone, camera flies to it */
 function syncIsoBtn(){
   const on = !!(isolated && selected && isolated===selected);
   $('isolateBtn').textContent = on ? 'Show all' : 'Isolate';
@@ -317,10 +321,10 @@ function syncIsoBtn(){
 function setIsolated(bone){
   isolated = bone;
   bones.forEach(b=>{ b.mesh.visible = !bone || b===bone; });
-  labelSprites.forEach(s=>{ s.visible = labelsOn && (!bone || s.userData.boneName===bone.name); });
   if (bone){
     $('isoName').textContent = 'Isolated: ' + titleCase(bone.name);
     $('isoPill').classList.add('show');
+    focusBone(bone);
   } else {
     $('isoPill').classList.remove('show');
     applyRegion();
@@ -358,67 +362,23 @@ function applyRegion(){
   bones.forEach(b=>{
     const vis = activeRegion==='All' || b.region===activeRegion;
     b.mesh.material = (selected===b) ? selMat : (vis ? boneMat : dimMat);
-  });
-  labelSprites.forEach(s=>{
-    const vis = activeRegion==='All' || s.userData.region===activeRegion;
-    s.material.opacity = vis ? 1 : 0.08;
+    if (!isolated) b.mesh.visible = true;
   });
 }
-document.querySelectorAll('.chip').forEach(ch=>{
-  ch.onclick = ()=>{
-    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
-    ch.classList.add('on');
+const regionBtn=$('regionBtn'), regionMenu=$('regionMenu'), regionName=$('regionName');
+regionBtn.onclick = e=>{ e.stopPropagation(); regionMenu.classList.toggle('open'); };
+document.addEventListener('click', e=>{ if(!regionMenu.contains(e.target) && e.target!==regionBtn) regionMenu.classList.remove('open'); });
+regionMenu.querySelectorAll('button').forEach(b=>{
+  b.onclick = ()=>{
+    regionMenu.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    regionName.textContent = b.textContent;
+    regionMenu.classList.remove('open');
     if (isolated) setIsolated(null);
-    activeRegion = ch.dataset.r;
+    activeRegion = b.dataset.r;
     applyRegion();
   };
 });
-
-/* labels */
-function roundRect(g,x,y,w,h,r){
-  g.beginPath();
-  g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
-  g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath();
-}
-function makeLabelSprite(text){
-  const c = document.createElement('canvas'); c.width=512; c.height=128;
-  const g = c.getContext('2d');
-  g.fillStyle='rgba(255,255,255,0.95)';
-  roundRect(g,10,26,492,76,38); g.fill();
-  g.strokeStyle='rgba(27,36,48,0.16)'; g.lineWidth=3; g.stroke();
-  g.fillStyle='#1b2430'; g.textAlign='center'; g.textBaseline='middle';
-  let fs=42; g.font='600 '+fs+'px Quicksand, sans-serif';
-  while (g.measureText(text).width > 450 && fs>20){ fs-=2; g.font='600 '+fs+'px Quicksand, sans-serif'; }
-  g.fillText(text, 256, 66);
-  const tex = new THREE.CanvasTexture(c); tex.anisotropy=4;
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, depthTest:true, transparent:true, depthWrite:false}));
-  sp.scale.set(200, 50, 1);
-  return sp;
-}
-function buildLabels(){
-  Object.entries(LABELS).forEach(([name, a])=>{
-    /* push slightly outward from the body core so the pill sits off the bone surface */
-    const v = new THREE.Vector3(a[0], a[2], -a[1]);
-    const axis = new THREE.Vector3(0, v.y, 20);
-    const dir = v.clone().sub(axis);
-    if (dir.lengthSq() < 1) dir.set(0,0,1);
-    dir.normalize();
-    v.add(dir.multiplyScalar(48));
-    const sp = makeLabelSprite(titleCase(name));
-    sp.position.copy(v);
-    sp.userData.region = regionOf(name);
-    sp.userData.boneName = name;
-    sp.visible = labelsOn;
-    scene.add(sp);
-    labelSprites.push(sp);
-  });
-  applyRegion();
-}
-$('labelBtn').onclick = ()=>{
-  labelsOn = !labelsOn;
-  $('labelBtn').classList.toggle('off', !labelsOn);
-  labelSprites.forEach(s=>{ s.visible = labelsOn; });
-};
 
 /* search */
 $('searchBtn').onclick = ()=>{
@@ -456,16 +416,6 @@ new GLTFLoader(manager).load('../models/skeleton_full.glb', gltf=>{
   });
   skel.add(gltf.scene);
   bones.sort((a,b)=>a.name.localeCompare(b.name));
-  const counts = {All:bones.length};
-  bones.forEach(b=>{ counts[b.region]=(counts[b.region]||0)+1; });
-  document.querySelectorAll('.chip').forEach(ch=>{
-    const n = counts[ch.dataset.r]||0;
-    if (n) ch.textContent = ch.textContent + ' · ' + n;
-  });
-  if (document.fonts && document.fonts.ready){
-    document.fonts.ready.then(buildLabels).catch(()=>buildLabels());
-    setTimeout(()=>{ if(!labelSprites.length) buildLabels(); }, 2500);
-  } else buildLabels();
   document.getElementById('loader').classList.add('done');
   setTimeout(()=>hint.classList.add('gone'), 9000);
 }, undefined, ()=>{
