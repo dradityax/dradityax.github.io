@@ -775,17 +775,28 @@ function runEntrance(){
   setTimeout(function(){ html.classList.remove("intro"); }, 2100);
 }
 
-/* ---------- password gate (SHA-256, no plaintext in source) ---------- */
-var PASS_HASH = "eff9eaea0ca3b60a846cc481a1ac1ad579d9e1cdf05bc61425e8edd4926b7845";
+/* ---------- password gate: AES-256-GCM decrypt; success == correct password ---------- */
+function b64ToBytes(b64){
+  var s = atob(b64), n = s.length, a = new Uint8Array(n);
+  for(var i=0;i<n;i++) a[i] = s.charCodeAt(i);
+  return a;
+}
+async function tryUnlock(pw){
+  var res = await fetch("journal-posts.enc.json",{cache:"no-store"});
+  if(!res.ok) throw new Error("fetch failed");
+  var enc = await res.json();
+  var baseKey = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
+  var key = await crypto.subtle.deriveKey(
+    {name:"PBKDF2", salt: b64ToBytes(enc.salt), iterations: enc.iterations, hash:"SHA-256"},
+    baseKey, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+  var buf = await crypto.subtle.decrypt(
+    {name:"AES-GCM", iv: b64ToBytes(enc.iv)}, key, b64ToBytes(enc.data));
+  return JSON.parse(new TextDecoder().decode(buf));
+}
 function boot(){
   if(!reduced) html.classList.add("intro");
-  fetch("journal-posts.json",{cache:"no-store"})
-    .then(function(r){ return r.json(); })
-    .then(function(posts){
-      entries = posts.slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
-      buildColumns();
-    })
-    .catch(function(){ buildColumns(); });
+  buildColumns();
   requestAnimationFrame(tick);
   runEntrance();
   setTimeout(function(){ if(!reduced) jdxLoop(); }, 1500);
@@ -806,24 +817,22 @@ function unlock(){
   document.getElementById("lock").classList.add("hide");
   boot();
 }
-async function tryPass(pw){
-  try{
-    var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
-    var hex = Array.prototype.map.call(new Uint8Array(buf), function(b){
-      return ("0"+b.toString(16)).slice(-2);
-    }).join("");
-    return hex === PASS_HASH;
-  }catch(_){ return false; }
-}
-document.getElementById("lockForm").addEventListener("submit", async function(ev){
+document.getElementById("lockForm").addEventListener("submit", function(ev){
   ev.preventDefault();
   var input = document.getElementById("lockInput");
-  if(await tryPass(input.value)){ unlock(); }
-  else{
+  var btn = document.querySelector(".lock-go");
+  var pw = input.value;
+  if(!pw) return;
+  btn.disabled = true; btn.textContent = "Unlocking…";
+  tryUnlock(pw).then(function(posts){
+    entries = posts.slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+    unlock();
+  }).catch(function(){
     var l = document.getElementById("lock");
     l.classList.remove("bad"); void l.offsetWidth; l.classList.add("bad");
     input.value=""; input.focus();
-  }
+    btn.disabled = false; btn.textContent = "Unlock";
+  });
 });
 (function initLock(){
   /* password is asked on EVERY fresh load — no persistence */
