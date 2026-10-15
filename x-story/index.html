@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Story — Private</title>
+<title>Story</title>
 <style>
   :root{--ink:#141312;--cream:#f6f1e7;--card:#fffdf7;--red:#c93a2e;--muted:#6b6862}
   *{box-sizing:border-box}
   body{margin:0;background:var(--cream);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
   a{color:inherit}
-  /* ---------- Password lock (same UX as x-journal: full-screen, no content before unlock) ---------- */
+  /* ---------- Password lock ---------- */
   #lock{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:#141312;color:#f6f1e7;padding:24px}
   #lock.hidden{display:none}
   .lock-card{width:min(420px,100%);text-align:center}
@@ -20,7 +20,7 @@
   .lock-card input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font-size:16px;outline:none}
   .lock-card button{margin-top:12px;width:100%;padding:13px;border:0;border-radius:12px;background:#f6f1e7;color:#141312;font-size:16px;font-weight:700;cursor:pointer}
   #lockError{display:none;margin-top:10px;font-size:13px;color:#ff9a8a}
-  /* ---------- Story reading experience (cinematic, no columns, full-screen reading) ---------- */
+  /* ---------- Story reading ---------- */
   #story{max-width:720px;margin:0 auto;padding:28px 20px 80px;display:none}
   #story.show{display:block}
   .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:28px}
@@ -48,9 +48,7 @@
 <!-- Lock: nothing below renders until correct password decrypts story.enc.json -->
 <div id="lock">
   <div class="lock-card">
-    <div class="lock-kicker">Private · Encrypted · Story</div>
     <h1>Story</h1>
-    <p>Same password as x-journal. No password is stored on this page.</p>
     <form id="lockForm">
       <input id="pw" type="password" placeholder="Password" autocomplete="current-password" required>
       <button type="submit">Unlock Story</button>
@@ -61,17 +59,13 @@
 
 <!-- Reader: empty shell until decrypt succeeds -->
 <main id="story" aria-live="polite">
-  <div class="topbar"><div class="brand">Story</div><div class="hint">Private · Encrypted</div></div>
-  <div class="kicker">Private · Encrypted · Story</div>
-  <h1 class="story-title" id="storyTitle">Story — Aaj se shuru</h1>
-  <p class="story-sub" id="storySub">Narrator aaj se shuru karta hai, phir dheere-dheere peeche aur aage move karta rehta hai. Time-frame spine hai.</p>
+  <h1 class="story-title" id="storyTitle">Story</h1>
   <div class="progress"><div id="progressBar"></div></div>
   <div id="frames"></div>
   <div class="frame-nav">
     <button id="prevBtn" type="button">← Previous frame</button>
     <button id="nextBtn" type="button">Next frame →</button>
   </div>
-  <div class="end-note" id="endNote">Yahan se kahani kal phir aage badhegi. Future additions spine se reconcile karke add hongi — overwrite nahi.</div>
 </main>
 
 <script>
@@ -116,14 +110,13 @@
       var r = await fetch("story.enc.json", {cache:"no-store"});
       if(!r.ok) throw new Error("Story file not found");
       var enc = await r.json();
-      // SAME crypto as x-journal: PBKDF2 600k + AES-256-GCM, same password. No second password.
+      // PBKDF2 + AES-256-GCM.
       var baseKey = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
       var key = await crypto.subtle.deriveKey({name:"PBKDF2", salt: b64ToBytes(enc.salt), iterations: enc.iterations, hash:"SHA-256"}, baseKey, {name:"AES-GCM", length:256}, false, ["decrypt"]);
       var buf = await crypto.subtle.decrypt({name:"AES-GCM", iv: b64ToBytes(enc.iv)}, key, b64ToBytes(enc.data));
       var data = JSON.parse(new TextDecoder().decode(buf));
       frames = data.frames || [];
       if(!frames.length) throw new Error("Empty story");
-      if(data.title) document.getElementById("storyTitle").textContent = data.title;
       lockEl.classList.add("hidden");
       storyEl.classList.add("show");
       showFrame(0);
