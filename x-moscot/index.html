@@ -42,6 +42,20 @@
    .dx .l1{transform:translateX(-50%) rotate(40deg) scaleY(1)}
    .dx .l2{transform:translateX(-50%) rotate(-40deg) scaleY(1)}
   }
+
+/* MOSCOT-V3 : character body language + ground shadow — bars only, no face */
+.dx{transform-origin:50% 100%;transition:transform .28s cubic-bezier(.2,.9,.3,1.25)}
+.xslot::after{content:"";position:absolute;left:50%;bottom:-.20em;width:.9em;height:.12em;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.38),rgba(255,255,255,0) 70%);opacity:.45;transition:transform .28s cubic-bezier(.2,.9,.3,1.25),opacity .28s ease;pointer-events:none}
+.xslot.v3-leanin .dx{transform:translateY(.04em) rotate(-4deg) scale(1.03,.98)}
+.xslot.v3-leanback .dx{transform:translateY(-.02em) rotate(3deg) scale(.97,1.08)}
+.xslot.v3-slump .dx{transform:translateY(.08em) rotate(-2deg) scale(1.10,.85)}
+.xslot.v3-stretch .dx{transform:scale(.96,1.12)}
+.xslot.v3-squash .dx{transform:scale(1.14,.84)}
+.xslot.v3-hop .dx{transform:translateY(-.08em) scale(.95,1.08)}
+.xslot.v3-squash::after{transform:translateX(-50%) scaleX(1.3);opacity:.55}
+.xslot.v3-hop::after{transform:translateX(-50%) scaleX(.8);opacity:.2}
+.xslot.v3-slump::after{transform:translateX(-50%) scaleX(1.25);opacity:.5}
+@media(prefers-reduced-motion:reduce){.dx{transition:none}.xslot::after{display:none}}
 </style>
 </head>
 <body>
@@ -93,26 +107,67 @@ function dxRead(){
   }).then(function(){ return new Promise(function(r){ setTimeout(r, 350); }); })
     .then(function(){ dxb.classList.remove("open"); return new Promise(function(r){ setTimeout(r, 500); }); });
 }
-/* fully automatic loop — exactly like the homepage */
-var dxN=0;
+/* MOSCOT-V3 : body language helpers + yawn + tap-hop (same as homepage) */
+var dxSlot=document.querySelector('.xslot'), dxPhase="dot";
+function v3Body(k,ms){if(reduce||!dxSlot)return;dxSlot.classList.remove("v3-leanin","v3-leanback","v3-slump","v3-stretch","v3-squash","v3-hop");if(!k)return;dxSlot.classList.add("v3-"+k);if(ms)setTimeout(function(){if(dxSlot)dxSlot.classList.remove("v3-"+k);},ms);}
+function v3Hop(){if(reduce)return;v3Body("hop",260);setTimeout(function(){v3Body("squash",180);},260);setTimeout(function(){v3Body("stretch",180);},440);setTimeout(function(){v3Body(null);},620);}
+async function dxYawn(){
+  v3Body("stretch",650);
+  await Promise.all([dxSet(dx1,DX_BLINK1,650,"ease-in"),dxSet(dx2,DX_BLINK2,650,"ease-in")]);
+  await Promise.all([dxSet(dx1,DX_DOT1,300,"ease-out"),dxSet(dx2,DX_DOT2,300,"ease-out")]);
+  v3Body("slump",750);
+  await new Promise(function(r){setTimeout(r,750);});
+  v3Body(null);
+}
+if(dxSlot){
+  dxSlot.addEventListener("click",function(){
+    if(reduce)return;v3Hop();
+    if(dxPhase==="dot"){
+      Promise.all([dxSet(dx1,"translateX(-.20em) scale(1.25,.30)",260),dxSet(dx2,"translateX(.20em) scale(1.25,.30)",260)]).then(function(){
+        setTimeout(function(){if(dxPhase==="dot"){dxSet(dx1,DX_DOT1,260);dxSet(dx2,DX_DOT2,260);}},360);
+      });
+    }
+  });
+}
+/* fully automatic loop — exactly like the homepage (V3) */
+var dxN=1; /* V3-fix 25 Oct: first cycle (dxN=2) shows glasses, then yawn, then read */
+
 async function dxLoop(){
   while(true){
     dxN++;
     await new Promise(function(r){ setTimeout(r, 2800); });
-    for(var i=0;i<2;i++){ await dxBlink(); await new Promise(function(r){ setTimeout(r, i<1?1200:2200); }); }
+    var blinks=Math.random()<0.3?1:2;
+    for(var i=0;i<blinks;i++){ await dxBlink(); if(i+1<blinks) await new Promise(function(r){ setTimeout(r, 900+Math.random()*900); }); }
+    if(Math.random()<0.25){ await dxBlink(); await new Promise(function(r){ setTimeout(r, 220); }); await dxBlink(); }
     if(dxN%4===2){ await dxGlasses(); }
     else if(dxN%4===0){ await dxRead(); }
+    else if(dxN%4===3){ await dxYawn(); }
     await new Promise(function(r){ setTimeout(r, 1500); });
+    if(Math.random()<0.4){
+      v3Body("leanin");
+      await Promise.all([dxSet(dx1,"translateX(-.14em) scaleY(.236)",380,"cubic-bezier(.2,.9,.3,1.25)"),dxSet(dx2,"translateX(.26em) scaleY(.236)",380,"cubic-bezier(.2,.9,.3,1.25)")]);
+      await Promise.all([dxSet(dx1,"translateX(-.26em) scaleY(.236)",380,"cubic-bezier(.2,.9,.3,1.25)"),dxSet(dx2,"translateX(.14em) scaleY(.236)",380,"cubic-bezier(.2,.9,.3,1.25)")]);
+      await Promise.all([dxSet(dx1,DX_DOT1,320),dxSet(dx2,DX_DOT2,320)]);
+      v3Body(null);
+    }
+    dxPhase="line";
     await Promise.all([ dxSet(dx1, DX_LINE1, 1100), dxSet(dx2, DX_LINE2, 1100) ]);
     await new Promise(function(r){ setTimeout(r, 900); });
     await Promise.all([
       dxSet(dx1, DX_X1, 1500, "cubic-bezier(.3,1.2,.4,1)"),
       dxSet(dx2, DX_X2, 1500, "cubic-bezier(.3,1.2,.4,1)")
     ]);
+    dxPhase="x";
+    v3Body("squash",260); await new Promise(function(r){ setTimeout(r, 260); });
+    v3Body("stretch",180); await new Promise(function(r){ setTimeout(r, 180); });
+    v3Body(null);
     await new Promise(function(r){ setTimeout(r, 8000); });
     await Promise.all([ dxSet(dx1, DX_LINE1, 1300), dxSet(dx2, DX_LINE2, 1300) ]);
     await new Promise(function(r){ setTimeout(r, 700); });
     await Promise.all([ dxSet(dx1, DX_DOT1, 1100), dxSet(dx2, DX_DOT2, 1100) ]);
+    dxPhase="dot";
+    v3Body("squash",200); await new Promise(function(r){ setTimeout(r, 200); });
+    v3Body(null);
   }
 }
 setTimeout(function(){ if(!reduce) dxLoop(); }, 1500);
