@@ -214,7 +214,7 @@ a.sw-card{text-decoration:none;color:inherit;cursor:pointer;transition:opacity .
 
 /* MOSCOT-V3 : character body language + ground shadow — bars only, no face */
 .dx{transform-origin:50% 100%;transition:transform .28s cubic-bezier(.2,.9,.3,1.25)}
-.xslot::after{content:"";position:absolute;left:50%;bottom:-.20em;width:.9em;height:.12em;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.28),rgba(255,255,255,0) 70%);opacity:.35;transition:transform .28s cubic-bezier(.2,.9,.3,1.25),opacity .28s ease;pointer-events:none}
+.xslot::after{content:"";position:absolute;left:50%;bottom:-.20em;width:.9em;height:.12em;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.38),rgba(255,255,255,0) 70%);opacity:.45;transition:transform .28s cubic-bezier(.2,.9,.3,1.25),opacity .28s ease;pointer-events:none}
 .xslot.corner::after{display:none}
 .xslot.v3-leanin .dx{transform:translateY(.04em) rotate(-4deg) scale(1.03,.98)}
 .xslot.v3-leanback .dx{transform:translateY(-.02em) rotate(3deg) scale(.97,1.08)}
@@ -426,7 +426,7 @@ async function dxYawn(){
   await new Promise(function(r){setTimeout(r,750);});
   v3Body(null);
 }
-var dxN=0;
+var dxN=1; /* V3-fix 25 Oct: first cycle (dxN=2) shows glasses, then yawn, then read */
 async function dxLoop(){
   while(true){
     dxN++;
