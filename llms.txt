@@ -1,0 +1,30 @@
+# Aditya X
+
+> Aditya X (dradityax) — first-year MBBS student at Madhubani Medical College, building tools for the journey he is on. Mortui vivos docent.
+> Canonical website: https://dradityax.pages.dev/
+
+## Main
+
+- [Aditya X](https://dradityax.pages.dev/): Homepage — MBBS student, builder, and the arc from student to doctor to entrepreneur, in his own words.
+
+## Projects
+
+- [Project One](https://dradityax.pages.dev/project-1/): Bihar NEET/UGMAC counselling platform — signup, document converter, form practice, and result tracking. Built from a Rs 50,000 counselling experience.
+- [Project One — Document Converter](https://dradityax.pages.dev/project-1/converter/): Document converter for Project One.
+- [Project One — Form Practice](https://dradityax.pages.dev/project-1/form-practice/): Form practice for Project One.
+- [Project One — Signup](https://dradityax.pages.dev/project-1/signup/): Signup for Project One.
+- [Project One — Dashboard](https://dradityax.pages.dev/project-1/dashboard/): Dashboard for Project One.
+- [Project One — Privacy](https://dradityax.pages.dev/project-1/privacy/): Privacy policy for Project One.
+- [Project One — Terms](https://dradityax.pages.dev/project-1/terms/): Terms for Project One.
+- [Project Two](https://dradityax.pages.dev/project-2/): Second website project — interactive anatomy viewer.
+- [Project Two — Skeleton](https://dradityax.pages.dev/project-2/skeleton/): Skeleton viewer demo for Project Two.
+
+## Other pages
+
+- [Glacier](https://dradityax.pages.dev/glacier/): A page on the Aditya X site.
+- [Experience](https://dradityax.pages.dev/experience/): A page on the Aditya X site.
+- [Owl](https://dradityax.pages.dev/owl/): A page on the Aditya X site.
+
+## Optional
+
+- [Sitemap](https://dradityax.pages.dev/sitemap.xml): Machine-readable sitemap for this site.
