@@ -225,7 +225,10 @@ a.sw-card{text-decoration:none;color:inherit;cursor:pointer;transition:opacity .
 .xslot.v3-squash::after{transform:translateX(-50%) scaleX(1.3);opacity:.5}
 .xslot.v3-hop::after{transform:translateX(-50%) scaleX(.8);opacity:.2}
 .xslot.v3-slump::after{transform:translateX(-50%) scaleX(1.25);opacity:.45}
-@media(prefers-reduced-motion:reduce){.dx{transition:none}.xslot::after{display:none}}
+/* MOSCOT-POLISH 26 Oct: breathing idle on the slot wrapper only, so it never fights .dx pose transforms */
+.xslot{transform-origin:50% 100%;animation:moscot-breathe 4s ease-in-out infinite}
+@keyframes moscot-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.005,1.015)}}
+@media(prefers-reduced-motion:reduce){.dx{transition:none}.xslot::after{display:none}.xslot{animation:none}}
 </style></head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
@@ -403,15 +406,15 @@ function dxBlink(){
 function dxGlasses(){
   dxg.classList.add("show");
   return new Promise(function(r){setTimeout(r,700);}).then(dxBlink)
-  .then(function(){return new Promise(function(r){setTimeout(r,2200);});})
+  .then(function(){return new Promise(function(r){setTimeout(r,4000);});})
   .then(function(){dxg.classList.remove("show");return new Promise(function(r){setTimeout(r,450);});});
 }
 async function dxRead(){
   dxb.classList.add("open");
   await new Promise(function(r){setTimeout(r,550);});
   for(var i=0;i<3;i++){
-    await Promise.all([dxSet(dx1,"translateX(-.14em) scaleY(.236)",380),dxSet(dx2,"translateX(.26em) scaleY(.236)",380)]);
-    await Promise.all([dxSet(dx1,"translateX(-.26em) scaleY(.236)",380),dxSet(dx2,"translateX(.14em) scaleY(.236)",380)]);
+    await Promise.all([dxSet(dx1,"translateX(-.14em) scaleY(.236)",550),dxSet(dx2,"translateX(.26em) scaleY(.236)",550)]);
+    await Promise.all([dxSet(dx1,"translateX(-.26em) scaleY(.236)",550),dxSet(dx2,"translateX(.14em) scaleY(.236)",550)]);
   }
   await Promise.all([dxSet(dx1,DX_DOT1,320),dxSet(dx2,DX_DOT2,320)]);
   await new Promise(function(r){setTimeout(r,350);});
@@ -477,6 +480,33 @@ if(dxSlot){
     var r=heroEl.getBoundingClientRect(),fx=(e.clientX-r.left)/r.width;
     if(fx<0.33)v3Body("leanin");else if(fx>0.66)v3Body("leanback");else v3Body(null);
   });}
+  /* MOSCOT-POLISH 26 Oct: cursor eye-shift (dot phase only), scroll reaction, 30s idle slump */
+  (function(){
+    if(reduce)return;
+    var lastAct=Date.now(),idleShown=false,eyeTimer=null,scrollTimer=null,lastY=window.scrollY||0;
+    function poke(){lastAct=Date.now();idleShown=false;}
+    ["mousemove","click","touchstart","keydown"].forEach(function(t){window.addEventListener(t,poke,{passive:true});});
+    if(heroEl){heroEl.addEventListener("mousemove",function(e){
+      if(dxSlot.classList.contains("corner")||document.body.classList.contains("playing")||dxPhase!=="dot")return;
+      var r=heroEl.getBoundingClientRect(),fx=(e.clientX-r.left)/r.width;
+      var a=DX_DOT1,b=DX_DOT2;
+      if(fx<0.33){a="translateX(-.26em) scaleY(.236)";b="translateX(.14em) scaleY(.236)";}
+      else if(fx>0.66){a="translateX(-.14em) scaleY(.236)";b="translateX(.26em) scaleY(.236)";}
+      dxSet(dx1,a,260);dxSet(dx2,b,260);
+      clearTimeout(eyeTimer);eyeTimer=setTimeout(function(){if(dxPhase==="dot"){dxSet(dx1,DX_DOT1,260);dxSet(dx2,DX_DOT2,260);}},800);
+    });}
+    window.addEventListener("scroll",function(){
+      poke();
+      if(dxSlot.classList.contains("corner")||document.body.classList.contains("playing"))return;
+      var y=window.scrollY||0,down=y>lastY;lastY=y;
+      v3Body(down?"slump":"stretch");
+      clearTimeout(scrollTimer);scrollTimer=setTimeout(function(){v3Body(null);},700);
+    },{passive:true});
+    setInterval(function(){
+      if(idleShown||dxPhase!=="dot")return;
+      if(Date.now()-lastAct>30000){idleShown=true;v3Body("slump",2000);}
+    },5000);
+  })();
 }
 setTimeout(function(){if(!reduce)dxLoop();},1500);
 })();
