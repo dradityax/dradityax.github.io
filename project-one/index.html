@@ -201,8 +201,10 @@ function spec(){var p=PRESETS[$("docType").value]; $("specNote").textContent=p.l
 $("docType").addEventListener("change",spec); spec();
 $("convertBtn").addEventListener("click",function(){
   var f=$("docFile").files[0]; if(!f){$("convMsg").textContent="Choose an image first.";return;}
+  if(!f.type||f.type.indexOf("image/")!==0){$("convMsg").textContent="Choose an image file (JPG / PNG), not this file type.";return;}
   var p=PRESETS[$("docType").value];
   var img=new Image(); var url=URL.createObjectURL(f);
+  img.onerror=function(){$("convMsg").textContent="Could not read this image. Try another image file.";};
   img.onload=function(){
     var scale=Math.min(1,p.maxW/img.width,p.maxH/img.height);
     var c=document.createElement("canvas"); c.width=Math.max(1,Math.round(img.width*scale)); c.height=Math.max(1,Math.round(img.height*scale));
@@ -216,6 +218,9 @@ $("convertBtn").addEventListener("click",function(){
   };
   img.src=url;
 });
+
+var botBtn=document.querySelector(".bot");
+if(botBtn)botBtn.onclick=function(){var old=document.getElementById("botToast");if(old)old.remove();var t=document.createElement("div");t.id="botToast";t.textContent="AI assistant coming soon — not connected yet.";t.style.cssText="position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#211d19;color:#fff;padding:12px 16px;border-radius:12px;z-index:99;font-size:.9rem;text-align:center;max-width:90vw";document.body.appendChild(t);setTimeout(function(){t.remove();},3000);};
 
 // ---- v7 REAL PORTAL practice: registration -> login -> dashboard -> 12 steps -> fee ----
 var P={stage:'instr',app:0,cap:'',capStage:'',otp:null,otpExp:0,otpOk:false,eotp:null,eotpOk:false,appno:'',regPw:'',liveCap:false,liveRef:false,vals:{},done:{}};
@@ -312,9 +317,9 @@ var APP=[
  ]},
  {title:'Register Exam & Center Details',fields:[
   {id:'ap_med',label:'Question Paper Medium',type:'select',opts:['English','English + Hindi','English + other regional language'],req:true},
-  {id:'ap_es1',label:'Exam State / City - 1st choice (State)',req:true},{id:'ap_c1',label:'Exam City - 1st choice',type:'select',opts:CITIES,req:true},
-  {id:'ap_es2',label:'Exam State / City - 2nd choice (State)',req:true},{id:'ap_c2',label:'Exam City - 2nd choice',type:'select',opts:CITIES,req:true},
-  {id:'ap_es3',label:'Exam State / City - 3rd choice (State)',req:true},{id:'ap_c3',label:'Exam City - 3rd choice',type:'select',opts:CITIES,req:true},
+  {id:'ap_es1',label:'Exam State - 1st choice',type:'select',opts:['Delhi','Bihar','West Bengal'],req:true},{id:'ap_c1',label:'Exam City - 1st choice',type:'select',opts:CITIES,req:true},
+  {id:'ap_es2',label:'Exam State - 2nd choice',type:'select',opts:['Delhi','Bihar','West Bengal'],req:true},{id:'ap_c2',label:'Exam City - 2nd choice',type:'select',opts:CITIES,req:true},
+  {id:'ap_es3',label:'Exam State - 3rd choice',type:'select',opts:['Delhi','Bihar','West Bengal'],req:true},{id:'ap_c3',label:'Exam City - 3rd choice',type:'select',opts:CITIES,req:true},
   {id:'ap_focc',label:"Father's / Guardian's Occupation",type:'select',opts:OCC,req:true},
   {id:'ap_mocc',label:"Mother's / Guardian's Occupation",type:'select',opts:['','AGRICULTURE','BUSINESS','GOVERNMENT SERVICE','PRIVATE SERVICE','OTHERS (INCLUDING HOUSE WIFE)'],req:true},
   {id:'ap_fqual',label:"Father's / Guardian's Qualification",type:'select',opts:QUAL,req:true},
@@ -375,7 +380,7 @@ function renderPortal(){
     ensureCap('login');
     h=portalHead('Login')+'<div class="pmain"><h3>Login to Access Your Account</h3><p class="note">Enter your Application Number and Password to login and continue with your application.</p><div class="frow"><label>Application Number</label><input id="p_lapp"></div><div class="frow"><label>Password</label><input type="password" id="p_lpw"></div>'+capHTML()+errBox(msg)+saveBtn('Login')+'</div>';
   } else if(P.stage==='dash'){
-    h=portalHead('Status')+'<div class="pmain"><h3>Application Status</h3><table class="ptable"><tr><th>Step</th><th>Status</th></tr>'+SIDE.map(function(t,i){var d=P.done[i];return '<tr><td>'+esc(t)+'</td><td style="color:'+(d?'#166534':'#b45309')+'">'+(d?'✓ Completed':'○ Incomplete')+'</td></tr>';}).join('')+'</table>'+errBox(msg)+'<div style="text-align:right;margin-top:18px"><button class="btn-blue" id="pFill">Fill Up Application Form</button></div></div>';
+    h=portalHead('Status')+'<div class="pmain"><h3>Application Status</h3><table class="ptable"><tr><th>Step</th><th>Status</th></tr>'+SIDE.map(function(t,i){var d=P.done[i];return '<tr><td>'+esc(t)+'</td><td style="color:'+(d?'#166534':'#b45309')+'">'+(d?'✓ Completed':'○ Incomplete')+'</td></tr>';}).join('')+'</table>'+errBox(msg)+'<p class="note">Progress is saved on this device only, so a refresh does not lose it. Nothing is sent anywhere.</p><div style="text-align:right;margin-top:18px"><button class="btn-blue" id="pFill">Fill Up Application Form</button> <button class="ghost" style="width:auto" id="pReset">Start fresh (clear saved practice)</button></div></div>';
   } else if(P.stage==='app'){
     var st=APP[P.app], curIdx=P.app+1;
     ensureCap('app:'+P.app);
@@ -394,13 +399,15 @@ function renderPortal(){
     var all=[];
     REG.forEach(function(f){if(f.id!=='reg_pw'&&f.id!=='reg_cpw'&&f.type!=='check')all.push([f.label,P.vals[f.id]||'']);});
     APP.forEach(function(s){s.fields.forEach(function(f){if(f.type!=='check'&&visible(f))all.push([f.label,P.vals[f.id]||'']);});});
+    all.push(['Live Photograph',P.liveCap?(P.liveRef?'Captured + refreshed':'Captured'):'Not captured']);
+    all.push(['Uploaded Documents',P.done[10]?'All required documents uploaded and validated at the upload step':'Not uploaded yet']);
     h=portalHead('Final Submit')+'<div class="pgrid">'+sideHTML(11)+'<div class="pmain"><h3>Filled Application Form — Review</h3><table class="ptable">'+all.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td></tr>';}).join('')+'</table><label><input type="checkbox" id="p_ver" style="width:auto"> I have verified all the details.</label><br><label><input type="checkbox" id="p_agree" style="width:auto"> I Agree</label>'+errBox(msg)+saveBtn('Final Submission of Application')+'</div></div>';
   } else if(P.stage==='fee'){
-    var fee={'General':1700,'General-EWS':1600,'OBC-NCL':1600,'SC':1000,'ST':1000}[P.vals.ap_cat]||1700;
+    var fee=(P.vals.ap_pwd==='Yes'||P.vals.reg_gender==='Third Gender')?1000:({'General':1700,'General-EWS':1600,'OBC-NCL':1600,'SC':1000,'ST':1000}[P.vals.ap_cat]||1700);
     h=portalHead('Fee')+'<div class="pmain"><h3>Pay Examination Fee</h3><p class="note" style="color:#b91c1c">This Payment Request will be expired within 30 minutes (simulated).</p><table class="ptable"><tr><td>Candidate Name</td><td>'+esc(P.vals.reg_name||'')+'</td></tr><tr><td>Application Number</td><td>'+esc(P.appno)+'</td></tr><tr><td>Fee Amount</td><td>Rs '+fee+'/-</td></tr></table><p><b>Select Payment Provider:</b></p><label><input type="radio" name="prov" value="SBI" checked style="width:auto"> SBI MOPS (Debit / Credit Card / UPI / Net Banking of any bank)</label><br><label><input type="radio" name="prov" value="Canara" style="width:auto"> Canara Bank Payment Gateway</label><br><label><input type="radio" name="prov" value="ICICI" style="width:auto"> ICICI Bank Payment Gateway</label><br><label><input type="radio" name="prov" value="HDFC" style="width:auto"> HDFC Bank Payment Gateway</label><p class="note">Simulated payment — no real money. Real rule: no Confirmation Page = no submission, even if money was deducted.</p>'+errBox(msg)+saveBtn('Proceed for payment')+'</div>';
   } else if(P.stage==='done'){
-    var fee2={'General':1700,'General-EWS':1600,'OBC-NCL':1600,'SC':1000,'ST':1000}[P.vals.ap_cat]||1700;
-    h=portalHead('Confirmation')+'<div class="pmain"><div id="sheet"><h3>Confirmation Page (Practice Only)</h3><table class="ptable"><tr><td>Application Number</td><td>'+esc(P.appno)+' (practice only)</td></tr><tr><td>Candidate Name</td><td>'+esc(P.vals.reg_name||'')+'</td></tr><tr><td>Category</td><td>'+esc(P.vals.ap_cat||'')+'</td></tr><tr><td>Exam Cities</td><td>'+esc([P.vals.ap_c1,P.vals.ap_c2,P.vals.ap_c3].filter(Boolean).join(', '))+'</td></tr><tr><td>Fee Paid (simulated)</td><td>Rs '+fee2+'/-</td></tr><tr><td>Payment</td><td>Simulated — no real money</td></tr></table><p class="note">Real rule: generation of the Confirmation Page is proof of successful submission. Download, save and print sufficient copies.</p></div><div style="text-align:right;margin-top:18px"><button class="btn-blue" id="printBtn">PRINT / SAVE AS PDF (via browser print)</button></div></div>';
+    var fee2=(P.vals.ap_pwd==='Yes'||P.vals.reg_gender==='Third Gender')?1000:({'General':1700,'General-EWS':1600,'OBC-NCL':1600,'SC':1000,'ST':1000}[P.vals.ap_cat]||1700);
+    h=portalHead('Confirmation')+'<div class="pmain"><div id="sheet"><h3>Confirmation Page (Practice Only)</h3><table class="ptable"><tr><td>Application Number</td><td>'+esc(P.appno)+' (practice only)</td></tr><tr><td>Candidate Name</td><td>'+esc(P.vals.reg_name||'')+'</td></tr><tr><td>Category</td><td>'+esc(P.vals.ap_cat||'')+'</td></tr><tr><td>Exam Cities</td><td>'+esc([P.vals.ap_c1,P.vals.ap_c2,P.vals.ap_c3].filter(Boolean).join(', '))+'</td></tr><tr><td>Fee Paid (simulated)</td><td>Rs '+fee2+'/-</td></tr><tr><td>Payment</td><td>Simulated — no real money</td></tr></table><p class="note">Real rule: generation of the Confirmation Page is proof of successful submission. Download, save and print sufficient copies.</p></div><div style="text-align:right;margin-top:18px"><button class="btn-blue" id="printBtn">PRINT / SAVE AS PDF (via browser print)</button> <button class="ghost" style="width:auto" id="pReset2">Start a new practice form</button></div></div>';
   }
   $("portal").innerHTML=h;
   bindCap(); bindSide();
@@ -415,6 +422,9 @@ function renderPortal(){
   if($("pNext"))$("pNext").onclick=nextStage;
   if($("pFill"))$("pFill").onclick=function(){var fi=0;for(var k=0;k<10;k++){if(!P.done[k+1]){fi=k;break;}if(k===9)fi=9;}P.stage='app';P.app=fi;if(fi===9&&P.done[10])P.stage='final';renderPortal();window.scrollTo(0,0);};
   if($("printBtn"))$("printBtn").onclick=function(){window.print();};
+  if($("pReset"))$("pReset").onclick=resetPractice;
+  if($("pReset2"))$("pReset2").onclick=resetPractice;
+  savePractice();
   window.scrollTo(0,0);
 }
 function nextStage(){
@@ -454,7 +464,7 @@ function nextStage(){
       saveFields(st.fields);
       if(!m)m=checkFields(st.fields);
       if(!m&&P.app===3){/* APAAR handled by checkFields */}
-      if(!m&&P.app===4){var cs=[P.vals.ap_c1,P.vals.ap_c2,P.vals.ap_c3].filter(Boolean);if(cs.length!==3||new Set(cs).size!==3)m='Choose 3 different exam cities.';}
+      if(!m&&P.app===4){var cs=[P.vals.ap_c1,P.vals.ap_c2,P.vals.ap_c3].filter(Boolean);if(cs.length!==3||new Set(cs).size!==3)m='Choose 3 different exam cities.';else{var cmap={'Delhi':'Delhi','Patna':'Bihar','Purnea':'Bihar','Araria':'Bihar','Muzaffarpur':'Bihar','Darbhanga':'Bihar','Bhagalpur':'Bihar','Gaya':'Bihar','Siliguri':'West Bengal','Kolkata':'West Bengal'};if(cmap[P.vals.ap_c1]!==P.vals.ap_es1||cmap[P.vals.ap_c2]!==P.vals.ap_es2||cmap[P.vals.ap_c3]!==P.vals.ap_es3)m='Exam City must match its State (Patna -> Bihar, Siliguri -> West Bengal, Delhi -> Delhi).';}}
       if(!m&&P.app===5){var y=parseInt(P.vals.ap_y10,10),now=new Date().getFullYear();if(isNaN(y)||y<1990||y>now)m='Class 10 year must be 1990 to '+now+'.';}
       if(!m&&pv('capIn')!==P.cap)m='CAPTCHA did not match (case sensitive).';
     }
@@ -472,6 +482,10 @@ function nextStage(){
   else if(P.stage==='fee')P.stage='done';
   renderPortal();
 }
+function savePractice(){try{var v={};Object.keys(P.vals).forEach(function(k){if(k!=='reg_pw'&&k!=='reg_cpw')v[k]=P.vals[k];});localStorage.setItem('projectOnePractice',JSON.stringify({stage:P.stage,app:P.app,appno:P.appno,regPw:P.regPw,liveCap:P.liveCap,liveRef:P.liveRef,vals:v,done:P.done}));}catch(e){}}
+function loadPractice(){try{var d=JSON.parse(localStorage.getItem('projectOnePractice')||'null');if(d&&d.stage){P.stage=d.stage;P.app=d.app||0;P.appno=d.appno||'';P.regPw=d.regPw||'';P.liveCap=!!d.liveCap;P.liveRef=!!d.liveRef;P.vals=d.vals||{};P.done=d.done||{};}}catch(e){}}
+function resetPractice(){try{localStorage.removeItem('projectOnePractice');}catch(e){}P.stage='instr';P.app=0;P.appno='';P.regPw='';P.liveCap=false;P.liveRef=false;P.vals={};P.done={};P.cap='';P.capStage='';P.otp=null;P.otpOk=false;renderPortal();window.scrollTo(0,0);}
+loadPractice();
 renderPortal();
 
 var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
