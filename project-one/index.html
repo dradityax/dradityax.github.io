@@ -4,12 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Project One</title>
-<meta name="description" content="Project One">
+<meta name="description" content="Project One — free practice tools for NEET UG, NEET PG, INICET and other competition exams: document converter, real-portal form practice, and personalised counselling.">
+<meta property="og:title" content="Project One">
+<meta property="og:description" content="Project One — free practice tools for NEET UG, NEET PG, INICET and other competition exams: document converter, real-portal form practice, and personalised counselling.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dradityax.pages.dev/project-one/">
 <meta name="keywords" content="NEET UG, NTA registration, NEET form practice, NEET document converter, Bihar NEET counselling">
 <link rel="canonical" href="https://dradityax.pages.dev/project-one/">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#fdf8ee;--card:#fffdf6;--ink:#211d19;--mut:#7a7264;--fine:#a89e8a;--line:#e8ddc8;--acc:#211d19}
+:root{--bg:#fdf8ee;--card:#fffdf6;--ink:#211d19;--mut:#756e60;--fine:#a89e8a;--line:#e8ddc8;--acc:#211d19}
 html,body{background:var(--bg);color:var(--ink);font-family:Quicksand,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;min-height:100%}
 .wrap{max-width:980px;margin:0 auto;padding:calc(44px + env(safe-area-inset-top)) 28px calc(48px + env(safe-area-inset-bottom))}
 .mascot{position:static;margin:0;text-align:left}
@@ -80,7 +84,7 @@ button{font-family:inherit}
 #fpMsg{color:#b91c1c;font-weight:700}
 @media(max-width:560px){.nta-body{display:block}.nta-side{width:auto;border-right:0;border-bottom:1px solid #b8c6d6}}
 .stickybar{position:sticky;top:0;z-index:40;background:#fdf8ee;border-bottom:1px solid #e8ddc8;display:flex;align-items:center;gap:14px;padding:10px 18px}
-.brand{font-weight:700;letter-spacing:3px;font-size:1rem;margin:0}.brand small{display:block;letter-spacing:0;color:#7a7264;font-size:.75rem;font-weight:400}
+.brand{font-weight:700;letter-spacing:3px;font-size:1rem;margin:0}.brand small{display:block;letter-spacing:0;color:#756e60;font-size:.75rem;font-weight:400}
 section.screen{max-width:620px;margin-left:auto;margin-right:auto}#exam.screen,#neetug.screen,#neetpg.screen,#inicet.screen,#other.screen{padding-top:52px}#practice.screen{max-width:980px}
 .portal{background:#fff;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;text-align:left}
 .phead{background:#1e4e79;color:#fff;padding:14px 16px;font-size:.9rem;line-height:1.5}.psmall{font-size:.8rem;opacity:.9}
@@ -218,7 +222,7 @@ var examYear=new Date().getFullYear()+1, cutoff=new Date(examYear-17,11,31);
 function pv(id){var e=$(id);return e?e.value.trim():"";}
 function setV(id){if($(id))P.vals[id]=pv(id);}
 function newCap(){P.cap=Array.from({length:6},function(){return "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[Math.floor(Math.random()*32)];}).join("");return P.cap;}
-function capHTML(){return '<div class="frow"><label>CAPTCHA</label><div><p class="note" style="margin:0 0 6px">Enter CAPTCHA as shown below (case sensitive)</p><input id="capIn" style="max-width:260px"><div style="margin-top:8px"><span class="captext">'+esc(P.cap)+'</span> <button class="ghost" style="width:auto;min-height:36px;padding:6px 12px;display:inline-block;margin:0 0 0 8px" id="capRef">Refresh</button></div></div></div>';}
+function capHTML(){return '<div class="frow"><label>CAPTCHA</label><div><p class="note" style="margin:0 0 6px">Enter CAPTCHA as shown below (case sensitive)</p><input id="capIn" style="max-width:260px"><div style="margin-top:8px"><span class="captext">'+esc(P.cap)+'</span> <button class="ghost" style="width:auto;min-height:44px;padding:10px 12px;display:inline-block;margin:0 0 0 8px" id="capRef">Refresh</button></div></div></div>';}
 function bindCap(){if($("capRef"))$("capRef").onclick=function(){newCap();renderPortal();};}
 function errBox(m){return m?'<p class="perr">STOPPED: '+esc(m)+'</p>':'';}
 function frow(f){
