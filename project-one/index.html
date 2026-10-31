@@ -124,7 +124,7 @@ section.screen{max-width:620px;margin-left:auto;margin-right:auto}#exam.screen,#
 <h2>NEET PG</h2>
 <p class="sub">Coming soon.</p>
 <button class="tile" data-go="converter">Document Converter <small>Coming soon</small></button>
-<button class="tile" data-go="practice">Form Practice <small>Coming soon</small></button>
+<button class="tile" data-go="soon">Form Practice <small>Coming soon</small></button>
 <button class="tile" data-go="counselling">Personalised Counselling <small>Free · Coming soon</small></button>
 <p class="note">PG forms differ from NEET UG. Not copied from NEET UG.</p>
 </section>
@@ -133,7 +133,7 @@ section.screen{max-width:620px;margin-left:auto;margin-right:auto}#exam.screen,#
 <h2>INICET</h2>
 <p class="sub">Coming soon.</p>
 <button class="tile" data-go="converter">Document Converter <small>Coming soon</small></button>
-<button class="tile" data-go="practice">Form Practice <small>Coming soon</small></button>
+<button class="tile" data-go="soon">Form Practice <small>Coming soon</small></button>
 <button class="tile" data-go="counselling">Personalised Counselling <small>Free · Coming soon</small></button>
 <p class="note">INICET forms differ from NEET UG. Not copied from NEET UG.</p>
 </section>
@@ -142,7 +142,7 @@ section.screen{max-width:620px;margin-left:auto;margin-right:auto}#exam.screen,#
 <h2>OTHER EXAMS</h2>
 <p class="sub">Coming soon.</p>
 <button class="tile" data-go="converter">Document Converter <small>Coming soon</small></button>
-<button class="tile" data-go="practice">Form Practice <small>Coming soon</small></button>
+<button class="tile" data-go="soon">Form Practice <small>Coming soon</small></button>
 <button class="tile" data-go="counselling">Personalised Counselling <small>Free · Coming soon</small></button>
 </section>
 
@@ -165,6 +165,12 @@ section.screen{max-width:620px;margin-left:auto;margin-right:auto}#exam.screen,#
 </section>
 
 <section class="screen" id="practice" data-title="Project One" data-desc="Practice the NEET UG form in the real NTA portal layout. Practice only."><div class="portal" id="portal"></div><p class="note" style="text-align:center">Practice only. No real registration, no real payment, no data sent anywhere.</p></section>
+
+<section class="screen" id="soon" data-title="Project One" data-desc="This exam's form practice is coming soon.">
+<h2>COMING SOON</h2>
+<p class="sub">This exam's form practice is coming soon.<br>NEET UG form practice is available now.</p>
+<button class="tile" data-go="exam">Choose your exam <span>→</span></button>
+</section>
 
 <section class="screen" id="counselling" data-title="Project One" data-desc="Personalised counselling, free for every user, coming soon.">
 <h2>COUNSELLING</h2>
@@ -212,18 +218,19 @@ $("convertBtn").addEventListener("click",function(){
 });
 
 // ---- v7 REAL PORTAL practice: registration -> login -> dashboard -> 12 steps -> fee ----
-var P={stage:'instr',app:0,cap:'',otp:null,otpExp:0,otpOk:false,eotp:null,eotpOk:false,appno:'',regPw:'',liveCap:false,liveRef:false,vals:{},done:{}};
+var P={stage:'instr',app:0,cap:'',capStage:'',otp:null,otpExp:0,otpOk:false,eotp:null,eotpOk:false,appno:'',regPw:'',liveCap:false,liveRef:false,vals:{},done:{}};
 var SIDE=["1. Register Contact Details","2. Register Personal Detail","3. Disability Details","4. Register Identity Details","5. Register APAAR ID","6. Register Exam & Center Details","7. Register Qualification Details","8. Register Additional Details","9. Register Emergency Contact Detail","10. Capture Live Photograph","11. Upload Documents","12. Final Submit"];
 var CITIES=["","Delhi","Patna","Purnea","Araria","Siliguri","Kolkata","Muzaffarpur","Darbhanga","Bhagalpur","Gaya"];
 var OCC=["","AGRICULTURE","BUSINESS","GOVERNMENT SERVICE","PRIVATE SERVICE","OTHERS"];
 var QUAL=["","ILLITERATE","BELOW MATRIC","MATRIC","INTERMEDIATE","GRADUATE","POST GRADUATE","DOCTORATE","OTHERS"];
 var INCOME=["","Up to Rs. 1,00,000","Rs. 1,00,001 - 2,00,000","Rs. 2,00,001 - 3,00,000","Rs. 3,00,001 - 4,00,000","Rs. 4,00,001 - 5,00,000","Rs. 5,00,001 - 6,00,000","Rs. 6,00,001 - 8,00,000","Above Rs. 8,00,000"];
-var examYear=new Date().getFullYear()+1, cutoff=new Date(examYear-17,11,31);
+var examYear=2026, cutoff=new Date(examYear-17,11,31);
 function pv(id){var e=$(id);return e?e.value.trim():"";}
 function setV(id){if($(id))P.vals[id]=pv(id);}
+function ensureCap(k){if(P.capStage!==k){newCap();P.capStage=k;}}
 function newCap(){P.cap=Array.from({length:6},function(){return "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[Math.floor(Math.random()*32)];}).join("");return P.cap;}
 function capHTML(){return '<div class="frow"><label>CAPTCHA</label><div><p class="note" style="margin:0 0 6px">Enter CAPTCHA as shown below (case sensitive)</p><input id="capIn" style="max-width:260px"><div style="margin-top:8px"><span class="captext">'+esc(P.cap)+'</span> <button class="ghost" style="width:auto;min-height:44px;padding:10px 12px;display:inline-block;margin:0 0 0 8px" id="capRef">Refresh</button></div></div></div>';}
-function bindCap(){if($("capRef"))$("capRef").onclick=function(){newCap();renderPortal();};}
+function bindCap(){if($("capRef"))$("capRef").onclick=function(){if(P.stage==="reg")saveFields(REG);else if(P.stage==="app")saveFields(APP[P.app].fields);newCap();P.capStage=P.stage==="app"?("app:"+P.app):P.stage;renderPortal();};}
 function errBox(m){return m?'<p class="perr">STOPPED: '+esc(m)+'</p>':'';}
 function frow(f){
   var v=P.vals[f.id]||"";
@@ -255,7 +262,7 @@ function sideHTML(curIdx){
     return '<div class="'+cls+'" data-side="'+i+'">'+esc(t)+mark+'</div>';
   }).join('')+'</div>';
 }
-function bindSide(){document.querySelectorAll("[data-side]").forEach(function(d){d.onclick=function(){var i=+d.getAttribute("data-side");if(P.done[i]||i===0){if(i===0){P.stage='dash';}else if(i===11){P.stage='final';}else{P.stage='app';P.app=i-1;}renderPortal();window.scrollTo(0,0);}};});}
+function bindSide(){document.querySelectorAll("[data-side]").forEach(function(d){d.onclick=function(){if(P.stage==="app")saveFields(APP[P.app].fields);else if(P.stage==="reg")saveFields(REG);var i=+d.getAttribute("data-side");if(P.done[i]||i===0){if(i===0){P.stage='dash';}else if(i===11){P.stage='final';}else{P.stage='app';P.app=i-1;}renderPortal();window.scrollTo(0,0);}};});}
 function portalHead(title){return '<div class="phead"><div><b>NEET (UG) - 2026</b> &nbsp;|&nbsp; Candidate Portal — PRACTICE ONLY, not the real NTA portal</div><div class="psmall">Name: '+(P.vals.reg_name?esc(P.vals.reg_name):'—')+' &nbsp;|&nbsp; Application No.: '+(P.appno?esc(P.appno):'Not generated yet')+'</div></div>';}
 function saveBtn(txt){return '<div style="text-align:right;margin-top:18px"><button class="btn-blue" id="pNext">'+(txt||'Save &amp; Next')+'</button></div>';}
 var REG=[
@@ -357,21 +364,21 @@ function renderPortal(){
   if(P.stage==='instr'){
     h=portalHead('Instructions')+'<div class="pmain"><h3>Instructions and Procedure for Online Submission of Application Form</h3><p class="note">Fee (India): General Rs 1,700 · General-EWS / OBC-NCL Rs 1,600 · SC / ST / PwBD Rs 1,000. Outside India: Rs 9,500. Bank / GST charges extra.</p><p class="note">Three steps: (1) Register for Online Application Form, (2) Complete the Application Form, (3) Pay Examination Fee. Confirmation Page is generated only after successful payment.</p><p class="note">Password: 8-13 characters, at least 1 uppercase, 1 lowercase, 1 number, 1 special (!@#$%^&amp;*-). OTP valid for 10 minutes.</p><label><input type="checkbox" id="p_read" style="width:auto"> I have downloaded the Information Bulletin, read and understood all the instructions.</label>'+errBox(msg)+saveBtn('Click here to Proceed')+'</div>';
   } else if(P.stage==='reg'){
-    newCap();
+    ensureCap('reg');
     h=portalHead('Registration')+'<div class="pmain"><h3>Registration Form</h3><p class="note">Please fill the details exactly as printed on the Class 10th Passing Certificate / Marksheet issued by a recognised Board.</p>'+fieldsHTML(REG)+capHTML()+errBox(msg)+saveBtn('Submit')+'</div>';
   } else if(P.stage==='review'){
     var r=REG.filter(function(f){return f.type!=='check'&&f.id!=='reg_pw'&&f.id!=='reg_cpw';});
-    h=portalHead('Review')+'<div class="pmain"><h3>Review Page - Online Registration Form</h3><div class="popup"><b>Review Page !!</b><br>Please review the details below carefully. To make changes, use your browser back. If everything is correct, click Submit and Send OTP.</div><table class="ptable">'+r.map(function(f){return '<tr><td>'+esc(f.label)+'</td><td>'+esc(P.vals[f.id]||'')+'</td></tr>';}).join('')+'</table><label><input type="checkbox" id="p_decl" style="width:auto"> I have verified all personal details submitted.</label><br><label><input type="checkbox" id="p_decl2" style="width:auto"> I declare that the details are true and correct.</label>'+errBox(msg)+saveBtn('Submit and Send OTP to verify Mobile Number')+'</div>';
+    h=portalHead('Review')+'<div class="pmain"><h3>Review Page - Online Registration Form</h3><div class="popup"><b>Review Page !!</b><br>Please review the details below carefully. Check carefully before submitting. If everything is correct, click Submit and Send OTP.</div><table class="ptable">'+r.map(function(f){return '<tr><td>'+esc(f.label)+'</td><td>'+esc(P.vals[f.id]||'')+'</td></tr>';}).join('')+'</table><label><input type="checkbox" id="p_decl" style="width:auto"> I have verified all personal details submitted.</label><br><label><input type="checkbox" id="p_decl2" style="width:auto"> I declare that the details are true and correct.</label>'+errBox(msg)+saveBtn('Submit and Send OTP to verify Mobile Number')+'</div>';
   } else if(P.stage==='otp'){
     h=portalHead('OTP')+'<div class="pmain"><h3>Mobile Verification</h3><p class="note" id="otpNote"></p><button class="ghost" style="width:auto" id="otpSend">Send OTP (simulated, 10-min validity)</button><div class="frow"><label>Enter OTP</label><input id="p_otp" inputmode="numeric"></div>'+errBox(msg)+saveBtn('Submit Registration Form')+'</div>';
   } else if(P.stage==='login'){
-    newCap();
+    ensureCap('login');
     h=portalHead('Login')+'<div class="pmain"><h3>Login to Access Your Account</h3><p class="note">Enter your Application Number and Password to login and continue with your application.</p><div class="frow"><label>Application Number</label><input id="p_lapp"></div><div class="frow"><label>Password</label><input type="password" id="p_lpw"></div>'+capHTML()+errBox(msg)+saveBtn('Login')+'</div>';
   } else if(P.stage==='dash'){
     h=portalHead('Status')+'<div class="pmain"><h3>Application Status</h3><table class="ptable"><tr><th>Step</th><th>Status</th></tr>'+SIDE.map(function(t,i){var d=P.done[i];return '<tr><td>'+esc(t)+'</td><td style="color:'+(d?'#166534':'#b45309')+'">'+(d?'✓ Completed':'○ Incomplete')+'</td></tr>';}).join('')+'</table>'+errBox(msg)+'<div style="text-align:right;margin-top:18px"><button class="btn-blue" id="pFill">Fill Up Application Form</button></div></div>';
   } else if(P.stage==='app'){
     var st=APP[P.app], curIdx=P.app+1;
-    newCap();
+    ensureCap('app:'+P.app);
     var body='';
     if(P.app===8){
       body='<p class="note">Ensure a light-coloured background with proper lighting, and 80% face visibility (including ears, without a mask). If your device does not support a webcam, scan the QR code on the right with your mobile / tablet.</p><div style="display:flex;gap:16px;flex-wrap:wrap"><div style="flex:1;min-width:220px;border:1px solid #cbd5e1;padding:14px;text-align:center"><p><b>Live Camera</b></p><div style="background:#111;color:#fff;padding:40px 10px;margin:10px 0">'+(P.liveCap?'[ Captured Live Photograph — Preview ]':'[ Camera preview ]')+'</div><button class="ghost" style="width:auto" id="liveCap">Capture Live Photograph</button></div><div style="border:1px solid #cbd5e1;padding:14px;text-align:center"><p><b>QR Code</b></p><div style="background:#f1f5f9;padding:22px;font-size:2rem">▦▦<br>▦▦</div><p class="note">Scan with mobile (simulated)</p><button class="ghost" style="width:auto" id="liveRef">Refresh Captured Photograph</button><p class="note">'+(P.liveRef?'Refreshed ✓':'Not refreshed yet')+'</p></div></div>';
@@ -386,7 +393,7 @@ function renderPortal(){
   } else if(P.stage==='final'){
     var all=[];
     REG.forEach(function(f){if(f.id!=='reg_pw'&&f.id!=='reg_cpw'&&f.type!=='check')all.push([f.label,P.vals[f.id]||'']);});
-    APP.forEach(function(s){s.fields.forEach(function(f){if(f.type!=='check')all.push([f.label,P.vals[f.id]||'']);});});
+    APP.forEach(function(s){s.fields.forEach(function(f){if(f.type!=='check'&&visible(f))all.push([f.label,P.vals[f.id]||'']);});});
     h=portalHead('Final Submit')+'<div class="pgrid">'+sideHTML(11)+'<div class="pmain"><h3>Filled Application Form — Review</h3><table class="ptable">'+all.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td></tr>';}).join('')+'</table><label><input type="checkbox" id="p_ver" style="width:auto"> I have verified all the details.</label><br><label><input type="checkbox" id="p_agree" style="width:auto"> I Agree</label>'+errBox(msg)+saveBtn('Final Submission of Application')+'</div></div>';
   } else if(P.stage==='fee'){
     var fee={'General':1700,'General-EWS':1600,'OBC-NCL':1600,'SC':1000,'ST':1000}[P.vals.ap_cat]||1700;
@@ -406,7 +413,7 @@ function renderPortal(){
   }
   if(P.stage==='otp'&&$("otpSend"))$("otpSend").onclick=function(){P.otp=String(Math.floor(100000+Math.random()*900000));P.otpExp=Date.now()+600000;$("otpNote").textContent='Simulated OTP: '+P.otp+' (valid 10 minutes).';};
   if($("pNext"))$("pNext").onclick=nextStage;
-  if($("pFill"))$("pFill").onclick=function(){P.stage='app';P.app=0;renderPortal();window.scrollTo(0,0);};
+  if($("pFill"))$("pFill").onclick=function(){var fi=0;for(var k=0;k<10;k++){if(!P.done[k+1]){fi=k;break;}if(k===9)fi=9;}P.stage='app';P.app=fi;if(fi===9&&P.done[10])P.stage='final';renderPortal();window.scrollTo(0,0);};
   if($("printBtn"))$("printBtn").onclick=function(){window.print();};
   window.scrollTo(0,0);
 }
@@ -432,7 +439,7 @@ function nextStage(){
     if(!m){P.regPw=pw;}
   }
   if(P.stage==='review'){if(!$("p_decl")||!$("p_decl").checked)m='Tick the verification checkbox.';else if(!$("p_decl2")||!$("p_decl2").checked)m='Tick the declaration checkbox.';}
-  if(P.stage==='otp'){if(!P.otp||Date.now()>P.otpExp)m='OTP expired. Send again.';else if(pv('p_otp')!==P.otp)m='Wrong OTP.';else{P.otpOk=true;P.appno='PRAC-'+String(Date.now()).slice(-8);P.done[0]=true;}}
+  if(P.stage==='otp'){if(!P.otp)m='Send OTP first, then enter it.';else if(Date.now()>P.otpExp)m='OTP expired. Send again.';else if(pv('p_otp')!==P.otp)m='Wrong OTP.';else{P.otpOk=true;P.appno='PRAC-'+String(Date.now()).slice(-8);P.done[0]=true;}}
   if(P.stage==='login'){if(pv('p_lapp')!==P.appno)m='Application Number does not match the generated number.';else if(pv('p_lpw')!==P.regPw)m='Password does not match.';else if(pv('capIn')!==P.cap)m='CAPTCHA did not match (case sensitive).';}
   if(P.stage==='app'){
     var st=APP[P.app];
@@ -454,7 +461,7 @@ function nextStage(){
     if(!m){P.done[P.app+1]=true;}
   }
   if(P.stage==='final'){if(!$("p_ver")||!$("p_ver").checked)m='Tick that you have verified all details.';else if(!$("p_agree")||!$("p_agree").checked)m='Tick I Agree.';else P.done[11]=true;}
-  if(m){P.msg=m;renderPortal();return;}
+  if(m){if(P.stage==='app'&&P.app===9){var e=document.querySelector('.perr');if(!e){e=document.createElement('p');e.className='perr';var pm=document.querySelector('.pmain');if(pm)pm.appendChild(e);}e.textContent='STOPPED: '+m;window.scrollTo(0,0);return;}P.msg=m;renderPortal();return;}
   if(P.stage==='instr')P.stage='reg';
   else if(P.stage==='reg')P.stage='review';
   else if(P.stage==='review')P.stage='otp';
