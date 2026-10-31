@@ -15,7 +15,7 @@ A scroll-vision homepage, with projects and writing growing around it.
 ## Inside
 
 - `/` — homepage (scroll vision)
-- `/project-1/` — Project One, a Bihar NEET / UGMAC counselling platform (landing, converter, form practice, signup, dashboard)
+- `/project-one/` — Project One, a Bihar NEET / UGMAC counselling platform (landing, converter, form practice, signup, dashboard)
 - `/x-moscot/` — the X mascot
 - `/assets/` — images and site assets
 
