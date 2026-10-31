@@ -243,6 +243,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const $ = id => document.getElementById(id);
 const PER_PATIENT_MIN = 10, OTP_CODE = '4821';
@@ -317,31 +318,21 @@ function applyLang(){
 $('langEn').onclick = ()=>{ lang='en'; applyLang(); };
 $('langHi').onclick = ()=>{ lang='hi'; applyLang(); };
 
-/* ---------- backend-style data ---------- */
-const HOSPITALS = [
-  {id:'hA', name:'Hospital A', doctors:['Doctor 1','Doctor 2']},
-  {id:'hB', name:'Hospital B', doctors:['Doctor 3']},
-];
-let staff = [
-  {name:'Owner',        phone:'9876500001', role:'owner',        hospital:'hA'},
-  {name:'Doctor 1',     phone:'9876500002', role:'doctor',       hospital:'hA'},
-  {name:'Doctor 2',     phone:'9876500003', role:'doctor',       hospital:'hA'},
-  {name:'Receptionist', phone:'9876500004', role:'receptionist', hospital:'hA'},
-  {name:'Doctor 3',     phone:'9876500005', role:'doctor',       hospital:'hB'},
-];
-let tokens = [
-  {no:12, name:'Ramesh Kumar',  phone:'98••••••21', hospital:'hA', doc:'Doctor 1', status:'serving'},
-  {no:13, name:'Sunita Devi',   phone:'98••••••45', hospital:'hA', doc:'Doctor 1', status:'waiting', arrived:true},
-  {no:14, name:'Mohd. Imran',   phone:'98••••••67', hospital:'hA', doc:'Doctor 1', status:'waiting', arrived:true},
-  {no:15, name:'Anjali Kumari', phone:'98••••••89', hospital:'hA', doc:'Doctor 1', status:'waiting', arrived:false},
-  {no:16, name:'Vikash Singh',  phone:'98••••••10', hospital:'hA', doc:'Doctor 1', status:'waiting', arrived:true},
-  {no:8,  name:'Pooja Sharma',  phone:'98••••••33', hospital:'hA', doc:'Doctor 2', status:'serving'},
-  {no:9,  name:'Amit Verma',    phone:'98••••••44', hospital:'hA', doc:'Doctor 2', status:'waiting', arrived:true},
-  {no:21, name:'Farhan Khan',   phone:'98••••••55', hospital:'hB', doc:'Doctor 3', status:'serving'},
-];
+/* ---------- Supabase backend (shared, realtime) ---------- */
+const SUPABASE_URL = 'https://jvipsjrqvorgwiznlqyf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aXBzanJxdm9yZ3dpem5scXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0NjI3NjEsImV4cCI6MjEwOTAzODc2MX0.JWdZics02JoiP6nzufQi0z_WUskv3immeLcC6jBlOb8';
+const sb = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+/* local caches, mapped to the page's existing shapes */
+let HOSPITALS = [];
+let DOCTORS = [];
+let staff = [];
+let tokens = [];
 let myToken = null, currentStaff = null, toastT = null;
 const hospName = id => (HOSPITALS.find(h=>h.id===id)||{}).name || id;
 const docsOf = hid => (HOSPITALS.find(h=>h.id===hid)||{doctors:[]}).doctors;
+const doctorIdByName = (hid, name) => (DOCTORS.find(d=>d.hospital_id===hid && d.name===name)||{}).id || null;
+const doctorNameById = id => (DOCTORS.find(d=>d.id===id)||{}).name || '';
 const statusLabel = s => ({serving:t('sServing'), waiting:t('sWaiting'), hold:t('sHold'), cancelled:t('sCancelled'), done:t('sDone')}[s] || s);
 const badge = s => 'badge b-' + (s==='serving'?'serving':s==='waiting'?'wait':s==='hold'?'hold':s==='cancelled'?'cancel':'done');
 const validPhone = p => /^[6-9]\d{9}$/.test(p.trim());
@@ -353,7 +344,46 @@ function toast(msg){
 function servingForDoc(doc){ return tokens.find(x=>x.doc===doc && x.status==='serving') || null; }
 function tokensForDoc(doc){ return tokens.filter(x=>x.doc===doc).sort((a,b)=>a.no-b.no); }
 function tokensForHosp(hid){ return tokens.filter(x=>x.hospital===hid).sort((a,b)=>a.no-b.no); }
-function nextNoForDoc(doc){ const ns = tokensForDoc(doc).map(x=>x.no); return ns.length ? Math.max(...ns)+1 : 1; }
+function mapToken(row){
+  return {id:row.id, no:row.token_no, name:row.patient_name, phone:row.phone, hospital:row.hospital_id, doctor_id:row.doctor_id, doc:doctorNameById(row.doctor_id), status:row.status, arrived:!!row.arrived};
+}
+function mapStaff(row){
+  return {id:row.id, name:row.name, phone:row.phone, role:row.role, hospital:row.hospital_id, doctor_id:row.doctor_id};
+}
+async function loadReference(){
+  if (!sb) return;
+  const [h, d, s] = await Promise.all([
+    sb.from('hospitals').select('id,name').order('name'),
+    sb.from('doctors').select('id,hospital_id,name,dept,fee,slot,active').order('name'),
+    sb.from('staff').select('id,hospital_id,doctor_id,role,name,phone').order('name'),
+  ]);
+  if (d.data) DOCTORS = d.data.filter(x=>x.active !== false);
+  if (h.data) HOSPITALS = h.data.map(x=>({id:x.id, name:x.name, doctors:DOCTORS.filter(dd=>dd.hospital_id===x.id).map(dd=>dd.name)}));
+  if (s.data) staff = s.data.map(mapStaff);
+}
+async function loadStaff(){
+  if (!sb) return;
+  const { data } = await sb.from('staff').select('id,hospital_id,doctor_id,role,name,phone').order('name');
+  if (data) staff = data.map(mapStaff);
+}
+async function loadTokens(){
+  if (!sb) return;
+  const { data } = await sb.from('tokens').select('id,hospital_id,doctor_id,token_no,patient_name,phone,status,eta_minutes,arrived,created_at,updated_at').order('token_no');
+  if (data) tokens = data.map(mapToken);
+}
+async function nextNoForDocId(doctorId){
+  if (!sb) return 1;
+  const { data } = await sb.from('tokens').select('token_no').eq('doctor_id', doctorId).order('token_no', {ascending:false}).limit(1);
+  return (data && data[0] ? data[0].token_no : 0) + 1;
+}
+function subscribeRealtime(){
+  if (!sb) return;
+  sb.channel('project-two-queue')
+    .on('postgres_changes', {event:'*', schema:'public', table:'tokens'}, async ()=>{ await loadTokens(); renderAll(); })
+    .on('postgres_changes', {event:'*', schema:'public', table:'staff'}, async ()=>{ await loadStaff(); renderAll(); })
+    .on('postgres_changes', {event:'*', schema:'public', table:'doctors'}, async ()=>{ await loadReference(); populateHospitals(); renderAll(); })
+    .subscribe();
+}
 
 function populateHospitals(){
   $('pHosp').innerHTML = HOSPITALS.map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
@@ -370,6 +400,7 @@ function showView(id){
   $(id).classList.add('on');
   $('staffTopBtn').textContent = (id==='v-patient') ? t('staffLogin') : t('patientView');
   renderAll();
+  if (sb) loadTokens().then(()=>renderAll());
 }
 $('staffTopBtn').onclick = ()=>{
   const cur = document.querySelector('.view.on');
@@ -384,12 +415,12 @@ function staffListHTML(hid){
     <span class="badge b-done">${s.role==='doctor'?t('roleDoctor'):s.role==='receptionist'?t('roleRec'):t('roleOwner')}</span></div>`).join('');
 }
 function tokenRowHTML(x, actions){
-  return `<div class="row"><div><b>#${x.no} · ${x.name}</b><br><span>${x.phone} · ${x.doc}</span></div>
+  return `<div class="row"><div><b>#${x.no} · ${x.name}</b><br><span>${mask(x.phone)} · ${x.doc}</span></div>
     <span class="${badge(x.status)}">${statusLabel(x.status)}</span></div>` +
     (actions ? `<div class="actions">
-      <button onclick="markArrived(${x.no},'${x.doc}')" ${x.status!=='waiting'?'disabled':''}>${t('arrivedBtn')}</button>
-      <button onclick="holdToken(${x.no})" ${x.status!=='waiting'&&x.status!=='serving'?'disabled':''}>${t('holdBtnSm')}</button>
-      <button onclick="cancelToken(${x.no})" ${x.status==='done'||x.status==='cancelled'?'disabled':''}>${t('cancelBtn')}</button>
+      <button onclick="markArrived('${x.id}')" ${x.status!=='waiting'?'disabled':''}>${t('arrivedBtn')}</button>
+      <button onclick="holdToken('${x.id}')" ${x.status!=='waiting'&&x.status!=='serving'?'disabled':''}>${t('holdBtnSm')}</button>
+      <button onclick="cancelToken('${x.id}')" ${x.status==='done'||x.status==='cancelled'?'disabled':''}>${t('cancelBtn')}</button>
     </div>` : '');
 }
 
@@ -398,7 +429,7 @@ function renderAll(){
   if (myToken){
     const s = servingForDoc(myToken.doc);
     $('liveNow').textContent = s ? s.no : '—';
-    const mine = tokens.find(x=>x.no===myToken.no && x.doc===myToken.doc);
+    const mine = tokens.find(x=>x.id===myToken.id);
     const ahead = tokens.filter(x=>x.doc===myToken.doc && (x.status==='waiting'||x.status==='serving') && x.no < myToken.no).length;
     $('liveAhead').innerHTML = mine && mine.status==='serving'
       ? '<b>' + t('yourTurn') + '</b>'
@@ -418,7 +449,7 @@ function renderAll(){
   if (currentStaff && currentStaff.role==='doctor'){
     const doc = currentStaff.name, s = servingForDoc(doc);
     $('docNow').textContent = s ? s.no : '—';
-    $('docName').textContent = s ? s.name + ' · ' + s.phone : '';
+    $('docName').textContent = s ? s.name + ' · ' + mask(s.phone) : '';
     $('docAll').innerHTML = tokensForDoc(doc).map(x=>tokenRowHTML(x, true)).join('') || '<p style="padding:.6rem 0">' + t('empty') + '</p>';
     $('docStaffList').innerHTML = staffListHTML(currentStaff.hospital);
   }
@@ -450,12 +481,22 @@ $('sendOtpBtn').onclick = ()=>{
   $('otpBox').style.display='block'; $('sendOtpBtn').disabled = true;
   $('pOtp').focus();
 };
-$('verifyBtn').onclick = ()=>{
+$('verifyBtn').onclick = async ()=>{
   if ($('pOtp').value.trim() !== OTP_CODE){ $('otpErr').classList.add('show'); return; }
   $('otpErr').classList.remove('show');
   const hid = $('pHosp').value, doc = $('pDoc').value;
-  const tk = {no:nextNoForDoc(doc), name:$('pName').value.trim(), phone:mask($('pPhone').value.trim()), hospital:hid, doc:doc, status:'waiting', arrived:true};
-  tokens.push(tk); myToken = tk;
+  const doctorId = doctorIdByName(hid, doc);
+  if (!sb || !doctorId){ $('pErr').classList.add('show'); return; }
+  const phone = $('pPhone').value.trim();
+  const { data: existing } = await sb.from('tokens').select('id').eq('doctor_id', doctorId).eq('phone', phone).in('status', ['waiting','serving','hold']).limit(1);
+  if (existing && existing.length){ $('pErr').classList.add('show'); return; }
+  const no = await nextNoForDocId(doctorId);
+  const now = new Date().toISOString();
+  const { data: inserted, error } = await sb.from('tokens').insert({hospital_id:hid, doctor_id:doctorId, token_no:no, patient_name:$('pName').value.trim(), phone:phone, status:'waiting', eta_minutes:0, arrived:true, created_at:now, updated_at:now}).select().single();
+  if (error || !inserted){ $('pErr').classList.add('show'); return; }
+  const tk = mapToken(inserted);
+  myToken = tk;
+  await loadTokens();
   $('myNo').textContent = tk.no; $('myName').textContent = tk.name; $('myHospDoc').textContent = hospName(hid) + ' · ' + doc;
   const ahead = tokens.filter(x=>x.doc===doc && (x.status==='waiting'||x.status==='serving') && x.no < tk.no).length;
   $('myEta').textContent = '~' + (ahead*PER_PATIENT_MIN) + ' min';
@@ -465,18 +506,22 @@ $('verifyBtn').onclick = ()=>{
 $('toQueueBtn').onclick = ()=>{ $('confirmCard').style.display='none'; $('liveCard').style.display='block'; renderAll(); };
 
 /* ---------- staff login: phone identifies you, no role picker ---------- */
-$('sSendOtpBtn').onclick = ()=>{
+$('sSendOtpBtn').onclick = async ()=>{
   if (!validPhone($('sPhone').value)){ $('sErr').classList.add('show'); return; }
   $('sErr').classList.remove('show'); $('sNotReg').classList.remove('show');
-  const found = staff.find(s=>s.phone===$('sPhone').value.trim());
+  if (!sb){ $('sNotReg').classList.add('show'); return; }
+  const { data: found } = await sb.from('staff').select('id,hospital_id,doctor_id,role,name,phone').eq('phone', $('sPhone').value.trim()).maybeSingle();
   if (!found){ $('sNotReg').classList.add('show'); return; }
   $('sOtpBox').style.display='block'; $('sSendOtpBtn').disabled = true;
   $('sOtp').focus();
 };
-$('sVerifyBtn').onclick = ()=>{
+$('sVerifyBtn').onclick = async ()=>{
   if ($('sOtp').value.trim() !== OTP_CODE){ $('sOtpErr').classList.add('show'); return; }
   $('sOtpErr').classList.remove('show');
-  currentStaff = staff.find(s=>s.phone===$('sPhone').value.trim());
+  if (!sb){ $('sNotReg').classList.add('show'); return; }
+  const { data: found } = await sb.from('staff').select('id,hospital_id,doctor_id,role,name,phone').eq('phone', $('sPhone').value.trim()).maybeSingle();
+  if (!found){ $('sNotReg').classList.add('show'); return; }
+  currentStaff = mapStaff(found);
   const roleView = {receptionist:'v-reception', doctor:'v-doctor', owner:'v-owner'}[currentStaff.role];
   showView(roleView);
   const rName = currentStaff.role==='doctor'?t('roleDoctor'):currentStaff.role==='receptionist'?t('roleRec'):t('roleOwner');
@@ -484,54 +529,97 @@ $('sVerifyBtn').onclick = ()=>{
 };
 
 /* ---------- queue actions ---------- */
-$('walkBtn').onclick = ()=>{
+$('walkBtn').onclick = async ()=>{
   if (!$('wName').value.trim() || !validPhone($('wPhone').value)){ $('wErr').classList.add('show'); return; }
   $('wErr').classList.remove('show');
   const doc = $('wDoc').value;
-  const tk = {no:nextNoForDoc(doc), name:$('wName').value.trim(), phone:mask($('wPhone').value.trim()), hospital:currentStaff.hospital, doc:doc, status:'waiting', arrived:true};
-  tokens.push(tk); $('wName').value=''; $('wPhone').value='';
-  renderAll(); toast(t('tWalk').replace('{n}', tk.no));
+  const doctorId = doctorIdByName(currentStaff.hospital, doc);
+  if (!sb || !doctorId){ $('wErr').classList.add('show'); return; }
+  const phone = $('wPhone').value.trim();
+  const { data: existing } = await sb.from('tokens').select('id').eq('doctor_id', doctorId).eq('phone', phone).in('status', ['waiting','serving','hold']).limit(1);
+  if (existing && existing.length){ $('wErr').classList.add('show'); return; }
+  const no = await nextNoForDocId(doctorId);
+  const now = new Date().toISOString();
+  const { data: inserted, error } = await sb.from('tokens').insert({hospital_id:currentStaff.hospital, doctor_id:doctorId, token_no:no, patient_name:$('wName').value.trim(), phone:phone, status:'waiting', eta_minutes:0, arrived:true, created_at:now, updated_at:now}).select().single();
+  if (error || !inserted){ $('wErr').classList.add('show'); return; }
+  $('wName').value=''; $('wPhone').value='';
+  await loadTokens();
+  renderAll(); toast(t('tWalk').replace('{n}', no));
 };
 $('searchBox').addEventListener('input', renderAll);
-function markArrived(no){
-  const x = tokens.find(y=>y.no===no); if(x){ x.arrived = true; renderAll(); toast(t('tArrived').replace('{n}', no)); }
+async function markArrived(id){
+  const x = tokens.find(y=>y.id===id); if(!x || !sb) return;
+  await sb.from('tokens').update({arrived:true, updated_at:new Date().toISOString()}).eq('id', id);
+  await loadTokens(); renderAll(); toast(t('tArrived').replace('{n}', x.no));
 }
-function holdToken(no){
-  const x = tokens.find(y=>y.no===no); if(!x) return;
-  if (x.status==='serving'){ x.status='hold'; nextPatient(x.doc, true); }
-  else x.status='hold';
-  renderAll(); toast(t('tHold').replace('{n}', no));
+async function holdToken(id){
+  const x = tokens.find(y=>y.id===id); if(!x || !sb) return;
+  const wasServing = x.status==='serving';
+  await sb.from('tokens').update({status:'hold', updated_at:new Date().toISOString()}).eq('id', id);
+  await loadTokens();
+  if (wasServing) await nextPatient(x.doctor_id, x.doc, true);
+  else renderAll();
+  toast(t('tHold').replace('{n}', x.no));
 }
-function cancelToken(no){
-  const x = tokens.find(y=>y.no===no); if(x){ x.status='cancelled'; renderAll(); toast(t('tCancel').replace('{n}', no)); }
+async function cancelToken(id){
+  const x = tokens.find(y=>y.id===id); if(!x || !sb) return;
+  await sb.from('tokens').update({status:'cancelled', updated_at:new Date().toISOString()}).eq('id', id);
+  await loadTokens(); renderAll(); toast(t('tCancel').replace('{n}', x.no));
 }
-function nextPatient(doc, fromHold){
-  const cur = servingForDoc(doc);
-  if (cur && !fromHold) cur.status='done';
-  while (true){
-    const nxt = tokensForDoc(doc).filter(x=>x.status==='waiting').sort((a,b)=>a.no-b.no)[0];
-    if (!nxt) break;
-    if (nxt.arrived){ nxt.status='serving'; break; }
-    nxt.status='cancelled';
-    toast(t('tAuto').replace('{n}', nxt.no));
+async function nextPatient(doctorId, doctorName, fromHold){
+  if (!sb) return;
+  const { data: serving } = await sb.from('tokens').select('id').eq('doctor_id', doctorId).eq('status', 'serving').limit(1);
+  if (serving && serving[0] && !fromHold){
+    await sb.from('tokens').update({status:'done', updated_at:new Date().toISOString()}).eq('id', serving[0].id);
   }
-  renderAll();
+  while (true){
+    const { data: waiting } = await sb.from('tokens').select('id,token_no,arrived').eq('doctor_id', doctorId).eq('status', 'waiting').order('token_no', {ascending:true}).limit(1);
+    if (!waiting || !waiting[0]) break;
+    const nxt = waiting[0];
+    if (nxt.arrived){
+      await sb.from('tokens').update({status:'serving', updated_at:new Date().toISOString()}).eq('id', nxt.id);
+      break;
+    }
+    await sb.from('tokens').update({status:'cancelled', updated_at:new Date().toISOString()}).eq('id', nxt.id);
+    toast(t('tAuto').replace('{n}', nxt.token_no));
+  }
+  await loadTokens(); renderAll();
 }
-$('nextBtn').onclick = ()=>{ if (currentStaff) { nextPatient(currentStaff.name, false); toast(t('tNext')); } };
-$('holdBtn').onclick = ()=>{ if (currentStaff){ const s = servingForDoc(currentStaff.name); if (s) holdToken(s.no); } };
+$('nextBtn').onclick = async ()=>{ if (currentStaff){ const doctorId = doctorIdByName(currentStaff.hospital, currentStaff.name); if (doctorId) await nextPatient(doctorId, currentStaff.name, false); toast(t('tNext')); } };
+$('holdBtn').onclick = async ()=>{ if (currentStaff){ const s = servingForDoc(currentStaff.name); if (s) await holdToken(s.id); } };
 
 /* ---------- staff management: owner & doctor only ---------- */
-function addStaff(nameEl, phoneEl, roleEl){
+async function addStaff(nameEl, phoneEl, roleEl){
   const name = $(nameEl).value.trim(), phone = $(phoneEl).value.trim(), role = $(roleEl).value;
   if (!name || !validPhone(phone)) { toast(t('phoneErr')); return; }
-  staff.push({name:name, phone:phone, role:role, hospital:currentStaff.hospital});
+  if (!sb) { toast(t('phoneErr')); return; }
+  const { data: dup } = await sb.from('staff').select('id').eq('phone', phone).limit(1);
+  if (dup && dup.length){ toast(t('phoneErr')); return; }
+  const hospitalId = currentStaff.hospital;
+  if (role === 'doctor'){
+    const { data: docRow, error: docErr } = await sb.from('doctors').insert({hospital_id:hospitalId, name:name, dept:'General', fee:300, slot:'10:00 – 1:00', active:true}).select().single();
+    if (docErr || !docRow){ toast(t('phoneErr')); return; }
+    const { error: staffErr } = await sb.from('staff').insert({hospital_id:hospitalId, doctor_id:docRow.id, role:'doctor', name:name, phone:phone});
+    if (staffErr){ toast(t('phoneErr')); return; }
+    await loadReference();
+    populateHospitals();
+  } else {
+    const { error: staffErr } = await sb.from('staff').insert({hospital_id:hospitalId, doctor_id:null, role:'receptionist', name:name, phone:phone});
+    if (staffErr){ toast(t('phoneErr')); return; }
+    await loadStaff();
+  }
   $(nameEl).value=''; $(phoneEl).value='';
   renderAll(); toast(t('tStaff').replace('{n}', name));
 }
 $('osAddBtn').onclick = ()=> addStaff('osName','osPhone','osRole');
 $('dsAddBtn').onclick = ()=> addStaff('dsName','dsPhone','dsRole');
 
-applyLang();
+(async function init(){
+  await loadReference();
+  await loadTokens();
+  subscribeRealtime();
+  applyLang();
+})();
 </script>
 </body>
 </html>
